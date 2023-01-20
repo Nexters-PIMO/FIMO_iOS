@@ -1,0 +1,11 @@
+disabled_rules:
+- trailing_whitespace
+- identifier_name
+- type_name
+- force_cast
+- force_unwrapping
+- shorthand_operator
+- line_length
+
+excluded:
+- Tuist/
