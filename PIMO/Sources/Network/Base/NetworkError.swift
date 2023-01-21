@@ -12,7 +12,7 @@ import Alamofire
 
 struct NetworkError: Error {
     var initialError: AFError?
-    let errorType: NetworkErrorType
+    let errorType: NetworkErrorType?
 }
 
 enum NetworkErrorType {
@@ -27,6 +27,8 @@ extension NetworkError: LocalizedError {
             return "토큰이 만료됐습니다."
         case .nilValue:
             return "값이 존재하지 않습니다."
+        default:
+            return initialError?.localizedDescription ?? "알 수 없는 에러입니다."
         }
     }
 }
