@@ -5,7 +5,9 @@ disabled_rules:
 - force_cast
 - force_unwrapping
 - shorthand_operator
-- line_length
+
+force_cast: warning
+line_length: 140
 
 excluded:
 - Tuist/

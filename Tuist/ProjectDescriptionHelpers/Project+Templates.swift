@@ -1,9 +1,11 @@
 import ProjectDescription
 
 extension Project {
-    public static func app(name: String,
-                           platform: Platform,
-                           dependencies: [TargetDependency] = [])
+    public static func app(
+        name: String,
+        platform: Platform,
+        dependencies: [TargetDependency] = [])
+    
     -> Project {
         
         let mainTarget = Target(
@@ -17,7 +19,7 @@ extension Project {
             scripts: [.SwiftLintShell],
             dependencies: dependencies
         )
-
+        
         let testTarget = Target(
             name: "\(name)Tests",
             platform: platform,
@@ -27,12 +29,13 @@ extension Project {
             sources: ["\(name)/Tests/**"],
             dependencies: [
                 .target(name: "\(name)")
-        ])
+            ])
         
         let targets: [Target] = [mainTarget, testTarget]
         
-        return Project(name: name,
-                       organizationName: Environment.organizationName,
-                       targets: targets)
+        return Project(
+            name: name,
+            organizationName: Environment.organizationName,
+            targets: targets)
     }
 }
