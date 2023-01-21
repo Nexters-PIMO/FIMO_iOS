@@ -1,5 +1,5 @@
 //
-//  LoginStore.swift
+//  HomeStore.swift
 //  PIMO
 //
 //  Created by Ok Hyeon Kim on 2023/01/21.
@@ -10,4 +10,4 @@ import Foundation
 
 import ComposableArchitecture
 
-struct LoginStore { }
+struct HomeStore { }

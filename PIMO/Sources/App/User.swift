@@ -21,7 +21,7 @@ class User: ObservableObject {
     private let encoder = JSONEncoder()
 
     @Published open var status: User.Status = .unAuthenticated
-    open private(set) var memberToken: MemberToken? = nil
+    open private(set) var memberToken: MemberToken?
 
     private init() {
         if checkHasToken() {
