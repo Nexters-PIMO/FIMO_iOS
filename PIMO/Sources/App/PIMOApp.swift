@@ -9,10 +9,10 @@ struct PIMOApp: App {
         WindowGroup {
             Group {
                 switch user.status {
-                    case .unAuthenticated:
-                        LoginView()
-                    case .authenticated:
-                        HomeView()
+                case .unAuthenticated:
+                    LoginView()
+                case .authenticated:
+                    HomeView()
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: .tokenExpired)) { _ in
