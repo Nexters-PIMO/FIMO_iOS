@@ -41,6 +41,5 @@ struct BaseNetworkImpl: BaseNetwork {
                 return value
             })
             .eraseToAnyPublisher()
-
     }
 }

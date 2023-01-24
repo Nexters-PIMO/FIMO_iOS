@@ -27,7 +27,7 @@ enum HTTPFields: String, CustomStringConvertible {
     case accept = "Accept"
     case authorization = "Authorization"
 
-    public var description: String {
+    var description: String {
         return self.rawValue
     }
 }

@@ -14,7 +14,7 @@ class User: ObservableObject {
         case authenticated
     }
 
-    static var shared = User()
+    static let shared = User()
 
     private let userDefaults = UserDefaults.standard
     private let decoder = JSONDecoder()
