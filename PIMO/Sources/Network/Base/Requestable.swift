@@ -13,7 +13,6 @@ import Alamofire
 protocol Requestable: URLRequestConvertible {
     associatedtype Response: Decodable
     var path: String { get }
-    var baseURL: String { get }
     var method: HTTPMethod { get }
     var parameters: Parameters { get }
 }
@@ -23,6 +22,10 @@ extension Requestable {
         return [
             HTTPFields.contentType: HTTPHeaderType.contentType.header
         ]
+    }
+
+    var baseURL: String {
+        return ""
     }
 
     func asURLRequest() throws -> URLRequest {

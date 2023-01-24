@@ -16,11 +16,7 @@ struct AppleLoginRequest: Requestable {
     var path: String {
         return "/"
     }
-
-    var baseURL: String {
-        NetworkEnvironment.baseURL
-    }
-
+    
     var method: Alamofire.HTTPMethod {
         return .post
     }
