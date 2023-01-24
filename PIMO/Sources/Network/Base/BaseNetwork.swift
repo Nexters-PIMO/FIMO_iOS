@@ -7,9 +7,9 @@
 //
 
 import Foundation
+import Combine
 
 import Alamofire
-import Combine
 
 protocol BaseNetwork {
     func request<API: Requestable>(api: API, isInterceptive: Bool) -> AnyPublisher<API.Response, Error>

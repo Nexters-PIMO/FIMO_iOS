@@ -20,8 +20,8 @@ class User: ObservableObject {
     private let decoder = JSONDecoder()
     private let encoder = JSONEncoder()
 
-    @Published open var status: User.Status = .unAuthenticated
-    open private(set) var memberToken: MemberToken?
+    @Published open private(set) var status: User.Status = .unAuthenticated
+    private(set) var memberToken: MemberToken?
 
     private init() {
         if checkHasToken() {
@@ -29,6 +29,14 @@ class User: ObservableObject {
         } else {
             status = .unAuthenticated
         }
+    }
+
+    open func setAuthenticatedStatus() {
+        status = .authenticated
+    }
+
+    open func setUnauthenticatedStatus() {
+        status = .unAuthenticated
     }
 }
 
