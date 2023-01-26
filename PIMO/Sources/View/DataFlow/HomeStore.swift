@@ -10,4 +10,14 @@ import Foundation
 
 import ComposableArchitecture
 
-struct HomeStore { }
+struct HomeState: Equatable { }
+
+enum HomeAction: Equatable { }
+
+struct HomeEnvironment {
+    let homeService: HomeServiceInterface
+}
+
+let homeReducer = AnyReducer<HomeState, HomeAction, HomeEnvironment> { state, action, environment in
+    return
+}
