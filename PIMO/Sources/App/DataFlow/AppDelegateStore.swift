@@ -16,9 +16,7 @@ enum AppDelegateAction: Equatable {
     case onLaunchFinish
 }
 
-struct AppDelegateEnvironment {
-    let userClient: UserClient
-}
+struct AppDelegateEnvironment { }
 
 let appDelegateReducer = AnyReducer<AppDelegateState, AppDelegateAction, AppDelegateEnvironment>.combine([
     AnyReducer<AppDelegateState, AppDelegateAction, AppDelegateEnvironment> { _, action, _ in

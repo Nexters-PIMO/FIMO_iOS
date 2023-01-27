@@ -44,8 +44,8 @@ let appReducer = AnyReducer<AppState, AppAction, AppEnvironment>.combine([
     appDelegateReducer.pullback(
         state: \AppState.appDelegateState,
         action: /AppAction.appDelegate,
-        environment: {
-            .init(userClient: $0.userClient)
+        environment: { _ in
+            .init()
         }),
     homeReducer.pullback(
         state: \AppState.homeState,
