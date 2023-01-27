@@ -1,14 +1,17 @@
 import SwiftUI
 
+import ComposableArchitecture
+
 @main
 struct PIMOApp: App {
-    @StateObject private var user = User.shared
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
-    #warning("TCA 방식 추후 적용")
     var body: some Scene {
         WindowGroup {
-            Group {
-                switch user.status {
+            WithViewStore(
+                appDelegate.store.scope(state: \.userState.status)
+            ) { viewStore in
+                switch viewStore.state {
                 case .unAuthenticated:
                     LoginView()
                 case .authenticated:
