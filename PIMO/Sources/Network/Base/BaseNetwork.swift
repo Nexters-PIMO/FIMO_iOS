@@ -11,16 +11,18 @@ import Combine
 
 import Alamofire
 
-protocol BaseNetwork {
+protocol BaseNetworkInterface {
     func request<API: Requestable>(api: API, isInterceptive: Bool) -> AnyPublisher<API.Response, Error>
 }
 
-struct BaseNetworkImpl: BaseNetwork {
+struct BaseNetwork: BaseNetworkInterface {
     private let decoder = JSONDecoder()
     private let session: Session
     private let interceptorAuthenticator: RequestInterceptor
 
-    init(interceptorAuthenticator: RequestInterceptor = InterceptorAuthenticator()) {
+    static let shared: BaseNetworkInterface = BaseNetwork()
+
+    private init(interceptorAuthenticator: RequestInterceptor = InterceptorAuthenticator()) {
         self.interceptorAuthenticator = interceptorAuthenticator
 
         let configuration = URLSessionConfiguration.af.default
@@ -40,6 +42,8 @@ struct BaseNetworkImpl: BaseNetwork {
 
                 return value
             })
+            .subscribe(on: DispatchQueue.global())
+            .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
 }

@@ -18,10 +18,10 @@ enum LoginAction: Equatable {
 }
 
 struct LoginEnvironment {
-    let loginService: LoginServiceInterface
+    let loginClient: LoginClient
 }
 
-let LoginReducer = AnyReducer<LoginState, LoginAction, LoginEnvironment> { state, action, environment in
+let loginReducer = AnyReducer<LoginState, LoginAction, LoginEnvironment> { _, action, _ in
     switch action {
     case .tappedKakaoLoginButton:
         return .none

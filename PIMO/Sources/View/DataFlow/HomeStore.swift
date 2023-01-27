@@ -15,9 +15,9 @@ struct HomeState: Equatable { }
 enum HomeAction: Equatable { }
 
 struct HomeEnvironment {
-    let homeService: HomeServiceInterface
+    let homeClient: HomeClient
 }
 
-let homeReducer = AnyReducer<HomeState, HomeAction, HomeEnvironment> { state, action, environment in
-    return
+let homeReducer = AnyReducer<HomeState, HomeAction, HomeEnvironment> { _, _, _ in
+    return .none
 }
