@@ -12,7 +12,7 @@ import Foundation
 import ComposableArchitecture
 
 struct LoginClient {
-    var appleLogin: @Sendable (_ identityToken: String) -> Effect<AppleLogin, Error>
+    var appleLogin: (_ identityToken: String) -> Effect<AppleLogin, Error>
 }
 
 extension LoginClient {
