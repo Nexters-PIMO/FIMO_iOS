@@ -12,25 +12,25 @@ import SwiftUI
 import ComposableArchitecture
 
 class UserUtill: ObservableObject {
-    private static let userDefaults = UserDefaults.standard
-    private static let decoder = JSONDecoder()
-    private static let encoder = JSONEncoder()
+    private let userDefaults = UserDefaults.standard
+    private let decoder = JSONDecoder()
+    private let encoder = JSONEncoder()
 
     static let shared = UserUtill()
 
     private init() { }
 
     func setUserDefaults<T: Encodable>(key: UserDefaultsKeys, value: T) {
-        guard let data = try? UserUtill.encoder.encode(value) else {
+        guard let data = try? encoder.encode(value) else {
             return
         }
 
-        UserUtill.userDefaults.set(data, forKey: key.description)
+        userDefaults.set(data, forKey: key.description)
     }
 
     private func getUserDefaults<T: Decodable>(key: UserDefaultsKeys) -> T? {
-        guard let data = UserUtill.userDefaults.object(forKey: key.description) as? Data,
-              let object = try? UserUtill.decoder.decode(T.self, from: data) else {
+        guard let data = userDefaults.object(forKey: key.description) as? Data,
+              let object = try? decoder.decode(T.self, from: data) else {
             return nil
         }
 
