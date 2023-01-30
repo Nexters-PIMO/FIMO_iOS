@@ -14,5 +14,5 @@ import ComposableArchitecture
 struct HomeClient { }
 
 extension HomeClient {
-    static let live = Self()
+    static let live = Self.init()
 }

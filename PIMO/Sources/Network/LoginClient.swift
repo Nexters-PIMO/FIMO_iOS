@@ -16,12 +16,12 @@ struct LoginClient {
 }
 
 extension LoginClient {
-    static let live = Self { identityToken in
+    static let live = Self.init(appleLogin: { identityToken in
         let request = AppleLoginRequest(parameters: [
             "identityToken": identityToken
         ])
 
         return BaseNetwork.shared.request(api: request, isInterceptive: false)
             .eraseToEffect()
-    }
+    })
 }
