@@ -35,7 +35,6 @@ let userReducer = AnyReducer<UserState, UserAction, UserEnvironment> { state, ac
             state.status = .unAuthenticated
             return .none
         }
-
         state.status = .authenticated
         state.token = token
         return .none
