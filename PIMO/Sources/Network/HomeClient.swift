@@ -13,6 +13,13 @@ import ComposableArchitecture
 
 struct HomeClient { }
 
-extension HomeClient {
-    static let live = Self.init()
+extension DependencyValues {
+    var homeClient: HomeClient {
+        get { self[HomeClient.self] }
+        set { self[HomeClient.self] = newValue }
+    }
+}
+
+extension HomeClient: DependencyKey {
+    static let liveValue = Self.init()
 }

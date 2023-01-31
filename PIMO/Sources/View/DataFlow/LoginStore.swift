@@ -10,22 +10,23 @@ import Foundation
 
 import ComposableArchitecture
 
-struct LoginState: Equatable { }
-
-enum LoginAction: Equatable {
-    case tappedKakaoLoginButton
-    case tappedAppleLoginButton
-}
-
-struct LoginEnvironment {
-    let loginClient: LoginClient
-}
-
-let loginReducer = AnyReducer<LoginState, LoginAction, LoginEnvironment> { _, action, _ in
-    switch action {
-    case .tappedKakaoLoginButton:
-        return .none
-    case .tappedAppleLoginButton:
-        return .none
+struct LoginStore: ReducerProtocol {
+    struct State: Equatable { }
+    
+    enum Action: Equatable {
+        case tappedKakaoLoginButton
+        case tappedAppleLoginButton
+    }
+    
+    @Dependency(\.loginClient) var loginClient
+    
+    var body: some ReducerProtocol<State, Action> {
+        Reduce { state, action in
+            switch action {
+            case .tappedAppleLoginButton, .tappedKakaoLoginButton:
+                print("HOHOHOHOHO")
+                return .none
+            }
+        }
     }
 }

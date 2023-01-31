@@ -11,21 +11,16 @@ import SwiftUI
 import ComposableArchitecture
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    let store = Store<AppState, AppAction>(
-        initialState: AppState(),
-        reducer: appReducer,
-        environment: AppEnvironment(
-            homeClient: .live,
-            loginClient: .live,
-            userClient: .live
-        )
+    let store = Store<AppStore.State, AppStore.Action>(
+        initialState: AppStore.State(),
+        reducer: AppStore()
     )
 
-    lazy var viewStore = ViewStore<AppState, AppAction>(store)
+    lazy var viewStore = ViewStore<AppStore.State, AppStore.Action>(store)
 
     func application(
         _ application: UIApplication,
-        didFinishLaunchingWithOptionslaunchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
 
         viewStore.send(.appDelegate(.onLaunchFinish))
 

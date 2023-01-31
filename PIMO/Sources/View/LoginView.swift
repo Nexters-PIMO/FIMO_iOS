@@ -8,20 +8,34 @@
 
 import SwiftUI
 
+import ComposableArchitecture
+
 struct LoginView: View {
+    let store: StoreOf<LoginStore>
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
+            VStack {
+                Image(systemName: "globe")
+                    .imageScale(.large)
+                    .foregroundColor(.accentColor)
+                Text("Hello, world!")
+            }
+            .padding()
+            .onAppear {
+                viewStore.send(.tappedAppleLoginButton)
+            }
         }
-        .padding()
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView()
+        LoginView(
+            store: Store(
+                initialState: LoginStore.State(),
+                reducer: LoginStore()
+            )
+        )
     }
 }

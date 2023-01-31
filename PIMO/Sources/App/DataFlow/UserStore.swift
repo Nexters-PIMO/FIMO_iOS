@@ -10,33 +10,35 @@ import SwiftUI
 
 import ComposableArchitecture
 
-struct UserState: Equatable {
-    enum Status {
-        case unAuthenticated
-        case authenticated
+struct UserStore: ReducerProtocol {
+    struct State: Equatable {
+        enum Status {
+            case unAuthenticated
+            case authenticated
+        }
+
+        var status: Status = .unAuthenticated
+        var token: MemberToken?
     }
 
-    var status: Status = .unAuthenticated
-    var token: MemberToken?
-}
+    enum Action: Equatable {
+        case checkAccessToken
+    }
 
-enum UserAction: Equatable {
-    case checkAccessToken
-}
+    @Dependency(\.userClient) var userClient
 
-struct UserEnvironment {
-    let userClient: UserClient
-}
-
-let userReducer = AnyReducer<UserState, UserAction, UserEnvironment> { state, action, environment in
-    switch action {
-    case .checkAccessToken:
-        guard let token = environment.userClient.getToken() else {
-            state.status = .unAuthenticated
-            return .none
+    var body: some ReducerProtocol<State, Action> {
+        Reduce { state, action in
+            switch action {
+            case .checkAccessToken:
+                guard let token = userClient.getToken() else {
+                    state.status = .unAuthenticated
+                    return .none
+                }
+                state.status = .authenticated
+                state.token = token
+                return .none
+            }
         }
-        state.status = .authenticated
-        state.token = token
-        return .none
     }
 }

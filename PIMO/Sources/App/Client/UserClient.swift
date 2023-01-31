@@ -16,13 +16,17 @@ struct UserClient {
     let setToken: (_ token: MemberToken) -> Void
 }
 
-extension UserClient {
-    static let live: Self = .init(
-        getToken: {
-            UserUtill.shared.getToken()
-        },
-        setToken: { token in
-            UserUtill.shared.setUserDefaults(key: UserDefaultsKeys.token, value: token)
-        }
-    )
+extension DependencyValues {
+  var userClient: UserClient {
+    get { self[UserClient.self] }
+    set { self[UserClient.self] = newValue }
+  }
+}
+
+extension UserClient: DependencyKey {
+    static let liveValue = Self.init {
+        UserUtill.shared.getToken()
+    } setToken: { token in
+        UserUtill.shared.setUserDefaults(key: UserDefaultsKeys.token, value: token)
+    }
 }

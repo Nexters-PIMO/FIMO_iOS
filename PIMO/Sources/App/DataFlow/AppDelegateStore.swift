@@ -10,19 +10,17 @@ import SwiftUI
 
 import ComposableArchitecture
 
-struct AppDelegateState: Equatable { }
+struct AppDelegateStore: ReducerProtocol {
+    struct State: Equatable { }
 
-enum AppDelegateAction: Equatable {
-    case onLaunchFinish
-}
+    enum Action: Equatable {
+        case onLaunchFinish
+    }
 
-struct AppDelegateEnvironment { }
-
-let appDelegateReducer = AnyReducer<AppDelegateState, AppDelegateAction, AppDelegateEnvironment>.combine([
-    AnyReducer<AppDelegateState, AppDelegateAction, AppDelegateEnvironment> { _, action, _ in
+    func reduce(into state: inout State, action: Action) -> ComposableArchitecture.EffectTask<Action> {
         switch action {
         case .onLaunchFinish:
             return .none
         }
     }
-])
+}

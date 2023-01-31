@@ -10,59 +10,45 @@ import SwiftUI
 
 import ComposableArchitecture
 
-struct AppState: Equatable {
-    var homeState = HomeState()
-    var loginState = LoginState()
-    var appDelegateState = AppDelegateState()
-    var userState = UserState()
-}
+struct AppStore: ReducerProtocol {
+    struct State: Equatable {
+        var homeState = HomeStore.State()
+        var loginState = LoginStore.State()
+        var appDelegateState = AppDelegateStore.State()
+        var userState = UserStore.State()
+    }
 
-enum AppAction: Equatable {
-    case login(LoginAction)
-    case home(HomeAction)
-    case appDelegate(AppDelegateAction)
-    case user(UserAction)
-}
+    enum Action: Equatable {
+        case login(LoginStore.Action)
+        case home(HomeStore.Action)
+        case appDelegate(AppDelegateStore.Action)
+        case user(UserStore.Action)
+    }
 
-struct AppEnvironment {
-    let homeClient: HomeClient
-    let loginClient: LoginClient
-    let userClient: UserClient
-}
+    var body: some ReducerProtocol<State, Action> {
+        Reduce { _, action in
+            switch action {
+            case .appDelegate(.onLaunchFinish):
+                return .init(value: .user(.checkAccessToken))
+            default:
+                return .none
+            }
+        }
 
-let appReducerCore = AnyReducer<AppState, AppAction, AppEnvironment> { _, action, _ in
-    switch action {
-    case .appDelegate(.onLaunchFinish):
-        return .init(value: .user(.checkAccessToken))
-    default:
-        return .none
+        Scope(state: \.appDelegateState, action: /Action.appDelegate) {
+          AppDelegateStore()
+        }
+
+        Scope(state: \.userState, action: /Action.user) {
+          UserStore()
+        }
+
+        Scope(state: \.homeState, action: /Action.home) {
+          HomeStore()
+        }
+
+        Scope(state: \.loginState, action: /Action.login) {
+          LoginStore()
+        }
     }
 }
-
-let appReducer = AnyReducer<AppState, AppAction, AppEnvironment>.combine([
-    appReducerCore,
-    appDelegateReducer.pullback(
-        state: \AppState.appDelegateState,
-        action: /AppAction.appDelegate,
-        environment: { _ in
-            .init()
-        }),
-    homeReducer.pullback(
-        state: \AppState.homeState,
-        action: /AppAction.home,
-        environment: {
-            .init(homeClient: $0.homeClient)
-        }),
-    loginReducer.pullback(
-        state: \AppState.loginState,
-        action: /AppAction.login,
-        environment: {
-            .init(loginClient: $0.loginClient)
-        }),
-    userReducer.pullback(
-        state: \AppState.userState,
-        action: /AppAction.user,
-        environment: {
-            .init(userClient: $0.userClient)
-        })
-])

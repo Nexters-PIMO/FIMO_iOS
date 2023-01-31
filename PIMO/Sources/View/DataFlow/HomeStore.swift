@@ -10,14 +10,16 @@ import Foundation
 
 import ComposableArchitecture
 
-struct HomeState: Equatable { }
-
-enum HomeAction: Equatable { }
-
-struct HomeEnvironment {
-    let homeClient: HomeClient
-}
-
-let homeReducer = AnyReducer<HomeState, HomeAction, HomeEnvironment> { _, _, _ in
-    return .none
+struct HomeStore: ReducerProtocol {
+    struct State: Equatable { }
+    
+    enum Action: Equatable { }
+    
+    @Dependency(\.homeClient) var homeClient
+    
+    var body: some ReducerProtocol<State, Action> {
+        Reduce { state, action in
+            return .none
+        }
+    }
 }
