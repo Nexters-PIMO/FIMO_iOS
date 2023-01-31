@@ -16,7 +16,7 @@ struct UserState: Equatable {
         case authenticated
     }
 
-    @BindingState var status: Status = .unAuthenticated
+    var status: Status = .unAuthenticated
     var token: MemberToken?
 }
 
