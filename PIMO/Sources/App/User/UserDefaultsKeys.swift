@@ -15,7 +15,8 @@ enum UserDefaultsKeys {
 extension UserDefaultsKeys: CustomStringConvertible {
     var description: String {
         switch self {
-        case .token: return "token"
+        case .token:
+            return "token"
         }
     }
 }

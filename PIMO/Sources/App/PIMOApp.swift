@@ -1,18 +1,31 @@
 import SwiftUI
 
+import ComposableArchitecture
+
 @main
 struct PIMOApp: App {
-    @StateObject private var user = User.shared
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
-    #warning("TCA 방식 추후 적용")
     var body: some Scene {
         WindowGroup {
-            Group {
-                switch user.status {
+            WithViewStore(
+                appDelegate.store.scope(state: \.userState.status)
+            ) { viewStore in
+                switch viewStore.state {
                 case .unAuthenticated:
-                    LoginView()
+                    LoginView(
+                        store: appDelegate.store.scope(
+                            state: \.loginState,
+                            action: AppStore.Action.login
+                        )
+                    )
                 case .authenticated:
-                    HomeView()
+                    HomeView(
+                        store: appDelegate.store.scope(
+                            state: \.homeState,
+                            action: AppStore.Action.home
+                        )
+                    )
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: .tokenExpired)) { _ in
