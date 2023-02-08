@@ -15,13 +15,22 @@ struct LoginView: View {
     
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
-            VStack {
-                Image(systemName: "globe")
-                    .imageScale(.large)
-                    .foregroundColor(.accentColor)
-                Text("Hello, world!")
+            ZStack {
+                Color.blue.ignoresSafeArea() // TODO: 추후 이미지로 대체되야 함
+                
+                VStack {
+                    Text("SNS 계정으로 간편 가입하기")
+                        .foregroundColor(.white)
+                    Image("kakao_login_medium_wide")
+                        .renderingMode(.original)
+                        .scaledToFit()
+                        .cornerRadius(8)
+                        .frame(width: 360, height: 54, alignment: .center)
+                        .onTapGesture {
+                            viewStore.send(.tappedKakaoLoginButton)
+                        }
+                }
             }
-            .padding()
             .onAppear {
                 viewStore.send(.tappedAppleLoginButton)
             }

@@ -9,6 +9,7 @@
 import SwiftUI
 
 import ComposableArchitecture
+import KakaoSDKAuth
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     let store = Store<AppStore.State, AppStore.Action>(
@@ -25,5 +26,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         viewStore.send(.appDelegate(.onLaunchFinish))
 
         return true
+    }
+    
+    func application(
+        _ app: UIApplication,
+        open url: URL,
+        options: [UIApplication.OpenURLOptionsKey : Any] = [:]
+    ) -> Bool {
+        if (AuthApi.isKakaoTalkLoginUrl(url)) {
+            return AuthController.handleOpenUrl(url: url)
+        }
+
+        return false
     }
 }

@@ -1,0 +1,12 @@
+//
+//  Config.xcconfig
+//  PIMO
+//
+//  Created by 양호준 on 2023/02/08.
+//  Copyright © 2023 pimo. All rights reserved.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+KAKAO_NATIVE_APP_KEY = 2711e32b3abddf6c60257412467026ef
