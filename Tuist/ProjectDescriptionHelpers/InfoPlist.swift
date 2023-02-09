@@ -8,6 +8,12 @@ extension Project {
         "UILaunchStoryboardName": "LaunchScreen",
         "UIUserInterfaceStyle": "Light",
         "LSApplicationQueriesSchemes": ["kakaokompassauth"],
-        "KAKAO_NATIVE_APP_KEY": "${KAKAO_NATIVE_APP_KEY}"
+        "KAKAO_NATIVE_APP_KEY": "${KAKAO_NATIVE_APP_KEY}",
+        "CFBundleURLTypes": [
+            [
+                "CFBundleTypeRole": "Editor",
+                "CFBundleURLSchemes": ["kakao$(KAKAO_NATIVE_APP_KEY)"]
+            ]
+        ]
     ]
 }
