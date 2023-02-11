@@ -8,10 +8,13 @@
 
 import AuthenticationServices
 import SwiftUI
+import UIKit
 
 import ComposableArchitecture
 
 struct LoginView: View {
+    @EnvironmentObject var sceneDelegate: SceneDelegate
+    
     let store: StoreOf<LoginStore>
     
     var body: some View {
@@ -38,13 +41,11 @@ struct LoginView: View {
                         .onTapGesture {
                             viewStore.send(.tappedKakaoLoginButton)
                         }
-                    AppleLoginButton()
-                        .cornerRadius(8)
-                        .frame(width: 360, height: 54, alignment: .center)
-                        .onTapGesture {
+                    AppleLoginButton(window: sceneDelegate.window!, title: "Apple로 로그인") {
                             viewStore.send(.tappedAppleLoginButton)
                         }
-
+                        .cornerRadius(8)
+                        .frame(width: 360, height: 54, alignment: .center)
                 }
             }
         }

@@ -16,6 +16,7 @@ extension Project {
             infoPlist: .extendingDefault(with: Project.infoPlist),
             sources: ["\(name)/Sources/**"],
             resources: ["\(name)/Resources/**"],
+            entitlements: "\(name)/\(name).entitlements",
             scripts: [.SwiftLintShell],
             dependencies: dependencies
         )

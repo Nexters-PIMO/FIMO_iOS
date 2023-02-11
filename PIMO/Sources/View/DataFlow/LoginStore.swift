@@ -6,6 +6,7 @@
 //  Copyright © 2023 pimo. All rights reserved.
 //
 
+import AuthenticationServices
 import Foundation
 
 import ComposableArchitecture
@@ -28,7 +29,6 @@ struct LoginStore: ReducerProtocol {
         Reduce { state, action in
             switch action {
             case .tappedAppleLoginButton:
-                print("HOHOHOHOHO")
                 return .none
             case .tappedKakaoLoginButton:
                 var errorMessage = ""

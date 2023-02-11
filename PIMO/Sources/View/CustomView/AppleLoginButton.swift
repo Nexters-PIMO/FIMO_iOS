@@ -6,24 +6,89 @@
 //  Copyright © 2023 pimo. All rights reserved.
 //
 
+import AuthenticationServices
 import SwiftUI
+import UIKit
 
-struct AppleLoginButton: View {
-    var body: some View {
-        ZStack {
-            Color(uiColor: .black)
-            HStack {
-                Image("apple_logo_medium")
-                    .renderingMode(.original)
-                    .scaledToFit()
-                    .padding(EdgeInsets(top: .zero, leading: 10, bottom: .zero, trailing: .zero))
-                Text("Apple로 로그인")
-                    .foregroundColor(.white)
-                    .font(.system(size: 18))
-                    .padding(60)
-            }
-            .ignoresSafeArea()
+struct AppleLoginButton: UIViewRepresentable {
+    let window: UIWindow
+    let title: String
+    let action: () -> Void
+
+    var appleLoginButton = UIButton()
+    
+    init(window: UIWindow, title: String, action: @escaping () -> Void) {
+        self.window = window
+        self.title = title
+        self.action = action
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+    class Coordinator: NSObject {
+        var appleLoginButton: AppleLoginButton
+
+        init(_ appleLoginButton: AppleLoginButton) {
+            self.appleLoginButton = appleLoginButton
+            
+            super.init()
         }
-        .frame(width: 360, height: 54, alignment: .center)
+
+        @objc func doAction(_ sender: Any) {
+            requestAppleLogin()
+            self.appleLoginButton.action()
+        }
+        
+        private func requestAppleLogin() {
+            let request = ASAuthorizationAppleIDProvider().createRequest()
+            request.requestedScopes = [.fullName, .email]
+
+            let controller = ASAuthorizationController(authorizationRequests: [request])
+            controller.delegate = self
+            controller.presentationContextProvider = self
+
+            controller.performRequests()
+        }
+    }
+
+    func makeUIView(context: Context) -> UIButton {
+        let button = UIButton()
+        
+        button.backgroundColor = .black
+        button.setTitle(self.title, for: .normal)
+        button.setImage(UIImage(named: "apple_logo_medium"), for: .normal)
+        button.addTarget(context.coordinator, action: #selector(Coordinator.doAction(_ :)), for: .touchDown)
+        
+        return button
+    }
+
+    func updateUIView(_ uiView: UIButton, context: Context) { }
+}
+
+extension AppleLoginButton.Coordinator: ASAuthorizationControllerDelegate {
+    func authorizationController(
+        controller: ASAuthorizationController,
+        didCompleteWithAuthorization authorization: ASAuthorization
+    ) {
+      switch authorization.credential {
+      case let appleIDCredential as ASAuthorizationAppleIDCredential:
+          let userID = appleIDCredential.user
+          let provider = ASAuthorizationAppleIDProvider()
+          let userName = appleIDCredential.fullName?.formatted()
+
+          
+      default:
+        break
+      }
+    }
+    
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+      
+    }
+}
+
+extension AppleLoginButton.Coordinator: ASAuthorizationControllerPresentationContextProviding {
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return appleLoginButton.window
     }
 }
