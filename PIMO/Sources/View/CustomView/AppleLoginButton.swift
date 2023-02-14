@@ -85,7 +85,37 @@ extension AppleLoginButton.Coordinator: ASAuthorizationControllerDelegate {
           let provider = ASAuthorizationAppleIDProvider()
           let userName = appleIDCredential.fullName?.formatted()
           
-          print(userID)
+          #if DEBUG
+          print("사용자 애플 로그인 정보 이름: \(userName ?? "") ID: \(userID)")
+          #endif
+          
+          provider.getCredentialState(forUserID: userID) { credentialState, error in
+              switch credentialState {
+              case .authorized:
+                  #if DEBUG
+                  print("Authorized")
+                  #endif
+                  
+                  guard let identityTokenData = appleIDCredential.identityToken,
+                        let identityToken = String(data: identityTokenData, encoding: .utf8) else {
+                      return
+                  }
+                  
+                  UIPasteboard.general.string = identityToken // TODO: 테스트 이후 제거 예정
+              case .notFound:
+                  #if DEBUG
+                  print("Not Found")
+                  #endif
+              case .revoked:
+                  #if DEBUG
+                  print("Not Found")
+                  #endif
+                  
+                  let errorMessage = "소셜 계정 연결에 실패했습니다"
+              default:
+                  break
+              }
+          }
       default:
         break
       }
