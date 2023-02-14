@@ -20,35 +20,46 @@ struct LoginView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             ZStack {
-                Color.blue.ignoresSafeArea() // TODO: 추후 이미지로 대체되야 함
+                Color.blue // TODO: 추후 이미지로 대체되야 함
                 
                 VStack {
+                    Spacer()
                     Text("글사진 아카이브 플랫폼")
                         .font(.system(size: 15))
                         .foregroundColor(.white)
                         .opacity(0.6)
+                        .padding(.bottom, 17)
                     Image("app_logo")
                         .renderingMode(.original)
                         .scaledToFit()
-                        .frame(width: 200, height: 40, alignment: .center)
+                        .frame(width: 200, height: 40)
+                    Spacer()
                     Text("SNS 계정으로 간편 가입하기")
                         .foregroundColor(.white)
+                        .padding(.top, 0)
+                        .padding(.bottom, 18)
                     Image("kakao_login_medium_wide")
+                        .resizable()
                         .renderingMode(.original)
-                        .scaledToFit()
+                        .scaledToFill()
                         .cornerRadius(8)
-                        .frame(width: 360, height: 54, alignment: .center)
+                        .frame(width: 360, height: 54)
                         .onTapGesture {
                             viewStore.send(.tappedKakaoLoginButton)
                         }
+                        .padding(.top, 0)
+                        .padding(.bottom, 18)
                     AppleLoginButton(window: sceneDelegate.window!, title: "Apple로 로그인") {
                             viewStore.send(.tappedAppleLoginButton)
                         }
                         .cornerRadius(8)
-                        .frame(width: 360, height: 54, alignment: .center)
+                        .frame(width: 360, height: 54)
+                        .padding(.top, 0)
+                        .padding(.bottom, 50)
                 }
             }
         }
+        .ignoresSafeArea()
     }
 }
 

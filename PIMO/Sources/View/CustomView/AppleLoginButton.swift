@@ -53,10 +53,19 @@ struct AppleLoginButton: UIViewRepresentable {
 
     func makeUIView(context: Context) -> UIButton {
         let button = UIButton()
+        var configuration = UIButton.Configuration.filled()
+        var container = AttributeContainer()
         
-        button.backgroundColor = .black
-        button.setTitle(self.title, for: .normal)
-        button.setImage(UIImage(named: "apple_logo_medium"), for: .normal)
+        container.font = .systemFont(ofSize: 18)
+        
+        configuration.attributedTitle = AttributedString(self.title, attributes: container)
+        configuration.image = UIImage(named: "apple_logo_medium")
+        configuration.imagePadding = 95
+        configuration.contentInsets.trailing = 113
+        
+        button.tintColor = .black
+        button.configuration = configuration
+        
         button.addTarget(context.coordinator, action: #selector(Coordinator.doAction(_ :)), for: .touchDown)
         
         return button
@@ -75,8 +84,8 @@ extension AppleLoginButton.Coordinator: ASAuthorizationControllerDelegate {
           let userID = appleIDCredential.user
           let provider = ASAuthorizationAppleIDProvider()
           let userName = appleIDCredential.fullName?.formatted()
-
           
+          print(userID)
       default:
         break
       }
