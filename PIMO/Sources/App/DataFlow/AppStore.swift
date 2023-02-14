@@ -12,15 +12,15 @@ import ComposableArchitecture
 
 struct AppStore: ReducerProtocol {
     struct State: Equatable {
-        var homeState = HomeStore.State()
         var loginState = LoginStore.State()
+        var tabBarState = TabBarStore.State()
         var appDelegateState = AppDelegateStore.State()
         var userState = UserStore.State()
     }
 
     enum Action: Equatable {
         case login(LoginStore.Action)
-        case home(HomeStore.Action)
+        case tabBar(TabBarStore.Action)
         case appDelegate(AppDelegateStore.Action)
         case user(UserStore.Action)
     }
@@ -43,8 +43,8 @@ struct AppStore: ReducerProtocol {
           UserStore()
         }
 
-        Scope(state: \.homeState, action: /Action.home) {
-          HomeStore()
+        Scope(state: \.tabBarState, action: /Action.tabBar) {
+          TabBarStore()
         }
 
         Scope(state: \.loginState, action: /Action.login) {
