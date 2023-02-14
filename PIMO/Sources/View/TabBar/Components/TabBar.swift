@@ -10,7 +10,6 @@ import SwiftUI
 
 enum TabBarItem: CaseIterable {
     case home
-    case upload
     case myFeed
 }
 
@@ -23,15 +22,17 @@ struct TabBar: View {
                 Spacer()
                     .frame(width: 60)
                 
-                Image(uiImage: PIMOAsset.Assets.home.image)
-                    .frame(width: 28, height: 28)
+                HomeTabBar(isSelected: selected == .home)
+                    .onTapGesture {
+                        selected = .home
+                    }
                 
                 Spacer()
                 
-                Image(uiImage: PIMOAsset.Assets.example.image)
-                    .frame(width: 28, height: 28)
-                    .cornerRadius(14)
-                    .overlay(Circle().stroke(Color.black, lineWidth: 1.5))
+                MyFeedTabBar(isSelected: selected == .myFeed)
+                    .onTapGesture {
+                        selected = .myFeed
+                    }
                 
                 Spacer()
                     .frame(width: 60)
@@ -39,17 +40,39 @@ struct TabBar: View {
             .frame(minWidth: 0, maxWidth: .infinity, maxHeight: 72)
             .background(Color(PIMOAsset.Assets.gray.color))
             .cornerRadius(20, corners: [.topLeft, .topRight])
-            
-            ZStack {
-                Circle()
-                    .frame(width: 72, height: 72)
-                
-                Image(uiImage: PIMOAsset.Assets.plus.image)
-                    .frame(width: 24, height: 24)
-            }
-            .offset(x: 0, y: -36)
         }
         .frame(maxHeight: .infinity, alignment: .bottom)
         .edgesIgnoringSafeArea(.bottom)
+    }
+}
+
+struct HomeTabBar: View {
+    var isSelected: Bool = false
+    
+    var body: some View {
+        if isSelected {
+            Image(uiImage: PIMOAsset.Assets.homeFill.image)
+                .frame(width: 28, height: 28)
+        } else {
+            Image(uiImage: PIMOAsset.Assets.home.image)
+                .frame(width: 28, height: 28)
+        }
+    }
+}
+
+struct MyFeedTabBar: View {
+    var isSelected: Bool = false
+    
+    var body: some View {
+        if isSelected {
+                Image(uiImage: PIMOAsset.Assets.example.image)
+                    .frame(width: 28, height: 28)
+                    .cornerRadius(14)
+                    .overlay(Circle().stroke(Color.black, lineWidth: 1.5).frame(width: 32, height: 32))
+        } else {
+            Image(uiImage: PIMOAsset.Assets.example.image)
+                .frame(width: 28, height: 28)
+                .cornerRadius(14)
+        }
     }
 }
