@@ -26,7 +26,7 @@ struct LoginView: View {
                 VStack {
                     Spacer()
                     Text("글사진 아카이브 플랫폼")
-                        .font(.system(size: 15))
+                        .font(Font(PIMOFontFamily.Pretendard.regular.font(size: 15)))
                         .foregroundColor(.white)
                         .opacity(0.6)
                         .padding(.bottom, 17)
@@ -36,6 +36,7 @@ struct LoginView: View {
                         .frame(width: 200, height: 40)
                     Spacer()
                     Text("SNS 계정으로 간편 가입하기")
+                        .font(Font(PIMOFontFamily.Pretendard.medium.font(size: 14)))
                         .foregroundColor(.white)
                         .padding(.top, 0)
                         .padding(.bottom, 18)
