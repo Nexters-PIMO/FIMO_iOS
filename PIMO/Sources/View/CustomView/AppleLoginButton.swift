@@ -11,31 +11,29 @@ import SwiftUI
 import UIKit
 
 struct AppleLoginButton: UIViewRepresentable {
+    @Binding var isAlertShowing: Bool
     let window: UIWindow
     let title: String
     let action: () -> Void
 
     var appleLoginButton = UIButton()
-    
-    init(window: UIWindow, title: String, action: @escaping () -> Void) {
-        self.window = window
-        self.title = title
-        self.action = action
-    }
 
-    func makeCoordinator() -> Coordinator { Coordinator(self) }
+    func makeCoordinator() -> Coordinator { Coordinator(self, isAlertShowing: $isAlertShowing) }
 
     class Coordinator: NSObject {
         var appleLoginButton: AppleLoginButton
+        @Binding var isAlertShowing: Bool
 
-        init(_ appleLoginButton: AppleLoginButton) {
+        init(_ appleLoginButton: AppleLoginButton, isAlertShowing: Binding<Bool>) {
             self.appleLoginButton = appleLoginButton
+            self._isAlertShowing = isAlertShowing
             
             super.init()
         }
 
         @objc func doAction(_ sender: Any) {
             requestAppleLogin()
+            
             self.appleLoginButton.action()
         }
         
@@ -57,13 +55,14 @@ struct AppleLoginButton: UIViewRepresentable {
         var container = AttributeContainer()
         
         container.font = .systemFont(ofSize: 18)
+        container.foregroundColor = .white
         
         configuration.attributedTitle = AttributedString(self.title, attributes: container)
         configuration.image = UIImage(named: "apple_logo_medium")
         configuration.imagePadding = 95
         configuration.contentInsets.trailing = 113
+        configuration.background.backgroundColor = .black
         
-        button.tintColor = .black
         button.configuration = configuration
         
         button.addTarget(context.coordinator, action: #selector(Coordinator.doAction(_ :)), for: .touchDown)
@@ -83,17 +82,15 @@ extension AppleLoginButton.Coordinator: ASAuthorizationControllerDelegate {
       case let appleIDCredential as ASAuthorizationAppleIDCredential:
           let userID = appleIDCredential.user
           let provider = ASAuthorizationAppleIDProvider()
-          let userName = appleIDCredential.fullName?.formatted()
+          let userName = appleIDCredential.fullName?.formatted() // TODO: 필요없는 경우 제거
           
-          #if DEBUG
-          print("사용자 애플 로그인 정보 이름: \(userName ?? "") ID: \(userID)")
-          #endif
-          
-          provider.getCredentialState(forUserID: userID) { credentialState, error in
+          provider.getCredentialState(forUserID: userID) { [weak self] credentialState, error in
+              guard let self else { return }
+              
               switch credentialState {
               case .authorized:
                   #if DEBUG
-                  print("Authorized")
+                  print("Apple Login Authorized")
                   #endif
                   
                   guard let identityTokenData = appleIDCredential.identityToken,
@@ -102,18 +99,15 @@ extension AppleLoginButton.Coordinator: ASAuthorizationControllerDelegate {
                   }
                   
                   UIPasteboard.general.string = identityToken // TODO: 테스트 이후 제거 예정
-              case .notFound:
+                  self.isAlertShowing = true
+              case .notFound, .revoked, .transferred:
                   #if DEBUG
-                  print("Not Found")
-                  #endif
-              case .revoked:
-                  #if DEBUG
-                  print("Not Found")
+                  print("Apple Login Fail")
                   #endif
                   
-                  let errorMessage = "소셜 계정 연결에 실패했습니다"
-              default:
-                  break
+                  self.isAlertShowing = true
+              @unknown default:
+                  self.isAlertShowing = true
               }
           }
       default:

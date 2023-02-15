@@ -14,6 +14,7 @@ import ComposableArchitecture
 
 struct LoginView: View {
     @EnvironmentObject var sceneDelegate: SceneDelegate
+    @State private var isAlertShowing = false
     
     let store: StoreOf<LoginStore>
     
@@ -49,13 +50,22 @@ struct LoginView: View {
                         }
                         .padding(.top, 0)
                         .padding(.bottom, 18)
-                    AppleLoginButton(window: sceneDelegate.window!, title: "Apple로 로그인") {
+                    AppleLoginButton(
+                        isAlertShowing: $isAlertShowing,
+                        window: sceneDelegate.window!,
+                        title: "Apple로 로그인",
+                        action: {
                             viewStore.send(.tappedAppleLoginButton)
+                        })
+                    .alert("로그인이 실패했습니다", isPresented: $isAlertShowing) {
+                        Button("확인", role: .cancel) {
+                            isAlertShowing = false
                         }
-                        .cornerRadius(8)
-                        .frame(width: 360, height: 54)
-                        .padding(.top, 0)
-                        .padding(.bottom, 50)
+                    }
+                    .cornerRadius(8)
+                    .frame(width: 360, height: 54)
+                    .padding(.top, 0)
+                    .padding(.bottom, 50)
                 }
             }
         }
