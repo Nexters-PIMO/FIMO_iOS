@@ -20,10 +20,10 @@ struct PIMOApp: App {
                         )
                     )
                 case .authenticated:
-                    HomeView(
+                    TabBarView(
                         store: appDelegate.store.scope(
-                            state: \.homeState,
-                            action: AppStore.Action.home
+                            state: \.tabBarState,
+                            action: AppStore.Action.tabBar
                         )
                     )
                 }
