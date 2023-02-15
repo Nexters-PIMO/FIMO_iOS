@@ -68,7 +68,10 @@ struct MyFeedTabBar: View {
                 Image(uiImage: PIMOAsset.Assets.example.image)
                     .frame(width: 28, height: 28)
                     .cornerRadius(14)
-                    .overlay(Circle().stroke(Color.black, lineWidth: 1.5).frame(width: 32, height: 32))
+                    .overlay(
+                        Circle()
+                            .stroke(Color.black, lineWidth: 1.5)
+                            .frame(width: 32, height: 32))
         } else {
             Image(uiImage: PIMOAsset.Assets.example.image)
                 .frame(width: 28, height: 28)

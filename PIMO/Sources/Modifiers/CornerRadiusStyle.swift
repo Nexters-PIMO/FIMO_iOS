@@ -9,11 +9,10 @@
 import SwiftUI
 
 struct CornerRadiusStyle: ViewModifier {
-    var radius: CGFloat
-    var corners: UIRectCorner
+    let radius: CGFloat
+    let corners: UIRectCorner
     
     struct CornerRadiusShape: Shape {
-
         var radius = CGFloat.infinity
         var corners = UIRectCorner.allCorners
 

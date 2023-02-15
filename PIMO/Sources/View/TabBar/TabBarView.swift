@@ -38,32 +38,35 @@ struct TabBarView: View {
                 .onAppear {
                     UITabBar.appearance().isHidden = true
                 }
-                .background(Color.blue)
                 
                 TabBar(selected: viewStore.binding(\.$tabBarItem))
                 
-                ZStack {
-                    Circle()
-                        .frame(width: 72, height: 72)
-                    
-                    Image(uiImage: PIMOAsset.Assets.plus.image)
-                        .frame(width: 24, height: 24)
-                }
-                .frame(maxHeight: .infinity, alignment: .bottom)
-                .offset(x: 0, y: -36)
-                .onTapGesture {
-                    viewStore.send(TabBarStore.Action.setSheetState)
-                }
-                .sheet(isPresented: viewStore.binding(\.$isSheetPresented)) {
-                    UploadView(
-                        store: store.scope(
-                            state: \.uploadState,
-                            action: TabBarStore.Action.upload
-                        )
-                    )
-                }
+                uploadButton(viewStore: viewStore)
             }
             .ignoresSafeArea(.all)
+        }
+    }
+    
+    func uploadButton(viewStore: ViewStore<TabBarStore.State, TabBarStore.Action>) -> some View {
+        ZStack {
+            Circle()
+                .frame(width: 72, height: 72)
+            
+            Image(uiImage: PIMOAsset.Assets.plus.image)
+                .frame(width: 24, height: 24)
+        }
+        .frame(maxHeight: .infinity, alignment: .bottom)
+        .offset(x: 0, y: -36)
+        .onTapGesture {
+            viewStore.send(TabBarStore.Action.setSheetState)
+        }
+        .fullScreenCover(isPresented: viewStore.binding(\.$isSheetPresented)) {
+            UploadView(
+                store: store.scope(
+                    state: \.uploadState,
+                    action: TabBarStore.Action.upload
+                )
+            )
         }
     }
 }
