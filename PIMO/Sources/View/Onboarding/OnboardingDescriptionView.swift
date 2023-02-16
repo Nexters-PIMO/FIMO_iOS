@@ -33,8 +33,7 @@ struct OnboardingDescriptionView: View {
 
                     if type == .one {
                         Image(uiImage: PIMOAsset.Assets.fimo.image)
-                            .padding(.bottom, 4)
-                            .padding(.leading, 4)
+                            .padding([.bottom, .leading], 4)
                     }
                 }
                 .padding(.bottom, 19)

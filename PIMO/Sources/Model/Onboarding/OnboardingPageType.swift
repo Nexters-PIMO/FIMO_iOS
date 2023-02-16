@@ -54,7 +54,7 @@ enum OnboardingPageType: String {
     }
 }
 
-extension OnboardingPageType: Identifiable, CaseIterable, Hashable {
+extension OnboardingPageType: Identifiable, CaseIterable {
     var id: String {
         self.rawValue
     }

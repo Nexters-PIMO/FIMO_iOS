@@ -9,7 +9,7 @@
 import ComposableArchitecture
 
 struct OnboardingStore: ReducerProtocol {
-    struct State: Equatable, Hashable {
+    struct State: Equatable {
         @BindingState var pageType: OnboardingPageType = .one
     }
 
