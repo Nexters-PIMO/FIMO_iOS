@@ -8,74 +8,88 @@
 
 import SwiftUI
 
+import ComposableArchitecture
+import Kingfisher
+
 enum TabBarItem: CaseIterable {
     case home
     case myFeed
 }
 
-struct TabBar: View {
-    @Binding var selected: TabBarItem
-    
-    var body: some View {
-        ZStack {
-            HStack(alignment: .center) {
-                Spacer()
-                    .frame(width: 60)
-                
-                HomeTabBar(isSelected: selected == .home)
-                    .onTapGesture {
-                        selected = .home
-                    }
-                
-                Spacer()
-                
-                MyFeedTabBar(isSelected: selected == .myFeed)
+extension TabBarView {
+    struct TabBar: View {
+        @Binding var selected: TabBarItem
+        let profileImage: String?
+        
+        var body: some View {
+            ZStack {
+                HStack(alignment: .center) {
+                    Spacer()
+                    
+                    HomeTabBar(isSelected: selected == .home)
+                        .onTapGesture {
+                            selected = .home
+                        }
+                    
+                    Spacer()
+                    Spacer()
+                    Spacer()
+                    
+                    MyFeedTabBar(isSelected: selected == .myFeed,
+                                 profileImage: profileImage)
                     .onTapGesture {
                         selected = .myFeed
                     }
-                
-                Spacer()
-                    .frame(width: 60)
+                    
+                    Spacer()
+                }
+                .frame(minWidth: 0, maxWidth: .infinity, maxHeight: 72)
+                .background(Color(PIMOAsset.Assets.gray.color))
+                .cornerRadius(20, corners: [.topLeft, .topRight])
             }
-            .frame(minWidth: 0, maxWidth: .infinity, maxHeight: 72)
-            .background(Color(PIMOAsset.Assets.gray.color))
-            .cornerRadius(20, corners: [.topLeft, .topRight])
-        }
-        .frame(maxHeight: .infinity, alignment: .bottom)
-        .edgesIgnoringSafeArea(.bottom)
-    }
-}
-
-struct HomeTabBar: View {
-    var isSelected: Bool = false
-    
-    var body: some View {
-        if isSelected {
-            Image(uiImage: PIMOAsset.Assets.homeFill.image)
-                .frame(width: 28, height: 28)
-        } else {
-            Image(uiImage: PIMOAsset.Assets.home.image)
-                .frame(width: 28, height: 28)
+            .frame(maxHeight: .infinity, alignment: .bottom)
+            .edgesIgnoringSafeArea(.bottom)
         }
     }
-}
-
-struct MyFeedTabBar: View {
-    var isSelected: Bool = false
     
-    var body: some View {
-        if isSelected {
-                Image(uiImage: PIMOAsset.Assets.example.image)
+    struct HomeTabBar: View {
+        var isSelected: Bool = false
+        
+        var body: some View {
+            if isSelected {
+                Image(uiImage: PIMOAsset.Assets.homeSelected.image)
                     .frame(width: 28, height: 28)
-                    .cornerRadius(14)
-                    .overlay(
-                        Circle()
-                            .stroke(Color.black, lineWidth: 1.5)
-                            .frame(width: 32, height: 32))
-        } else {
-            Image(uiImage: PIMOAsset.Assets.example.image)
-                .frame(width: 28, height: 28)
-                .cornerRadius(14)
+            } else {
+                Image(uiImage: PIMOAsset.Assets.home.image)
+                    .frame(width: 28, height: 28)
+            }
+        }
+    }
+    
+    struct MyFeedTabBar: View {
+        var isSelected: Bool = false
+        var profileImage: String?
+        
+        var body: some View {
+            if let url = URL(string: profileImage ?? "") {
+                if isSelected {
+                    KFImage(url)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 28, height: 28)
+                        .cornerRadius(14)
+                        .overlay(
+                            Circle()
+                                .stroke(Color.black, lineWidth: 1.5)
+                                .frame(width: 32, height: 32))
+                } else {
+                    KFImage(url)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 28, height: 28)
+                        .cornerRadius(14)
+                }
+            }
         }
     }
 }

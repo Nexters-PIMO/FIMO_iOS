@@ -25,6 +25,7 @@ struct TabBarView: View {
                             action: TabBarStore.Action.home
                         )
                     )
+                    .padding(EdgeInsets(top: 0, leading: 0, bottom: 72, trailing: 0))
                     .tag(tabBarItems[0])
                     
                     MyFeedView(
@@ -33,13 +34,16 @@ struct TabBarView: View {
                             action: TabBarStore.Action.myFeed
                         )
                     )
+                    .padding(EdgeInsets(top: 0, leading: 0, bottom: 72, trailing: 0))
                     .tag(tabBarItems[1])
                 }
                 .onAppear {
+                    viewStore.send(.fetchProfile)
                     UITabBar.appearance().isHidden = true
                 }
                 
-                TabBar(selected: viewStore.binding(\.$tabBarItem))
+                TabBar(selected: viewStore.binding(\.$tabBarItem),
+                       profileImage: viewStore.state.profile?.imageURL)
                 
                 uploadButton(viewStore: viewStore)
             }
