@@ -13,10 +13,10 @@ struct PIMOApp: App {
             ) { viewStore in
                 switch viewStore.state {
                 case .unAuthenticated:
-                    LoginView(
+                    OnboardingView(
                         store: appDelegate.store.scope(
-                            state: \.loginState,
-                            action: AppStore.Action.login
+                            state: \.onboardingState,
+                            action: AppStore.Action.onboarding
                         )
                     )
                 case .authenticated:
