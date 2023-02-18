@@ -14,7 +14,22 @@ struct HomeView: View {
     let store: StoreOf<HomeStore>
     
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
+            VStack {
+                homeTopBar
+                    .frame(height: 116)
+                
+                if viewStore.feeds.isEmpty {
+                    homeWelcome
+                } else {
+                    FeedView()
+                        .frame(maxHeight: .infinity)
+                }
+            }
+            .onAppear {
+                viewStore.send(.fetchFeeds)
+            }
+        }
     }
 }
 

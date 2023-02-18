@@ -11,14 +11,22 @@ import Foundation
 import ComposableArchitecture
 
 struct HomeStore: ReducerProtocol {
-    struct State: Equatable { }
+    struct State: Equatable {
+        var feeds: [Feed] = []
+    }
     
-    enum Action: Equatable { }
+    enum Action: Equatable {
+        case fetchFeeds
+    }
     
     @Dependency(\.homeClient) var homeClient
     
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
+            switch action {
+            case .fetchFeeds:
+                state.feeds = homeClient.fetchFeeds()
+            }
             return .none
         }
     }

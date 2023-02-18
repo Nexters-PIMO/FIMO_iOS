@@ -11,7 +11,9 @@ import Foundation
 
 import ComposableArchitecture
 
-struct HomeClient { }
+struct HomeClient {
+    let fetchFeeds: () -> [Feed]
+}
 
 extension DependencyValues {
     var homeClient: HomeClient {
@@ -21,5 +23,19 @@ extension DependencyValues {
 }
 
 extension HomeClient: DependencyKey {
-    static let liveValue = Self.init()
+    static let liveValue = Self.init (
+        fetchFeeds: {
+            // TODO: 서버 통신
+            return [Feed(profile: Profile(imageURL: "", nickName: "0inn1"),
+                         uploadTime: "10:00",
+                         textImages: [TextImage(imageURL: "", text: "안녕")],
+                         clapCount: 310,
+                         isClapped: false),
+                    Feed(profile: Profile(imageURL: "", nickName: "0inn2"),
+                         uploadTime: "09:00",
+                         textImages: [TextImage(imageURL: "", text: "안녕")],
+                         clapCount: 320,
+                         isClapped: true)]
+        }
+    )
 }
