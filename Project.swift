@@ -9,5 +9,6 @@ let project = Project.app(
     platform: .iOS,
     dependencies: [
         .external(name: "Alamofire"),
-        .external(name: "ComposableArchitecture")
+        .external(name: "ComposableArchitecture"),
+        .external(name: "Kingfisher")
     ])

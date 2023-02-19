@@ -1,0 +1,17 @@
+/* 
+  Localizable.strings
+  PIMO
+
+  Created by 김영인 on 2023/02/18.
+  Copyright © 2023 pimo. All rights reserved.
+*/
+
+/// HOME
+friendPosts = "친구 글사진";
+newPost = "오늘 새로운 게시물 %d개";
+welcome = "에 오신 것을 환영해요";
+welcomeGuide = "본인 프로필 혹은 게시물 공유로\n친구를 맺고 더 많은 글사진을 살펴볼 수 있어요";
+
+/// Example
+profileImage = "https://ifh.cc/g/gCgJSO.jpg";
+textImage = "https://ifh.cc/g/vQHllj.png";
