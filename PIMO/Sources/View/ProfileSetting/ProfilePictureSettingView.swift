@@ -19,7 +19,7 @@ struct ProfilePictureSettingView: View {
                 ProgressView(value: 100, total: 100)
                     .tint(Color(PIMOAsset.Assets.red1.color))
 
-                VStack {
+                VStack(alignment: .leading) {
                     VStack(alignment: .leading, spacing: 0) {
                         Text("프로필 사진을 등록해주세요")
                             .padding(.top, 42)
