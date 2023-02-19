@@ -109,3 +109,14 @@ struct ArchiveSettingView: View {
         return isBlackArchiveField ? Color(PIMOAsset.Assets.gray1.color) : Color.black
     }
 }
+
+struct ArchiveSettingView_Previews: PreviewProvider {
+    static var previews: some View {
+        ArchiveSettingView(
+            store: Store(
+                initialState: ProfileSettingStore.State(),
+                reducer: ProfileSettingStore()
+            )
+        )
+    }
+}
