@@ -14,7 +14,7 @@ struct TabBarStore: ReducerProtocol {
     struct State: Equatable {
         @BindableState var tabBarItem: TabBarItem = .home
         @BindableState var isSheetPresented: Bool = false
-        var profile: Profile? //= Profile(imageURL: "", nickName: "")
+        var profile: Profile?
         var homeState = HomeStore.State()
         var uploadState = UploadStore.State()
         var myFeedState = MyFeedStore.State()

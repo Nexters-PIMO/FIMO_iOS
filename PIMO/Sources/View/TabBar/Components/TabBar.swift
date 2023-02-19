@@ -71,24 +71,28 @@ extension TabBarView {
         var profileImage: String?
         
         var body: some View {
-            if let url = URL(string: profileImage ?? "") {
-                if isSelected {
-                    KFImage(url)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 28, height: 28)
-                        .cornerRadius(14)
-                        .overlay(
-                            Circle()
-                                .stroke(Color.black, lineWidth: 1.5)
-                                .frame(width: 32, height: 32))
-                } else {
-                    KFImage(url)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 28, height: 28)
-                        .cornerRadius(14)
-                }
+            let url = URL(string: profileImage ?? "")
+            
+            if isSelected {
+                KFImage(url)
+                    .placeholder { Image(systemName: "person.fill") }
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 28, height: 28)
+                    .overlay(
+                        Circle()
+                            .stroke(Color.black, lineWidth: 1.5)
+                            .frame(width: 32, height: 32)
+                    )
+            } else {
+                KFImage(url)
+                    .placeholder { Image(systemName: "person") }
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 28, height: 28)
+                    .mask {
+                        Circle()
+                    }
             }
         }
     }
