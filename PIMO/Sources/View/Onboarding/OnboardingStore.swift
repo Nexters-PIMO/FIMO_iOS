@@ -10,7 +10,7 @@ import ComposableArchitecture
 
 struct OnboardingStore: ReducerProtocol {
     struct State: Equatable {
-        @BindableState var pageType: OnboardingPageType = .one
+        @BindingState var pageType: OnboardingPageType = .one
     }
 
     enum Action: BindableAction, Equatable {
