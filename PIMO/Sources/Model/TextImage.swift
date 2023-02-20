@@ -9,6 +9,7 @@
 import Foundation
 
 struct TextImage: Decodable, Equatable {
+    let id: Int
     let imageURL: String
     let text: String
 }
