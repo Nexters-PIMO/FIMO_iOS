@@ -9,6 +9,7 @@
 import Foundation
 
 struct Feed: Decodable, Equatable {
+    let id: Int
     let profile: Profile
     let uploadTime: String
     let textImages: [TextImage]
