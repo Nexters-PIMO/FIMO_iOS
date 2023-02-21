@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-enum NicknameValidationType {
+enum CheckValidationType {
     case available
     case onlyKoreanEnglishAndNumber
     case exceededCharacters
@@ -16,7 +16,7 @@ enum NicknameValidationType {
     case alreadyUsed
 }
 
-extension NicknameValidationType: CustomStringConvertible {
+extension CheckValidationType: CustomStringConvertible {
     var description: String {
         switch self {
         case .available:

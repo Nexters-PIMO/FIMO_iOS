@@ -66,7 +66,6 @@ struct ProfilePictureSettingView: View {
 
                         ZStack {
                             Rectangle()
-                                .foregroundColor(.clear)
 
                             Circle()
                                 .blendMode(.destinationOut)
@@ -76,7 +75,6 @@ struct ProfilePictureSettingView: View {
                         .foregroundColor(.black)
                         .opacity(0.6)
                     }
-                    .compositingGroup()
 
                 }
             })

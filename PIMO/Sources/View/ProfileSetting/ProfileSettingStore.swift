@@ -10,17 +10,26 @@ import SwiftUI
 
 import ComposableArchitecture
 
+protocol NextButtonStateProtocol {
+    var isActiveButton: Bool { get set }
+}
+
+protocol NextButtonActionProtocol {
+    static var tappedNextButtonOnNickname: Self { get }
+}
+
 struct ProfileSettingStore: ReducerProtocol {
-    struct State: Equatable {
+    struct State: Equatable, NextButtonStateProtocol {
         // MARK: 닉네임 설정
         @BindingState var nickname: String = ""
-        var nicknameValidationType: NicknameValidationType = .blank
+        var nicknameValidationType: CheckValidationType = .blank
         var isBlackNicknameField: Bool = true
         var isActiveButtonOnNickname: Bool = false
+        var isActiveButton: Bool = false
 
         // MARK: 아카이브 설정
         @BindingState var archiveName: String = ""
-        var archiveValidationType: NicknameValidationType = .blank
+        var archiveValidationType: CheckValidationType = .blank
         var isBlackArchiveField: Bool = true
         var isActiveButtonOnArchive: Bool = false
 
@@ -30,7 +39,7 @@ struct ProfileSettingStore: ReducerProtocol {
         var isActiveButtonOnImage: Bool  = false
     }
 
-    enum Action: BindableAction, Equatable {
+    enum Action: BindableAction, Equatable, NextButtonActionProtocol {
         case binding(BindingAction<State>)
         case checkDuplicateOnNickName
         case tappedNextButtonOnNickname
@@ -56,15 +65,9 @@ struct ProfileSettingStore: ReducerProtocol {
                 let nicknameCount = state.nickname.replacingOccurrences(of: "[가-힣]", with: "00", options: .regularExpression)
                     .count
 
-                if isBlack {
-                    state.nicknameValidationType = .blank
-                } else if isKoreanEnglishAndNumber {
-                    state.nicknameValidationType = .onlyKoreanEnglishAndNumber
-                } else if nicknameCount > 16 {
-                    state.nicknameValidationType = .exceededCharacters
-                } else {
-                    state.nicknameValidationType = .available
-                }
+                state.nicknameValidationType = checkValidation(isMatchCharactors: isKoreanEnglishAndNumber,
+                                                              isBlack: isBlack,
+                                                              charactorCount: nicknameCount)
 
                 return .none
             case .checkDuplicateOnNickName:
@@ -85,15 +88,9 @@ struct ProfileSettingStore: ReducerProtocol {
                 let archiveCharactorCount = state.archiveName.replacingOccurrences(of: "[가-힣]", with: "00", options: .regularExpression)
                     .count
 
-                if isBlack {
-                    state.archiveValidationType = .blank
-                } else if isKoreanEnglishAndNumber {
-                    state.archiveValidationType = .onlyKoreanEnglishAndNumber
-                } else if archiveCharactorCount > 16 {
-                    state.archiveValidationType = .exceededCharacters
-                } else {
-                    state.archiveValidationType = .available
-                }
+                state.archiveValidationType = checkValidation(isMatchCharactors: isKoreanEnglishAndNumber,
+                                                              isBlack: isBlack,
+                                                              charactorCount: archiveCharactorCount)
 
                 return .none
             case .checkDuplicateOnArchive:
@@ -117,6 +114,20 @@ struct ProfileSettingStore: ReducerProtocol {
             default:
                 return .none
             }
+        }
+    }
+
+    private func checkValidation(isMatchCharactors: Bool,
+                                 isBlack: Bool,
+                                 charactorCount: Int) -> CheckValidationType {
+        if isBlack {
+            return .blank
+        } else if isMatchCharactors {
+            return .onlyKoreanEnglishAndNumber
+        } else if charactorCount > 16 {
+            return .exceededCharacters
+        } else {
+            return .available
         }
     }
 }
