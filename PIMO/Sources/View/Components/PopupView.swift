@@ -75,7 +75,6 @@ struct PopupButton: View {
 struct PopupView_Previews: PreviewProvider {
     static var previews: some View {
         PopupView(
-            image: Image("a"),
             title: "Hello",
             message: "World!",
             popupButtons: [
