@@ -14,18 +14,23 @@ import KakaoSDKUser
 
 struct LoginStore: ReducerProtocol {
     struct State: Equatable {
+        @BindingState var isAlertShowing = false
         var isSignIn = false
         var errorMessage = ""
     }
     
-    enum Action: Equatable {
+    enum Action: BindableAction, Equatable {
+        case binding(BindingAction<State>)
         case tappedKakaoLoginButton
         case tappedAppleLoginButton
+        case showAlert
+        case tappedAlertOKButton
     }
     
     @Dependency(\.loginClient) var loginClient
     
     var body: some ReducerProtocol<State, Action> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
             case .tappedAppleLoginButton:
@@ -59,6 +64,16 @@ struct LoginStore: ReducerProtocol {
                 state.errorMessage = errorMessage
                 state.isSignIn = isSignIn
                 
+                return .none
+            case .showAlert:
+                state.isAlertShowing = true
+                
+                return .none
+            case .tappedAlertOKButton:
+                state.isAlertShowing = false
+                
+                return .none
+            default:
                 return .none
             }
         }

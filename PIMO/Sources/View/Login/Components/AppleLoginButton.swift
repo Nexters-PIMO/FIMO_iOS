@@ -10,23 +10,25 @@ import AuthenticationServices
 import SwiftUI
 import UIKit
 
+import ComposableArchitecture
+
 struct AppleLoginButton: UIViewRepresentable {
-    @Binding var isAlertShowing: Bool
+    let viewStore: ViewStore<LoginStore.State, LoginStore.Action>
     let window: UIWindow
     let title: String
     let action: () -> Void
 
     var appleLoginButton = UIButton()
 
-    func makeCoordinator() -> Coordinator { Coordinator(self, isAlertShowing: $isAlertShowing) }
+    func makeCoordinator() -> Coordinator { Coordinator(self, viewStore: viewStore) }
 
     class Coordinator: NSObject {
         var appleLoginButton: AppleLoginButton
-        @Binding var isAlertShowing: Bool
-
-        init(_ appleLoginButton: AppleLoginButton, isAlertShowing: Binding<Bool>) {
+        let viewStore: ViewStore<LoginStore.State, LoginStore.Action>
+        
+        init(_ appleLoginButton: AppleLoginButton, viewStore: ViewStore<LoginStore.State, LoginStore.Action>) {
             self.appleLoginButton = appleLoginButton
-            self._isAlertShowing = isAlertShowing
+            self.viewStore = viewStore
             
             super.init()
         }
@@ -84,7 +86,7 @@ extension AppleLoginButton.Coordinator: ASAuthorizationControllerDelegate {
           let provider = ASAuthorizationAppleIDProvider()
           let userName = appleIDCredential.fullName?.formatted() // TODO: 필요없는 경우 제거
           
-          provider.getCredentialState(forUserID: userID) { [weak self] credentialState, error in
+          provider.getCredentialState(forUserID: userID) { [weak self] credentialState, _ in
               guard let self else { return }
               
               switch credentialState {
@@ -97,17 +99,16 @@ extension AppleLoginButton.Coordinator: ASAuthorizationControllerDelegate {
                         let identityToken = String(data: identityTokenData, encoding: .utf8) else {
                       return
                   }
-                  
                   UIPasteboard.general.string = identityToken // TODO: 테스트 이후 제거 예정
-                  self.isAlertShowing = true
+                  
               case .notFound, .revoked, .transferred:
                   #if DEBUG
                   print("Apple Login Fail")
                   #endif
                   
-                  self.isAlertShowing = true
+                  self.viewStore.send(.showAlert)
               @unknown default:
-                  self.isAlertShowing = true
+                  self.viewStore.send(.showAlert)
               }
           }
       default:
