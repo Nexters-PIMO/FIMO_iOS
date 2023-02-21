@@ -40,17 +40,19 @@ struct LoginView: View {
                         .foregroundColor(.white)
                         .padding(.top, 0)
                         .padding(.bottom, 18)
-                    Image(uiImage: PIMOAsset.Assets.kakaoLoginMediumWide.image)
-                        .resizable()
-                        .renderingMode(.original)
-                        .scaledToFill()
-                        .cornerRadius(8)
-                        .frame(width: 360, height: 54)
-                        .onTapGesture {
-                            viewStore.send(.tappedKakaoLoginButton)
-                        }
-                        .padding(.top, 0)
-                        .padding(.bottom, 18)
+                    Button {
+                        viewStore.send(.tappedKakaoLoginButton)
+                    } label: {
+                        Image(uiImage: PIMOAsset.Assets.kakaoLoginMediumWide.image)
+                            .resizable()
+                            .renderingMode(.original)
+                            .scaledToFill()
+                            .cornerRadius(8)
+                    }
+                    .frame(width: 360, height: 54)
+                    .padding(.top, 0)
+                    .padding(.bottom, 18)
+                        
                     AppleLoginButton(
                         isAlertShowing: $isAlertShowing,
                         window: sceneDelegate.window!,

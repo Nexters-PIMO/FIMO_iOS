@@ -10,6 +10,6 @@ let project = Project.app(
     dependencies: [
         .external(name: "Alamofire"),
         .external(name: "ComposableArchitecture"),
-        .external(name: "Kingfisher")
+        .external(name: "Kingfisher"),
         .external(name: "KakaoSDK")
     ])
