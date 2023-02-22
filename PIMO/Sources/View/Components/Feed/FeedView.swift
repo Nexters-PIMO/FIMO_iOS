@@ -46,25 +46,31 @@ struct FeedView: View {
                 Spacer()
                     .frame(width: 18)
                 
-                Image(uiImage: PIMOAsset.Assets.more.image)
-                    .onTapGesture {
-                        // TODO: 바텀 시트
-                    }
+                Button {
+                    moreAction?()
+                } label: {
+                    Image(uiImage: PIMOAsset.Assets.more.image)
+                }
             }
             
             Spacer()
                 .frame(height: 8)
             
             // 글사진
-            ZStack {
+            ZStack(alignment: .top) {
                 TabView {
-                    ForEach(feed.textImages, id: \.id) { textImage in
-                        FeedTextImageView(textImage: textImage)
+                    ForEach(feed.textImages, id: \.id) {
+                        FeedTextImageView(textImage: $0)
+                            .tag($0)
                     }
                 }
-                .tabViewStyle(PageTabViewStyle())
-                .frame(width: 353, height: 353)
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(height: width)
                 .cornerRadius(4)
+                
+                textCopyButton()
+                
+                indexDisplay()
             }
             
             Spacer()
@@ -87,8 +93,64 @@ struct FeedView: View {
         .padding(EdgeInsets(top: 22, leading: 20, bottom: 0, trailing: 20))
     }
     
+    func textCopyButton() -> some View {
+        HStack(spacing: 4) {
+            Button {
+                copyAction?()
+            } label: {
+                ZStack {
+                    Circle()
+                        .frame(width: 40, height: 40)
+                        .foregroundColor(.black)
+                    
+                    Image(uiImage: PIMOAsset.Assets.copy.image)
+                }
+            }
+            
+            ZStack {
+                Image(uiImage: PIMOAsset.Assets.textCopy.image)
+                
+                HStack {
+                    Spacer()
+                        .frame(width: 12)
+                    
+                    Text(PIMOStrings.textCopy)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.white)
+                    
+                    Spacer()
+                        .frame(width: 3)
+                    
+                    Button {
+                        closeAction?()
+                    } label: {
+                        Image(uiImage: PIMOAsset.Assets.close.image)
+                    }
+                }
+            }
+        }
+        .padding(.leading, -(width)/2 + 36)
+        .padding(.top, 16)
+    }
+    
+    func indexDisplay() -> some View {
+        HStack(spacing: 4) {
+            ForEach(feed.textImages, id: \.self) {
+                Circle()
+                    .frame(width: 4, height: 4)
+                    .foregroundColor(
+                        ($0 == selectedTextImage) ? Color(PIMOAsset.Assets.orange.color) : Color(PIMOAsset.Assets.grayUnactive.color))
+            }
+        }
+        .padding(.top, width - 12)
+        .isHidden(feed.textImages.count == 1)
+    }
+    
     func clapButton() -> some View {
-        Button(action: { print("clap") }) {
+        Button {
+            clapAction?()
+            clapButtonDidTap.toggle()
+        } label: {
             ZStack {
                 Rectangle()
                     .frame(width: 86, height: 38)
@@ -96,7 +158,11 @@ struct FeedView: View {
                     .cornerRadius(20)
                 
                 HStack {
-                    Image(uiImage: PIMOAsset.Assets.clap.image)
+                    if feed.isClapped {
+                        Image(uiImage: PIMOAsset.Assets.clapSelected.image)
+                    } else {
+                        Image(uiImage: PIMOAsset.Assets.clap.image)
+                    }
                     
                     Text("\(feed.clapCount)")
                         .font(.system(size: 16))
@@ -120,9 +186,17 @@ struct FeedView: View {
     }
     
     func audioButton() -> some View {
-        Button(action: { print("audio") }) {
-            Image(uiImage: PIMOAsset.Assets.audio.image)
-                .frame(width: 80, height: 20)
+        Button(action: {
+            audioAction?()
+            audioButtonDidTap.toggle()
+        }) {
+            if audioButtonDidTap {
+                Image(uiImage: PIMOAsset.Assets.audioSelected.image)
+                    .frame(width: 80, height: 20)
+            } else {
+                Image(uiImage: PIMOAsset.Assets.audio.image)
+                    .frame(width: 80, height: 20)
+            }
         }
     }
 }

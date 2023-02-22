@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct TextImage: Decodable, Equatable {
+struct TextImage: Decodable, Equatable, Hashable {
     let id: Int
     let imageURL: String
     let text: String

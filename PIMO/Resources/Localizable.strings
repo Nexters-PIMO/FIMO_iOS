@@ -12,6 +12,9 @@ newPost = "오늘 새로운 게시물 %d개";
 welcome = "에 오신 것을 환영해요";
 welcomeGuide = "본인 프로필 혹은 게시물 공유로\n친구를 맺고 더 많은 글사진을 살펴볼 수 있어요";
 
+// Feed
+textCopy = "텍스트 복사하기";
+
 /// Example
 profileImage = "https://ifh.cc/g/gCgJSO.jpg";
-textImage = "https://ifh.cc/g/vQHllj.png";
+textImage = "https://ifh.cc/g/aBrbcB.png";
