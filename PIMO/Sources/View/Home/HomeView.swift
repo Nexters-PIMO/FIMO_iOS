@@ -36,17 +36,27 @@ struct HomeView: View {
             LazyVStack(alignment: .center) {
                 VStack {
                     ForEach(viewStore.feeds, id: \.id) { feed in
-                        FeedView(feed: feed)
+                        FeedView(
+                            feed: feed,
+                            selectedTextImage: feed.textImages[0],
+                            moreAction: { viewStore.send(.moreButtonDidTap) },
+                            copyAction: { viewStore.send(.copyButtonDidTap) },
+                            closeAction: { viewStore.send(.closeButtonDidTap) },
+                            clapAction: { viewStore.send(.clapButtonDidTap) },
+                            shareAction: { viewStore.send(.shareButtonDidTap) },
+                            audioAction: { viewStore.send(.audioButtonDidTap) }
+                        )
                         
                         Spacer()
                             .frame(height: 12)
                         
                         Divider()
                             .background(Color(PIMOAsset.Assets.grayDivider.color))
-                            .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
+                            .padding([.leading, .trailing], 20)
                     }
                 }
             }
+            .padding(.bottom, 72)
         }
         .scrollIndicators(.hidden)
     }

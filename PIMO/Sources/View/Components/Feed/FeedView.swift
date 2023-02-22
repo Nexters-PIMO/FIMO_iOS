@@ -12,10 +12,38 @@ import ComposableArchitecture
 import Kingfisher
 
 struct FeedView: View {
-    private let feed: Feed
     
-    init(feed: Feed) {
+    let width = UIScreen.main.bounds.width - 40
+    
+    @State private var clapButtonDidTap: Bool = false
+    @State private var audioButtonDidTap: Bool = false
+    
+    private let feed: Feed
+    @State var selectedTextImage: TextImage
+    
+    private var moreAction: (() -> Void)?
+    private var copyAction: (() -> Void)?
+    private var closeAction: (() -> Void)?
+    private var clapAction: (() -> Void)?
+    private var shareAction: (() -> Void)?
+    private var audioAction: (() -> Void)?
+    
+    init(feed: Feed,
+         selectedTextImage: TextImage,
+         moreAction: (() -> Void)? = nil,
+         copyAction: (() -> Void)? = nil,
+         closeAction: (() -> Void)? = nil,
+         clapAction: (() -> Void)? = nil,
+         shareAction: (() -> Void)? = nil,
+         audioAction: (() -> Void)? = nil) {
         self.feed = feed
+        self.selectedTextImage = selectedTextImage
+        self.moreAction = moreAction
+        self.copyAction = copyAction
+        self.closeAction = closeAction
+        self.clapAction = clapAction
+        self.shareAction = shareAction
+        self.audioAction = audioAction
     }
     
     var body: some View {
@@ -203,18 +231,23 @@ struct FeedView: View {
 
 struct FeedView_Previews: PreviewProvider {
     static var previews: some View {
-        FeedView(feed:
-                    Feed(id: 1,
-                         profile: Profile(imageURL: PIMOStrings.profileImage, nickName: "0inn1"),
-                         uploadTime: "5분 전",
-                         textImages: [TextImage(
+        FeedView(
+            feed:
+                Feed(id: 1,
+                     profile: Profile(imageURL: PIMOStrings.profileImage, nickName: "0inn1"),
+                     uploadTime: "5분 전",
+                     textImages: [
+                        TextImage(
                             id: 1,
                             imageURL: PIMOStrings.textImage, text: "안녕"),
-                                      TextImage(
-                                        id: 2,
-                                        imageURL: PIMOStrings.textImage, text: "안녕")],
-                         clapCount: 310,
-                         isClapped: false)
+                        TextImage(
+                            id: 2,
+                            imageURL: PIMOStrings.textImage, text: "안녕")],
+                     clapCount: 310,
+                     isClapped: false),
+            selectedTextImage: TextImage(
+                id: 1,
+                imageURL: PIMOStrings.textImage, text: "안녕")
         )
     }
 }
