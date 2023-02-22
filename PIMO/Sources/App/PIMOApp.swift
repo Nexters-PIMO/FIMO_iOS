@@ -15,17 +15,23 @@ struct PIMOApp: App {
             ) { viewStore in
                 switch viewStore.state {
                 case .unAuthenticated:
-                    OnboardingView(
+                    TabBarView(
                         store: appDelegate.store.scope(
-                            state: \.onboardingState,
-                            action: AppStore.Action.onboarding
+                            state: \.tabBarState,
+                            action: AppStore.Action.tabBar
                         )
                     )
-                    .onOpenURL { url in
-                        if AuthApi.isKakaoTalkLoginUrl(url) {
-                            AuthController.handleOpenUrl(url: url)
-                        }
-                    }
+//                    OnboardingView(
+//                        store: appDelegate.store.scope(
+//                            state: \.onboardingState,
+//                            action: AppStore.Action.onboarding
+//                        )
+//                    )
+//                    .onOpenURL { url in
+//                        if AuthApi.isKakaoTalkLoginUrl(url) {
+//                            AuthController.handleOpenUrl(url: url)
+//                        }
+//                    }
                 case .authenticated:
                     TabBarView(
                         store: appDelegate.store.scope(

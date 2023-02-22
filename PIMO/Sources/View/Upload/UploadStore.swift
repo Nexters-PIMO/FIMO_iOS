@@ -11,11 +11,16 @@ import ComposableArchitecture
 struct UploadStore: ReducerProtocol {
     struct State: Equatable { }
     
-    enum Action: Equatable { }
+    enum Action: Equatable {
+        case didTapCloseButton
+    }
     
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
-            return .none
+            switch action {
+            case .didTapCloseButton:
+                return .none
+            }
         }
     }
 }
