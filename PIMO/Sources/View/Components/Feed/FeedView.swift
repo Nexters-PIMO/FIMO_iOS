@@ -86,8 +86,8 @@ struct FeedView: View {
             
             // 글사진
             ZStack(alignment: .top) {
-                TabView {
-                    ForEach(feed.textImages, id: \.id) {
+                TabView(selection: $selectedTextImage) {
+                    ForEach(feed.textImages, id: \.self) {
                         FeedTextImageView(textImage: $0)
                             .tag($0)
                     }
