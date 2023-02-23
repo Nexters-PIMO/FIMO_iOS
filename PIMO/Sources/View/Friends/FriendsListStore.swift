@@ -14,20 +14,7 @@ struct FriendsListStore: ReducerProtocol {
     struct State: Equatable {
         var currentTab: FriendType = .mutualFriends
         var selectedSort: FriendListSortType = .newest
-        var friendsList: [FriendList] = [
-            FriendList(count: 2, friendType: .mutualFriends, friends: [
-                .init(friendType: .mutualFriends, prifileImageURL: "", name: "김옥현", archiveName: "하루", count: 2),
-                .init(friendType: .mutualFriends, prifileImageURL: "", name: "김김김", archiveName: "이틀", count: 1)
-            ]),
-            FriendList(count: 2, friendType: .myFriends, friends: [
-                .init(friendType: .mutualFriends, prifileImageURL: "", name: "김호현", archiveName: "하루", count: 2),
-                .init(friendType: .mutualFriends, prifileImageURL: "", name: "김김김", archiveName: "이틀", count: 1)
-            ]),
-            FriendList(count: 2, friendType: .theirFriends, friends: [
-                .init(friendType: .mutualFriends, prifileImageURL: "", name: "호호호", archiveName: "하루", count: 2),
-                .init(friendType: .mutualFriends, prifileImageURL: "", name: "김김김", archiveName: "이틀", count: 1)
-            ])
-        ]
+        var friendsList: [FriendList] = []
 
         var selectedFriendsList: FriendList {
             if friendsList.count > currentTab.index {
