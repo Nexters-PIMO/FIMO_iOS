@@ -9,10 +9,17 @@
 import SwiftUI
 
 struct PopupView: View {
-    var image: Image?
-    var title: String
-    var message: String
-    var popupButtons: [PopupButton]
+    private var image: Image?
+    private var title: String
+    private var message: String
+    private var popupButtons: [PopupButton]
+
+    init(image: Image? = nil, title: String, message: String, popupButtons: [PopupButton]) {
+        self.image = image
+        self.title = title
+        self.message = message
+        self.popupButtons = popupButtons
+    }
 
     var body: some View {
         ZStack {
