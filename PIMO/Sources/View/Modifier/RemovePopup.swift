@@ -1,5 +1,5 @@
 //
-//  RemovePopupViewModifier.swift
+//  RemovePopup.swift
 //  PIMO
 //
 //  Created by Ok Hyeon Kim on 2023/02/21.
@@ -7,6 +7,12 @@
 //
 
 import SwiftUI
+
+extension View {
+    func removePopup(isShowing: Binding<Bool>) -> some View {
+        return self.modifier(RemovePopupViewModifier(isShowing: isShowing))
+    }
+}
 
 struct RemovePopupViewModifier: ViewModifier {
     // TODO: Store 추가 필요
@@ -56,6 +62,6 @@ struct RemovePopupViewModifier: ViewModifier {
 struct RemovePopupViewModifier_Previews: PreviewProvider {
     static var previews: some View {
         Text("Hello World!")
-            .modifier(RemovePopupViewModifier(isShowing: .constant(true)))
+            .removePopup(isShowing: .constant(true))
     }
 }
