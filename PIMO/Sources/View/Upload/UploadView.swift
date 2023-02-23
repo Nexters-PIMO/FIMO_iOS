@@ -66,6 +66,15 @@ struct UploadView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 uploadButton(viewStore: viewStore)
+                    .onTapGesture {
+                        viewStore.send(.didTapUploadButton)
+                    }
+                    .sheet(isPresented: viewStore.binding(\.$isShowImagePicker)) {
+                        ImagePicker { uiImage in
+                            let image = Image(uiImage: uiImage)
+                            viewStore.send(.selectProfileImage(image))
+                        }
+                    }
             }
         }
     }
@@ -81,16 +90,12 @@ struct UploadView: View {
             }
             
             VStack(spacing: 0) {
-                Button {
+                ZStack {
+                    Circle()
+                        .foregroundColor(Color(PIMOAsset.Assets.gray1.color))
+                        .frame(width: 20, height: 20)
                     
-                } label: {
-                    ZStack {
-                        Circle()
-                            .foregroundColor(Color(PIMOAsset.Assets.gray1.color))
-                            .frame(width: 20, height: 20)
-                        
-                        Image(uiImage: PIMOAsset.Assets.uploadButton.image)
-                    }
+                    Image(uiImage: PIMOAsset.Assets.uploadButton.image)
                 }
                 .padding(.bottom, 4)
 
