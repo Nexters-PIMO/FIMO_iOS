@@ -106,14 +106,14 @@ struct ToastViewModifier: ViewModifier {
                         message: message,
                         isTabBarVisible: isTabBarVisible
                     )
-                        .onTapGesture {
+                    .onTapGesture {
+                        isShowing = false
+                    }
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                             isShowing = false
                         }
-                        .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-                                isShowing = false
-                            }
-                        }
+                    }
                 }
             }
             .animation(.easeInOut, value: isShowing)
