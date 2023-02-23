@@ -15,5 +15,5 @@ struct FriendList {
 }
 
 extension FriendList: Equatable {
-    static var EMPTY: FriendList = .init(count: 30, friendType: .mutualFriends, friends: [Friend]())
+    static var EMPTY: FriendList = .init(count: 0, friendType: .mutualFriends, friends: [Friend]())
 }
