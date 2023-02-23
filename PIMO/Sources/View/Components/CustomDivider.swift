@@ -9,7 +9,11 @@
 import SwiftUI
 
 struct CustomDivider: View {
-    var weight: CGFloat = 1
+    private var weight: CGFloat = 1
+
+    init(weight: CGFloat = 1) {
+        self.weight = weight
+    }
 
     var body: some View {
         Rectangle()

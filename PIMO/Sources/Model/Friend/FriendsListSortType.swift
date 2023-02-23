@@ -10,5 +10,5 @@ import Foundation
 
 enum FriendListSortType {
     case newest
-    case charactorOrder
+    case characterOrder
 }

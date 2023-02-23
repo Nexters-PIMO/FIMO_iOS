@@ -47,7 +47,7 @@ struct FriendsListStore: ReducerProtocol {
                 state.selectedSort = .newest
                 return .none
             case .tappedCharactorOrderButton:
-                state.selectedSort = .charactorOrder
+                state.selectedSort = .characterOrder
                 return .none
             }
         }

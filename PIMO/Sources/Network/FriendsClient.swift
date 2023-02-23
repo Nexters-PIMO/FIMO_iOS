@@ -27,16 +27,16 @@ extension FriendsClient: DependencyKey {
         // TODO: 서버 통신
         return [
             FriendList(count: 2, friendType: .mutualFriends, friends: [
-                .init(friendType: .mutualFriends, prifileImageURL: "", name: "김옥현", archiveName: "하루", count: 2),
-                .init(friendType: .mutualFriends, prifileImageURL: "", name: "김김김", archiveName: "이틀", count: 1)
+                .init(friendType: .mutualFriends, profileImageURL: "", name: "김옥현", archiveName: "하루", count: 2),
+                .init(friendType: .mutualFriends, profileImageURL: "", name: "김김김", archiveName: "이틀", count: 1)
             ]),
             FriendList(count: 2, friendType: .myFriends, friends: [
-                .init(friendType: .mutualFriends, prifileImageURL: "", name: "김옥현", archiveName: "하루", count: 2),
-                .init(friendType: .mutualFriends, prifileImageURL: "", name: "김김김", archiveName: "이틀", count: 1)
+                .init(friendType: .mutualFriends, profileImageURL: "", name: "김옥현", archiveName: "하루", count: 2),
+                .init(friendType: .mutualFriends, profileImageURL: "", name: "김김김", archiveName: "이틀", count: 1)
             ]),
             FriendList(count: 2, friendType: .theirFriends, friends: [
-                .init(friendType: .mutualFriends, prifileImageURL: "", name: "김옥현", archiveName: "하루", count: 2),
-                .init(friendType: .mutualFriends, prifileImageURL: "", name: "김김김", archiveName: "이틀", count: 1)
+                .init(friendType: .mutualFriends, profileImageURL: "", name: "김옥현", archiveName: "하루", count: 2),
+                .init(friendType: .mutualFriends, profileImageURL: "", name: "김김김", archiveName: "이틀", count: 1)
             ])
         ]
     }

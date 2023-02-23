@@ -43,7 +43,7 @@ struct FrientdsListView: View {
 
     func friendCell(_ store: ViewStore<FriendsListStore.State, FriendsListStore.Action>, friend: Friend) -> some View {
         HStack(alignment: .center) {
-            KFImage(URL(string: friend.prifileImageURL))
+            KFImage(URL(string: friend.profileImageURL))
                 .retry(maxCount: 3, interval: .seconds(5))
                 .cacheOriginalImage()
                 .resizable()
@@ -124,7 +124,7 @@ struct FrientdsListView: View {
                     } label: {
                         Text("가나다순")
                             .foregroundColor(
-                                store.selectedSort == .charactorOrder
+                                store.selectedSort == .characterOrder
                                 ? Color(PIMOAsset.Assets.red1.color)
                                 : .black
                             )

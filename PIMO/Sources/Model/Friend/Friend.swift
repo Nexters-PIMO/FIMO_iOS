@@ -10,7 +10,7 @@ import Foundation
 
 struct Friend {
     let friendType: FriendType
-    let prifileImageURL: String
+    let profileImageURL: String
     let name: String
     let archiveName: String
     let count: Int
