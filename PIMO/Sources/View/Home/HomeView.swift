@@ -35,17 +35,13 @@ struct HomeView: View {
         ScrollView {
             LazyVStack(alignment: .center) {
                 VStack {
-                    ForEach(viewStore.feeds, id: \.id) { feed in
-                        FeedView(
-                            feed: feed,
-                            selectedTextImage: feed.textImages[0],
-                            moreAction: { viewStore.send(.moreButtonDidTap) },
-                            copyAction: { viewStore.send(.copyButtonDidTap) },
-                            closeAction: { viewStore.send(.closeButtonDidTap) },
-                            clapAction: { viewStore.send(.clapButtonDidTap) },
-                            shareAction: { viewStore.send(.shareButtonDidTap) },
-                            audioAction: { viewStore.send(.audioButtonDidTap) }
+                    ForEachStore(
+                        self.store.scope(
+                            state: \.feeds,
+                            action: HomeStore.Action.feed(id:action:)
                         )
+                    ) {
+                        FeedView(store: $0)
                         
                         Spacer()
                             .frame(height: 12)
