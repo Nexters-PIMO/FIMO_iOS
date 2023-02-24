@@ -26,9 +26,9 @@ struct UploadView: View {
                         x: 0,
                         y: 3
                     )
+                    .padding(.bottom, 20)
                 
                 photoUploader(viewStore: viewStore)
-                    .frame(width: 72, height: 86)
                     
                 Spacer()
             }
@@ -71,10 +71,17 @@ struct UploadView: View {
                     }
                     .sheet(isPresented: viewStore.binding(\.$isShowImagePicker)) {
                         ImagePicker { uiImage in
-                            let image = Image(uiImage: uiImage)
-                            viewStore.send(.selectProfileImage(image))
+                            let uploadImage = UploadImage(
+                                id: viewStore.uploadedImages.count - 1,
+                                image: uiImage
+                            )
+                            
+                            viewStore.send(.selectProfileImage(uploadImage))
                         }
                     }
+                    .frame(width: 72, height: 86)
+                
+                Spacer()
             }
         }
     }
@@ -107,13 +114,32 @@ struct UploadView: View {
                     .padding(.bottom, 8)
                 
                 HStack(spacing: 0) {
-                    Text("\(viewStore.uploadedImagesCount)")
+                    Text("\(viewStore.uploadedImages.count)")
                     Text("/5")
                         .foregroundColor(Color(PIMOAsset.Assets.gray3.color))
                 }
                 .font(Font(PIMOFontFamily.Pretendard.medium.font(size: 16)))
                 .frame(width: 26, height: 18)
             }
+        }
+    }
+    
+    private func uploadedImage(viewStore: ViewStore<UploadStore.State, UploadStore.Action>) -> some View {
+//        LazyHGrid(rows: [GridItem(.fixed(72))], spacing: 8) {
+//            ForEach(viewStore.uploadedImages) { image in
+//
+//            }
+//        }
+        HStack(spacing: 8) {
+            VStack {
+                Spacer()
+                
+                Rectangle()
+                    .foregroundColor(Color(uiColor: PIMOAsset.Assets.gray0.color))
+                    .frame(width: 72, height: 72)
+            }
+            
+            
         }
     }
 }
