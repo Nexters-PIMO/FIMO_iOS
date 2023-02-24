@@ -22,12 +22,12 @@ struct FeedStore: ReducerProtocol {
     
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
-        case moreButtonDidTap
-        case copyButtonDidTap
+        case moreButtonDidTap(Int)
+        case copyButtonDidTap(String)
         case closeButtonDidTap
         case clapButtonDidTap
         case shareButtonDidTap
-        case audioButtonDidTap
+        case audioButtonDidTap(String)
     }
     
     private enum FeedID { }
@@ -37,26 +37,13 @@ struct FeedStore: ReducerProtocol {
         Reduce { state, action in
             switch action {
             case .binding:
-                return .none
-            case .moreButtonDidTap:
-                // TODO: 바텀시트
-                let _ = print("more")
-            case .copyButtonDidTap:
-                // TODO: 텍스트 복사
-                let _ = print("copy")
-            case .closeButtonDidTap:
-                // TODO: 텍스트 닫기 (UserDefault)
-                let _ = print("close")
+                break
             case .clapButtonDidTap:
                 state.clapCount += 1
-                let _ = print("clap")
-            case .shareButtonDidTap:
-                // TODO: 딥링크
-                let _ = print("share")
             case .audioButtonDidTap:
-                // TODO: TTS
                 state.audioButtonDidTap.toggle()
-                let _ = print("audio")
+            default:
+                break
             }
             return .none
         }

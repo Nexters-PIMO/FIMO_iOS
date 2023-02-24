@@ -46,7 +46,7 @@ struct FeedView: View {
                         .frame(width: 18)
                     
                     Button {
-                        viewStore.send(.moreButtonDidTap)
+                        viewStore.send(.moreButtonDidTap(viewStore.id))
                     } label: {
                         Image(uiImage: PIMOAsset.Assets.more.image)
                     }
@@ -96,7 +96,7 @@ struct FeedView: View {
     func textCopyButton(_ viewStore: ViewStore<FeedStore.State, FeedStore.Action>) -> some View {
         HStack(spacing: 4) {
             Button {
-                viewStore.send(.copyButtonDidTap)
+                viewStore.send(.copyButtonDidTap(viewStore.state.textImage.text))
             } label: {
                 ZStack {
                     Circle()
@@ -191,7 +191,7 @@ struct FeedView: View {
     
     func audioButton(_ viewStore: ViewStore<FeedStore.State, FeedStore.Action>) -> some View {
         Button {
-            viewStore.send(.audioButtonDidTap)
+            viewStore.send(.audioButtonDidTap(viewStore.state.textImage.text))
         } label: {
             let audioButtonImage = viewStore.audioButtonDidTap ?
             PIMOAsset.Assets.audioSelected.image : PIMOAsset.Assets.audio.image
