@@ -81,6 +81,9 @@ struct UploadView: View {
                     }
                     .frame(width: 72, height: 86)
                 
+                uploadedImage(viewStore: viewStore)
+                    .frame(width: 72, height: 86)
+                
                 Spacer()
             }
         }
@@ -125,21 +128,19 @@ struct UploadView: View {
     }
     
     private func uploadedImage(viewStore: ViewStore<UploadStore.State, UploadStore.Action>) -> some View {
-//        LazyHGrid(rows: [GridItem(.fixed(72))], spacing: 8) {
-//            ForEach(viewStore.uploadedImages) { image in
-//
-//            }
-//        }
-        HStack(spacing: 8) {
-            VStack {
-                Spacer()
-                
-                Rectangle()
-                    .foregroundColor(Color(uiColor: PIMOAsset.Assets.gray0.color))
-                    .frame(width: 72, height: 72)
+        LazyHGrid(rows: [GridItem(.fixed(72))], spacing: 8) {
+            ForEach(viewStore.uploadedImages) { uploadedImage in
+                VStack {
+                    Spacer()
+                    
+                    Image(uiImage: uploadedImage.image)
+                        .resizable()
+                        .renderingMode(.original)
+                        .scaledToFit()
+                        .cornerRadius(2)
+                        .frame(width: 72, height: 72)
+                }
             }
-            
-            
         }
     }
 }

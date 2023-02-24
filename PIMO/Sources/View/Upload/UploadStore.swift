@@ -40,7 +40,10 @@ struct UploadStore: ReducerProtocol {
             case .selectProfileImage(let uploadImage):
                 let extractedText = extractText(from: uploadImage, state: &state)
                 let image = UploadImage(id: uploadImage.id, image: uploadImage.image, text: extractedText)
-                state.uploadedImages.append(image)
+                
+                if !state.isShowOCRErrorToast {
+                    state.uploadedImages.append(image)
+                }
                 
                 return .none
             default:
