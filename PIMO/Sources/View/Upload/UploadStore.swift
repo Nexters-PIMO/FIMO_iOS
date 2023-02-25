@@ -13,6 +13,7 @@ import ComposableArchitecture
 
 struct UploadStore: ReducerProtocol {
     struct State: Equatable {
+        @BindingState var isClose = false
         @BindingState var isShowImagePicker = false
         var uploadedImages = [UploadImage]()
         
@@ -22,6 +23,7 @@ struct UploadStore: ReducerProtocol {
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
         case didTapCloseButton
+        case didTapCloseButtonWithData
         case didTapUploadButton
         case didTapPublishButton
         case didTapDeleteButton(Int)
@@ -33,6 +35,15 @@ struct UploadStore: ReducerProtocol {
         Reduce { state, action in
             switch action {
             case .didTapCloseButton:
+                state.uploadedImages = []
+                state.isClose = false
+                state.isShowImagePicker = false
+                state.isShowOCRErrorToast = false
+                
+                return .none
+            case .didTapCloseButtonWithData:
+                state.isClose = true
+                
                 return .none
             case .didTapUploadButton:
                 state.isShowImagePicker = true

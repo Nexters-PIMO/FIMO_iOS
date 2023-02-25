@@ -41,6 +41,10 @@ struct UploadView: View {
                     .padding(.bottom, 60)
                     .frame(width: 353, height: 56)
             }
+            .modifier(ClosePopupViewModifier(
+                viewStore: viewStore,
+                isShowing: viewStore.binding(\.$isClose)
+            ))
             .toast(
                 isShowing: viewStore.binding(\.$isShowOCRErrorToast),
                 title: "글이 존재하지 않는 사진이에요!",
@@ -58,7 +62,11 @@ struct UploadView: View {
                 .foregroundColor(.white)
             HStack {
                 Button {
-                    viewStore.send(.didTapCloseButton)
+                    if viewStore.state.uploadedImages.isEmpty {
+                        viewStore.send(.didTapCloseButton)
+                    } else {
+                        viewStore.send(.didTapCloseButtonWithData)
+                    }
                 } label: {
                     Image(uiImage: PIMOAsset.Assets.closeBlack.image)
                 }
