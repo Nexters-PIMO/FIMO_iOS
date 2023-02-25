@@ -14,7 +14,7 @@ struct FeedStore: ReducerProtocol {
     struct State: Equatable, Identifiable {
         var id: Int
         var feed: Feed = .init()
-        @BindableState var textImage: TextImage = .init()
+        @BindingState var textImage: TextImage = .init()
         var clapCount: Int = 0
         var clapButtonDidTap: Bool = false
         var audioButtonDidTap: Bool = false

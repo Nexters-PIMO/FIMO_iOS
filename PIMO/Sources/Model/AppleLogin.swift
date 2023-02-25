@@ -8,4 +8,8 @@
 
 import Foundation
 
-struct AppleLogin: Decodable { }
+struct AppleLogin: Codable {
+    let email: String
+    let name: String
+    let identifier: String
+}

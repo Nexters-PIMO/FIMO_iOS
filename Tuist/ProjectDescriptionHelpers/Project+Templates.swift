@@ -16,6 +16,7 @@ extension Project {
             infoPlist: .extendingDefault(with: Project.infoPlist),
             sources: ["\(name)/Sources/**"],
             resources: ["\(name)/Resources/**"],
+            entitlements: "\(name)/\(name).entitlements",
             scripts: [.SwiftLintShell],
             dependencies: dependencies
         )
@@ -33,9 +34,15 @@ extension Project {
         
         let targets: [Target] = [mainTarget, testTarget]
         
+        let settings = Settings.settings(configurations: [
+                .debug(name: "Debug", xcconfig: .relativeToRoot("\(name)/Resources/Config.xcconfig")),
+                .release(name: "Release", xcconfig: .relativeToRoot("\(name)/Resources/Config.xcconfig"))
+            ])
+        
         return Project(
             name: name,
             organizationName: Environment.organizationName,
+            settings: settings,
             targets: targets)
     }
 }

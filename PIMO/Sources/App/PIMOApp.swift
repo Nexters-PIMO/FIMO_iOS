@@ -1,6 +1,8 @@
 import SwiftUI
 
 import ComposableArchitecture
+import KakaoSDKAuth
+import KakaoSDKCommon
 
 @main
 struct PIMOApp: App {
@@ -19,6 +21,11 @@ struct PIMOApp: App {
                             action: AppStore.Action.onboarding
                         )
                     )
+                    .onOpenURL { url in
+                        if AuthApi.isKakaoTalkLoginUrl(url) {
+                            AuthController.handleOpenUrl(url: url)
+                        }
+                    }
                 case .authenticated:
                     TabBarView(
                         store: appDelegate.store.scope(
@@ -32,5 +39,11 @@ struct PIMOApp: App {
                 #warning("TCA 맞춰 재로그인 구현 필요")
             }
         }
+    }
+    
+    init() {
+        let kakaoAppKey = Bundle.main.infoDictionary?["KAKAO_NATIVE_APP_KEY"] as? String
+        
+        KakaoSDK.initSDK(appKey: kakaoAppKey ?? "")
     }
 }
