@@ -29,9 +29,23 @@ struct UploadView: View {
                     .padding(.bottom, 20)
                 
                 photoUploader(viewStore: viewStore)
+                    .frame(width: screenWidth - 40, height: 88)
+                    .padding(.bottom, 38)
+                
+                mainImage(viewStore: viewStore)
+                    .frame(width: 353, height: 353)
                     
                 Spacer()
+                
+                publishButton(viewStore: viewStore)
+                    .padding(.bottom, 60)
+                    .frame(width: 353, height: 56)
             }
+            .toast(
+                isShowing: viewStore.binding(\.$isShowOCRErrorToast),
+                title: "글이 존재하지 않는 사진이에요!",
+                message: "글이 포함되어 있는 사진으로 업로드해주세요."
+            )
         }
     }
     
@@ -63,28 +77,32 @@ struct UploadView: View {
     }
     
     private func photoUploader(viewStore: ViewStore<UploadStore.State, UploadStore.Action>) -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                uploadButton(viewStore: viewStore)
-                    .onTapGesture {
+        HStack(spacing: 8) {
+            uploadButton(viewStore: viewStore)
+                .onTapGesture {
+                    if viewStore.state.uploadedImages.count < 6 {
                         viewStore.send(.didTapUploadButton)
                     }
-                    .sheet(isPresented: viewStore.binding(\.$isShowImagePicker)) {
-                        ImagePicker { uiImage in
-                            let uploadImage = UploadImage(
-                                id: viewStore.uploadedImages.count - 1,
-                                image: uiImage
-                            )
-                            
-                            viewStore.send(.selectProfileImage(uploadImage))
-                        }
-                    }
-                    .frame(width: 72, height: 86)
+                }
+                .frame(width: 76, height: 86)
+                .padding(.bottom, 1)
+            
+            ScrollView(.horizontal) {
+                HStack(spacing: 8) {
+                    uploadedImage(viewStore: viewStore)
+                        .frame(width: 76, height: 86)
+                        .padding(.bottom, 1)
+                }
+            }
+        }
+        .sheet(isPresented: viewStore.binding(\.$isShowImagePicker)) {
+            ImagePicker { uiImage in
+                let uploadImage = UploadImage(
+                    id: viewStore.uploadedImages.count,
+                    image: uiImage
+                )
                 
-                uploadedImage(viewStore: viewStore)
-                    .frame(width: 72, height: 86)
-                
-                Spacer()
+                viewStore.send(.selectProfileImage(uploadImage))
             }
         }
     }
@@ -128,20 +146,104 @@ struct UploadView: View {
     }
     
     private func uploadedImage(viewStore: ViewStore<UploadStore.State, UploadStore.Action>) -> some View {
-        LazyHGrid(rows: [GridItem(.fixed(72))], spacing: 8) {
             ForEach(viewStore.uploadedImages) { uploadedImage in
-                VStack {
-                    Spacer()
+                ZStack {
+                    VStack {
+                        Spacer(minLength: 14)
+                        
+                        Image(uiImage: uploadedImage.image)
+                            .resizable()
+                            .renderingMode(.original)
+                            .scaledToFit()
+                            .cornerRadius(2)
+                            .frame(width: 72, height: 72)
+                            .overlay {
+                                if uploadedImage.id == .zero {
+                                    RoundedRectangle(cornerRadius: 2)
+                                        .stroke(Color(asset: PIMOAsset.Assets.red3), lineWidth: 2)
+                                }
+                            }
+                    }
                     
-                    Image(uiImage: uploadedImage.image)
-                        .resizable()
-                        .renderingMode(.original)
-                        .scaledToFit()
-                        .cornerRadius(2)
-                        .frame(width: 72, height: 72)
+                    VStack {
+                        Image(uiImage: PIMOAsset.Assets.deleteButton.image)
+                            .onTapGesture {
+                                viewStore.send(.didTapDeleteButton(uploadedImage.id))
+                            }
+                            .frame(width: 20, height: 20)
+                            .padding(.bottom, 58)
+                    }
+                    
+                    if uploadedImage.id == .zero {
+                        VStack {
+                            Spacer(minLength: 63.5)
+                            
+                            ZStack {
+                                Color.black.opacity(0.7)
+                                Text("대표 글사진")
+                                    .foregroundColor(.white)
+                                    .font(Font(PIMOFontFamily.Pretendard.medium.font(size: 12)))
+                            }
+                            .frame(width: 70, height: 22.5)
+                        }
+                    }
                 }
             }
+    }
+    
+    private func mainImage(viewStore: ViewStore<UploadStore.State, UploadStore.Action>) -> some View {
+        ZStack {
+            if viewStore.state.uploadedImages.isEmpty {
+                RoundedRectangle(cornerRadius: 2)
+                    .foregroundColor(Color(asset: PIMOAsset.Assets.gray0))
+                    .frame(width: 353, height: 353)
+                
+                VStack {
+                    Image(uiImage: PIMOAsset.Assets.simpleLogo.image)
+                        .renderingMode(.template)
+                        .foregroundColor(Color(asset: PIMOAsset.Assets.gray4))
+                        .padding(.bottom, 15.2)
+                    
+                    Text("미리보기")
+                        .font(Font(PIMOFontFamily.Pretendard.medium.font(size: 19)))
+                        .foregroundColor(.black)
+                        .padding(.bottom, 11)
+                    
+                    Text("미리보고 싶은 썸네일을 선택해주세요")
+                        .font(Font(PIMOFontFamily.Pretendard.medium.font(size: 14)))
+                        .foregroundColor(Color(asset: PIMOAsset.Assets.gray3))
+                }
+            } else {
+                Image(uiImage: viewStore.uploadedImages.first?.image ?? UIImage())
+                    .resizable()
+                    .renderingMode(.original)
+                    .scaledToFit()
+                    .cornerRadius(2)
+                    .frame(width: 353, height: 353)
+            }
         }
+    }
+    
+    private func publishButton(viewStore: ViewStore<UploadStore.State, UploadStore.Action>) -> some View {
+        Button {
+            if !viewStore.state.uploadedImages.isEmpty {
+                viewStore.send(.didTapPublishButton)
+            }
+        } label: {
+            ZStack {
+                let gray = Color(uiColor: PIMOAsset.Assets.gray4.color)
+                let orange = Color(uiColor: PIMOAsset.Assets.red3.color)
+
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(viewStore.state.uploadedImages.isEmpty ? gray : orange)
+                    .frame(width: 353, height: 56)
+                
+                Text("게시하기")
+                    .font(Font(PIMOFontFamily.Pretendard.medium.font(size: 16)))
+                    .foregroundColor(.white)
+            }
+        }
+        .buttonStyle(.plain)
     }
 }
 

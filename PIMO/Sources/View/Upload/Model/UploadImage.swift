@@ -8,8 +8,8 @@
 
 import SwiftUI
 
-struct UploadImage: Identifiable, Equatable {
-    let id: Int
+final class UploadImage: Identifiable, Equatable {
+    var id: Int
     let image: UIImage
     let text: String
     
@@ -17,5 +17,9 @@ struct UploadImage: Identifiable, Equatable {
         self.id = id
         self.image = image
         self.text = text
+    }
+    
+    static func == (lhs: UploadImage, rhs: UploadImage) -> Bool {
+        lhs.id == rhs.id
     }
 }

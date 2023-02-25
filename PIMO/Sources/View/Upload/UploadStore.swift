@@ -8,7 +8,6 @@
 
 import SwiftUI
 import Vision
-import VisionKit
 
 import ComposableArchitecture
 
@@ -24,6 +23,8 @@ struct UploadStore: ReducerProtocol {
         case binding(BindingAction<State>)
         case didTapCloseButton
         case didTapUploadButton
+        case didTapPublishButton
+        case didTapDeleteButton(Int)
         case selectProfileImage(UploadImage)
     }
     
@@ -37,14 +38,29 @@ struct UploadStore: ReducerProtocol {
                 state.isShowImagePicker = true
                 
                 return .none
+            case .didTapDeleteButton(let index):
+                state.uploadedImages = state.uploadedImages.filter { $0.id != index }
+                var id = 0
+                state.uploadedImages.forEach {
+                    $0.id = id
+                    id += 1
+                }
+                
+                return .none
             case .selectProfileImage(let uploadImage):
                 let extractedText = extractText(from: uploadImage, state: &state)
                 let image = UploadImage(id: uploadImage.id, image: uploadImage.image, text: extractedText)
                 
-                if !state.isShowOCRErrorToast {
+                if !extractedText.isEmpty {
                     state.uploadedImages.append(image)
+                } else {
+                    state.isShowOCRErrorToast = true
                 }
                 
+                return .none
+            case .didTapPublishButton:
+                print("업로드")
+                #warning("엔드포인트 (업로드)")
                 return .none
             default:
                 return .none
