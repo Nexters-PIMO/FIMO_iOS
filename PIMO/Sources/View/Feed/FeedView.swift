@@ -14,7 +14,7 @@ import Kingfisher
 struct FeedView: View {
     let store: StoreOf<FeedStore>
     
-    let width = UIScreen.main.bounds.width - 40
+    let width = UIScreen.screenWidth - 40
     
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
