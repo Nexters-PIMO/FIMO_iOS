@@ -15,18 +15,13 @@ struct Feed: Decodable, Equatable {
     let textImages: [TextImage]
     let clapCount: Int
     let isClapped: Bool
-    
-    init(id: Int = 0,
-         profile: Profile = .init(),
-         uploadTime: String = "",
-         textImages: [TextImage] = [],
-         clapCount: Int = 0,
-         isClapped: Bool = false) {
-        self.id = id
-        self.profile = profile
-        self.uploadTime = uploadTime
-        self.textImages = textImages
-        self.clapCount = clapCount
-        self.isClapped = isClapped
-    }
+        
+    static var EMPTY: Feed = .init(
+        id: 0,
+        profile: Profile.EMPTY,
+        uploadTime: "",
+        textImages: [],
+        clapCount: 0,
+        isClapped: false
+    )
 }

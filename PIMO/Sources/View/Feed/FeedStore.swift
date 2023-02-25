@@ -13,8 +13,8 @@ import ComposableArchitecture
 struct FeedStore: ReducerProtocol {
     struct State: Equatable, Identifiable {
         var id: Int
-        var feed: Feed = .init()
-        @BindingState var textImage: TextImage = .init()
+        var feed: Feed = Feed.EMPTY
+        @BindingState var textImage: TextImage = TextImage.EMPTY
         var clapCount: Int = 0
         var clapButtonDidTap: Bool = false
         var audioButtonDidTap: Bool = false

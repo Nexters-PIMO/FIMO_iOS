@@ -13,9 +13,8 @@ struct TextImage: Decodable, Equatable, Hashable {
     let imageURL: String
     let text: String
     
-    init(id: Int = 0, imageURL: String = "", text: String = "") {
-        self.id = id
-        self.imageURL = imageURL
-        self.text = text
-    }
+    static var EMPTY: TextImage = .init(
+        id: 0,
+        imageURL: "",
+        text: "")
 }
