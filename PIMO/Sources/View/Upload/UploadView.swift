@@ -88,7 +88,7 @@ struct UploadView: View {
         HStack(spacing: 8) {
             uploadButton(viewStore: viewStore)
                 .onTapGesture {
-                    if viewStore.state.uploadedImages.count < 6 {
+                    if viewStore.state.uploadedImages.count < 5 {
                         viewStore.send(.didTapUploadButton)
                     }
                 }
