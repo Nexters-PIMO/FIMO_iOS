@@ -30,6 +30,7 @@ struct FriendsListStore: ReducerProtocol {
         case fetchFriendsList
         case tappedNewestButton
         case tappedCharactorOrderButton
+        case tappedRequestFriendButton(FriendType)
     }
 
     @Dependency(\.friendsClient) var friendsClient
@@ -48,6 +49,8 @@ struct FriendsListStore: ReducerProtocol {
                 return .none
             case .tappedCharactorOrderButton:
                 state.selectedSort = .characterOrder
+                return .none
+            case .tappedRequestFriendButton(let type):
                 return .none
             }
         }

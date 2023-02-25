@@ -72,8 +72,17 @@ struct FrientdsListView: View {
                 .foregroundColor(Color(PIMOAsset.Assets.grayText.color))
                 .font(.system(size: 12))
 
-            friend.friendType.image
-                .padding(.leading, 19)
+            if friend.isMyRelationship {
+                Button {
+                    store.send(.tappedRequestFriendButton(friend.friendType))
+                } label: {
+                    friend.friendType.image
+                        .padding(.leading, 19)
+                }
+            } else {
+                friend.friendType.noRelationshipImage
+                    .padding(.leading, 19)
+            }
         }
         .frame(maxWidth: .infinity, minHeight: 40)
         .padding(.top, 25)

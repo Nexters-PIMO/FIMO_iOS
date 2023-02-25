@@ -14,6 +14,7 @@ struct Friend {
     let name: String
     let archiveName: String
     let count: Int
+    let isMyRelationship: Bool
 }
 
 extension Friend: Equatable, Hashable { }

@@ -41,6 +41,17 @@ enum FriendType: Int {
             return Image(uiImage: PIMOAsset.Assets.theirFriends.image)
         }
     }
+
+    var noRelationshipImage: Image {
+        switch self {
+        case .mutualFriends:
+            return Image(uiImage: PIMOAsset.Assets.mutualFriendsNoActive.image)
+        case .myFriends:
+            return Image(uiImage: PIMOAsset.Assets.myFriendsNoActive.image)
+        case .theirFriends:
+            return Image(uiImage: PIMOAsset.Assets.theirFriendsNoActive.image)
+        }
+    }
 }
 
 extension FriendType: CaseIterable { }
