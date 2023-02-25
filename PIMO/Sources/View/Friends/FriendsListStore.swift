@@ -14,20 +14,17 @@ struct FriendsListStore: ReducerProtocol {
     struct State: Equatable {
         var currentTab: FriendType = .mutualFriends
         var selectedSort: FriendListSortType = .newest
-        var friendsList: [FriendList] = []
+        var friendsList: [FriendList] = Array(repeating: .EMPTY, count: FriendType.allCases.count)
 
         var selectedFriendsList: FriendList {
-            if friendsList.count > currentTab.index {
-                return friendsList[currentTab.index]
-            } else {
-                return .EMPTY
-            }
+            return friendsList[currentTab.index]
         }
     }
 
     enum Action: Equatable {
+        case onAppear
         case tappedTab(Int)
-        case fetchFriendsList
+        case fetchFriendsList(FriendType)
         case tappedNewestButton
         case tappedCharactorOrderButton
         case tappedRequestFriendButton(FriendType)
@@ -38,11 +35,14 @@ struct FriendsListStore: ReducerProtocol {
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
+            case .onAppear:
+                return .send(.tappedTab(FriendType.mutualFriends.index))
             case .tappedTab(let index):
                 state.currentTab = FriendType(rawValue: index) ?? .mutualFriends
-                return .none
-            case .fetchFriendsList:
-                state.friendsList = friendsClient.fetchFriendsList()
+                return .send(.fetchFriendsList(state.currentTab))
+            case .fetchFriendsList(let type):
+                // TODO: Fetch Friends List
+                state.friendsList[state.currentTab.index] = friendsClient.fetchFriendsList(type)
                 return .none
             case .tappedNewestButton:
                 state.selectedSort = .newest

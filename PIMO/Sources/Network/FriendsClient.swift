@@ -12,7 +12,7 @@ import Foundation
 import ComposableArchitecture
 
 struct FriendsClient {
-    let fetchFriendsList: () -> [FriendList]
+    let fetchFriendsList: (FriendType) -> FriendList
 }
 
 extension DependencyValues {
@@ -23,21 +23,11 @@ extension DependencyValues {
 }
 
 extension FriendsClient: DependencyKey {
-    static let liveValue = Self.init {
+    static let liveValue = Self.init { friendType in
         // TODO: 서버 통신
-        return [
-            FriendList(count: 2, friendType: .mutualFriends, friends: [
-                .init(friendType: .mutualFriends, profileImageURL: "", name: "김옥현", archiveName: "하루", count: 2,  isMyRelationship: true),
-                .init(friendType: .mutualFriends, profileImageURL: "", name: "김김김", archiveName: "이틀", count: 1, isMyRelationship: true)
-            ]),
-            FriendList(count: 2, friendType: .myFriends, friends: [
-                .init(friendType: .mutualFriends, profileImageURL: "", name: "김옥현", archiveName: "하루", count: 2, isMyRelationship: true),
-                .init(friendType: .mutualFriends, profileImageURL: "", name: "김김김", archiveName: "이틀", count: 1, isMyRelationship: true)
-            ]),
-            FriendList(count: 2, friendType: .theirFriends, friends: [
-                .init(friendType: .mutualFriends, profileImageURL: "", name: "김옥현", archiveName: "하루", count: 2, isMyRelationship: true),
-                .init(friendType: .mutualFriends, profileImageURL: "", name: "김김김", archiveName: "이틀", count: 1, isMyRelationship: true)
-            ])
-        ]
+        return FriendList(count: 2, friendType: .mutualFriends, friends: [
+            .init(friendType: .mutualFriends, profileImageURL: "", name: "김옥현", archiveName: "하루", count: 2,  isMyRelationship: true),
+            .init(friendType: .mutualFriends, profileImageURL: "", name: "김김김", archiveName: "이틀", count: 1, isMyRelationship: true)
+        ])
     }
 }

@@ -26,10 +26,12 @@ struct FrientdsListView: View {
                             header(viewStore)
                         }
                     }
-
                 }
             }
             .padding(.horizontal, 20)
+            .onAppear {
+                viewStore.send(.onAppear)
+            }
         }
     }
 
