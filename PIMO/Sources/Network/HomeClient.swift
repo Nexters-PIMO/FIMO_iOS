@@ -38,6 +38,12 @@ extension HomeClient: DependencyKey {
                          uploadTime: "10분 전",
                          textImages: [TextImage(id: 2, imageURL: PIMOStrings.textImage, text: "안녕3")],
                          clapCount: 320,
+                         isClapped: true),
+                    Feed(id: 3,
+                         profile: Profile(imageURL: PIMOStrings.profileImage, nickName: "0inn3"),
+                         uploadTime: "10분 전",
+                         textImages: [TextImage(id: 2, imageURL: PIMOStrings.textImage, text: "안녕4")],
+                         clapCount: 320,
                          isClapped: true)]
         }
     )
