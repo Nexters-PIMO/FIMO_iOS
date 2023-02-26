@@ -29,6 +29,7 @@ struct ArchiveStore: ReducerProtocol {
     struct State: Equatable {
         var archiveType: ArchiveType = .myArchive
         var archiveInfo: ArchiveInfo = .EMPTY
+        var gridFeeds: [Feed] = []
         var feeds: IdentifiedArrayOf<FeedStore.State> = []
         var pushToSettingView: Bool = false
         var pushToFriendView: Bool = false
@@ -54,6 +55,7 @@ struct ArchiveStore: ReducerProtocol {
                 let archiveInfo = archive.archiveInfo
                 let feeds = archive.feeds
                 state.archiveInfo = archiveInfo
+                state.gridFeeds = archive.feeds
                 state.feeds = IdentifiedArrayOf(
                     uniqueElements: feeds.map { feed in
                         FeedStore.State(

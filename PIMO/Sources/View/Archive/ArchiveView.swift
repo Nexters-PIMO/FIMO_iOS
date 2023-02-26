@@ -14,6 +14,13 @@ import Kingfisher
 struct ArchiveView: View {
     let store: StoreOf<ArchiveStore>
     
+    let width = UIScreen.main.bounds.width - 5
+    
+    let columns: [GridItem] = [
+        GridItem(.flexible(), spacing: 5),
+        GridItem(.flexible())
+    ]
+    
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack {
@@ -33,39 +40,75 @@ struct ArchiveView: View {
             ZStack {
                 profileView(viewStore)
             }
-            LazyVStack(alignment: .center, pinnedViews: [.sectionHeaders]) {
-                Section(header: feedsHeader(viewStore)) {
-                    if viewStore.feeds.isEmpty {
-                        Spacer()
-                            .frame(height: 180)
-                        ArchiveEmptyView(archiveType: viewStore.archiveType)
-                    } else {
-                        LazyVStack {
-                            ForEachStore(
-                                self.store.scope(
-                                    state: \.feeds,
-                                    action: ArchiveStore.Action.feed(id:action:)
-                                )
-                            ) {
-                                FeedView(store: $0)
-                                
-                                Spacer()
-                                    .frame(height: 12)
-                                
-                                Divider()
-                                    .background(Color(PIMOAsset.Assets.grayDivider.color))
-                                    .padding([.leading, .trailing], 20)
-                            }
+            
+            if viewStore.feedsType == .basic {
+                basicFeedView(viewStore)
+            } else {
+                gridFeedView(viewStore)
+            }
+        }
+        .padding(.bottom, 72)
+        .scrollIndicators(.hidden)
+    }
+    
+    // 피드 기본 모드로 보기
+    func basicFeedView(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>) -> some View {
+        LazyVStack(alignment: .center, pinnedViews: [.sectionHeaders]) {
+            Section(header: feedsHeader(viewStore)) {
+                if viewStore.feeds.isEmpty {
+                    Spacer()
+                        .frame(height: 180)
+                    ArchiveEmptyView(archiveType: viewStore.archiveType)
+                } else {
+                    LazyVStack {
+                        ForEachStore(
+                            self.store.scope(
+                                state: \.feeds,
+                                action: ArchiveStore.Action.feed(id:action:)
+                            )
+                        ) {
+                            FeedView(store: $0)
+                            
+                            Spacer()
+                                .frame(height: 12)
+                            
+                            Divider()
+                                .background(Color(PIMOAsset.Assets.grayDivider.color))
+                                .padding([.leading, .trailing], 20)
                         }
                     }
                 }
             }
-            .padding(.bottom, 72)
         }
-        
-        .scrollIndicators(.hidden)
     }
     
+    // 피드 그리드 모드로 보기
+    func gridFeedView(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>) -> some View {
+        LazyVStack(alignment: .center, pinnedViews: [.sectionHeaders]) {
+            Section(header: feedsHeader(viewStore)) {
+                if viewStore.feeds.isEmpty {
+                    Spacer()
+                        .frame(height: 180)
+                    ArchiveEmptyView(archiveType: viewStore.archiveType)
+                } else {
+                    LazyVGrid(columns: columns,
+                              spacing: 5) {
+                        ForEach(viewStore.state.gridFeeds, id: \.self) { feed in
+                            KFImage(URL(string: feed.textImages[0].imageURL))
+                                .placeholder {
+                                    Rectangle()
+                                        .foregroundColor(.gray)
+                                }
+                                .resizable()
+                                .frame(height: width/2)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // 아카이브 상단 프로필 뷰
     func profileView(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>) -> some View {
         HStack {
             KFImage(URL(string: viewStore.archiveInfo.profile.imageURL))
@@ -105,6 +148,7 @@ struct ArchiveView: View {
         .padding([.leading, .trailing], 20)
     }
     
+    // 아카이브 상단 글 사진 뷰
     func feedsHeader(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>) -> some View {
         HStack {
             Image(uiImage: PIMOAsset.Assets.archiveLogo.image)
@@ -120,18 +164,18 @@ struct ArchiveView: View {
             
             Image(uiImage: viewStore.feedsType == .basic ?
                   PIMOAsset.Assets.basicModeSelected.image : PIMOAsset.Assets.basicMode.image)
-                .onTapGesture {
-                    viewStore.send(.feedsTypeButtonDidTap(.basic))
-                }
+            .onTapGesture {
+                viewStore.send(.feedsTypeButtonDidTap(.basic))
+            }
             
             Spacer()
                 .frame(width: 16)
             
             Image(uiImage: viewStore.feedsType == .grid ?
                   PIMOAsset.Assets.gridModeSelected.image : PIMOAsset.Assets.gridMode.image)
-                .onTapGesture {
-                    viewStore.send(.feedsTypeButtonDidTap(.grid))
-                }
+            .onTapGesture {
+                viewStore.send(.feedsTypeButtonDidTap(.grid))
+            }
         }
         .frame(height: 52)
         .padding([.leading, .trailing], 20)
@@ -143,6 +187,7 @@ struct ArchiveView: View {
         )
     }
     
+    // 아카이브 상단 이름 옆 버튼
     func archiveTopBarButton(_ viewStore: ViewStore<ArchiveView.ArchiveViewState, ArchiveStore.Action>) -> some View {
         switch viewStore.archiveType {
         case .myArchive:
