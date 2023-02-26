@@ -15,6 +15,12 @@ welcomeGuide = "본인 프로필 혹은 게시물 공유로\n친구를 맺고 �
 // Feed
 textCopy = "텍스트 복사하기";
 
+// Feeds
+archivingTextImage = "%d개의 글사진 아카이빙중";
+textImageTitle = "글사진 %d";
+emptyFeed = "글사진이 존재하지 않아요";
+emptyFeedGuide = "일상에서 마주친 글사진들을 피모에 저장해서\n언제든 꺼내보고 특별한 지인과 공유해보세요";
+
 /// Example
 profileImage = "https://ifh.cc/g/gCgJSO.jpg";
 textImage = "https://ifh.cc/g/aBrbcB.png";
