@@ -25,8 +25,6 @@ extension DependencyValues {
 extension ProfileClient: DependencyKey {
     static let liveValue = Self.init {
         // TODO: 서버 통신
-        return Profile(
-            imageURL: PIMOStrings.profileImage,
-            nickName: "0inn")
+        return Temp.profile
     }
 }
