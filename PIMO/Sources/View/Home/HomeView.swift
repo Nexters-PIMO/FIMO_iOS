@@ -34,7 +34,7 @@ struct HomeView: View {
     func homeFeedView(viewStore: ViewStore<HomeStore.State, HomeStore.Action>) -> some View {
         ScrollView {
             LazyVStack(alignment: .center) {
-                VStack {
+                LazyVStack {
                     ForEachStore(
                         self.store.scope(
                             state: \.feeds,
