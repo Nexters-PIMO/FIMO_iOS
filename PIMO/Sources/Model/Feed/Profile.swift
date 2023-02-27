@@ -11,4 +11,6 @@ import Foundation
 struct Profile: Decodable, Equatable {
     let imageURL: String
     let nickName: String
+    
+    static var EMPTY: Profile = .init(imageURL: "", nickName: "")
 }

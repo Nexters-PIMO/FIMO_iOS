@@ -9,9 +9,19 @@
 import Foundation
 
 struct Feed: Decodable, Equatable {
+    let id: Int
     let profile: Profile
     let uploadTime: String
     let textImages: [TextImage]
     let clapCount: Int
     let isClapped: Bool
+        
+    static var EMPTY: Feed = .init(
+        id: 0,
+        profile: Profile.EMPTY,
+        uploadTime: "",
+        textImages: [],
+        clapCount: 0,
+        isClapped: false
+    )
 }

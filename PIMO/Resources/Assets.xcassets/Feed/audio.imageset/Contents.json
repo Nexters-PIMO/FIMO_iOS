@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "fimo_text.png",
+      "filename" : "audio.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "fimo_text@2x.png",
+      "filename" : "audio@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "fimo_text@3x.png",
+      "filename" : "audio@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
