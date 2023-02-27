@@ -9,6 +9,7 @@
 import SwiftUI
 
 import ComposableArchitecture
+import Kingfisher
 
 struct SettingView: View {
     let store: StoreOf<SettingStore>
@@ -17,18 +18,25 @@ struct SettingView: View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack(alignment: .leading) {
                 HStack(alignment: .center) {
-                    Image("a")
+                    KFImage(URL(string: viewStore.imageURLString))
+                        .retry(maxCount: 3, interval: .seconds(5))
+                        .cacheOriginalImage()
                         .resizable()
-                        .frame(width: 52, height: 52)
+                        .placeholder({
+                            Image(systemName: "person.crop.circle")
+                                .font(.system(size: 40))
+                        })
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 40, height: 40)
                         .mask {
                             Circle()
                         }
 
                     VStack(alignment: .leading, spacing: 7) {
-                        Text("닉네임")
+                        Text(viewStore.nickname)
                             .font(.system(size: 16, weight: .medium))
 
-                        Text("아카이브")
+                        Text(viewStore.archiveName)
                             .font(.system(size: 16))
                             .foregroundColor(Color(PIMOAsset.Assets.grayText.color))
                     }

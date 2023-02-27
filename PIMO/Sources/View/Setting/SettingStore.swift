@@ -15,6 +15,9 @@ struct SettingStore: ReducerProtocol {
         @BindingState var isShowLogoutPopup: Bool = false
         @BindingState var isShowWithdrawalPopup: Bool = false
         @BindingState var isShowBackPopup: Bool = false
+        var nickname: String = "닉네임"
+        var archiveName: String = "아카이브 이름"
+        var imageURLString: String = ""
 
         var version: String {
             guard let dictionary = Bundle.main.infoDictionary,
