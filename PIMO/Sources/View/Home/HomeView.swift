@@ -22,14 +22,39 @@ struct HomeView: View {
                 if viewStore.feeds.isEmpty {
                     homeWelcome
                 } else {
-                    FeedView()
-                        .frame(maxHeight: .infinity)
+                    homeFeedView(viewStore: viewStore)
                 }
             }
             .onAppear {
                 viewStore.send(.fetchFeeds)
             }
         }
+    }
+    
+    func homeFeedView(viewStore: ViewStore<HomeStore.State, HomeStore.Action>) -> some View {
+        ScrollView {
+            LazyVStack(alignment: .center) {
+                LazyVStack {
+                    ForEachStore(
+                        self.store.scope(
+                            state: \.feeds,
+                            action: HomeStore.Action.feed(id:action:)
+                        )
+                    ) {
+                        FeedView(store: $0)
+                        
+                        Spacer()
+                            .frame(height: 12)
+                        
+                        Divider()
+                            .background(Color(PIMOAsset.Assets.grayDivider.color))
+                            .padding([.leading, .trailing], 20)
+                    }
+                }
+            }
+            .padding(.bottom, 72)
+        }
+        .scrollIndicators(.hidden)
     }
 }
 

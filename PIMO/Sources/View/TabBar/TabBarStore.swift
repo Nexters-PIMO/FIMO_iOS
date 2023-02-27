@@ -12,8 +12,8 @@ import ComposableArchitecture
 
 struct TabBarStore: ReducerProtocol {
     struct State: Equatable {
-        @BindableState var tabBarItem: TabBarItem = .home
-        @BindableState var isSheetPresented: Bool = false
+        @BindingState var tabBarItem: TabBarItem = .home
+        @BindingState var isSheetPresented: Bool = false
         var profile: Profile?
         var homeState = HomeStore.State()
         var uploadState = UploadStore.State()

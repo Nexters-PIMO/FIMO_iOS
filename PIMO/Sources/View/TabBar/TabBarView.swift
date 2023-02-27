@@ -25,7 +25,6 @@ struct TabBarView: View {
                             action: TabBarStore.Action.home
                         )
                     )
-                    .padding(EdgeInsets(top: 0, leading: 0, bottom: 72, trailing: 0))
                     .tag(tabBarItems[0])
                     
                     MyFeedView(
@@ -34,7 +33,6 @@ struct TabBarView: View {
                             action: TabBarStore.Action.myFeed
                         )
                     )
-                    .padding(EdgeInsets(top: 0, leading: 0, bottom: 72, trailing: 0))
                     .tag(tabBarItems[1])
                 }
                 .onAppear {
