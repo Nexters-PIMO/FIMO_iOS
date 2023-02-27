@@ -18,6 +18,8 @@ struct UploadStore: ReducerProtocol {
         var uploadedImages = [UploadImage]()
         
         @BindingState var isShowOCRErrorToast = false
+        var toastMessage: ToastModel?
+        var selectedImage: UploadImage?
     }
     
     enum Action: BindableAction, Equatable {
@@ -26,8 +28,11 @@ struct UploadStore: ReducerProtocol {
         case didTapCloseButtonWithData
         case didTapUploadButton
         case didTapPublishButton
+        case didTapUploadedImage(UploadImage)
         case didTapDeleteButton(Int)
         case selectProfileImage(UploadImage)
+        case sendToast(ToastModel)
+        case removeToast
     }
     
     var body: some ReducerProtocol<State, Action> {
@@ -49,6 +54,10 @@ struct UploadStore: ReducerProtocol {
                 state.isShowImagePicker = true
                 
                 return .none
+            case .didTapUploadedImage(let uploadedImage):
+                state.selectedImage = uploadedImage
+                
+                return .none
             case .didTapDeleteButton(let index):
                 state.uploadedImages = state.uploadedImages.filter { $0.id != index }
                 var id = 0
@@ -64,9 +73,32 @@ struct UploadStore: ReducerProtocol {
                 
                 if !extractedText.isEmpty {
                     state.uploadedImages.append(image)
+                    
+                    if state.selectedImage == nil {
+                        state.selectedImage = image
+                    }
+                    
+                    return .none
                 } else {
                     state.isShowOCRErrorToast = true
+                    
+                    let message = ToastModel(
+                        title: "글이 존재하지 않는 사진이에요!",
+                        message: "글이 포함되어 있는 사진으로 업로드해주세요."
+                    )
+                    
+                    return EffectTask.task {
+                        return .sendToast(message)
+                    }
                 }
+            case .sendToast(let toastModel):
+                state.toastMessage = toastModel
+
+                return EffectTask<Action>(value: .removeToast)
+                    .delay(for: .seconds(1.5), scheduler: DispatchQueue.main)
+                    .eraseToEffect()
+            case .removeToast:
+                state.isShowOCRErrorToast = false
                 
                 return .none
             case .didTapPublishButton:

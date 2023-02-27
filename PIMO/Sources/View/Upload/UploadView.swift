@@ -47,8 +47,9 @@ struct UploadView: View {
             ))
             .toast(
                 isShowing: viewStore.binding(\.$isShowOCRErrorToast),
-                title: "글이 존재하지 않는 사진이에요!",
-                message: "글이 포함되어 있는 사진으로 업로드해주세요."
+                title: viewStore.state.toastMessage?.title ?? "",
+                message: viewStore.state.toastMessage?.message ?? "",
+                isTabBarVisible: false
             )
         }
     }
@@ -196,6 +197,9 @@ struct UploadView: View {
                         }
                     }
                 }
+                .onTapGesture {
+                    viewStore.send(.didTapUploadedImage(uploadedImage))
+                }
             }
     }
     
@@ -222,7 +226,7 @@ struct UploadView: View {
                         .foregroundColor(Color(asset: PIMOAsset.Assets.gray3))
                 }
             } else {
-                Image(uiImage: viewStore.uploadedImages.first?.image ?? UIImage())
+                Image(uiImage: viewStore.selectedImage?.image ?? UIImage())
                     .resizable()
                     .renderingMode(.original)
                     .scaledToFit()
