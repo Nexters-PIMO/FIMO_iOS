@@ -14,14 +14,17 @@ struct FeedStore: ReducerProtocol {
     struct State: Equatable, Identifiable {
         var id: Int = 0
         var feed: Feed = Feed.EMPTY
+        var isFirstFeed: Bool = false
         @BindingState var textImage: TextImage = TextImage.EMPTY
         var clapCount: Int = 0
         var clapButtonDidTap: Bool = false
         var audioButtonDidTap: Bool = false
+        var closeButtonDidTap: Bool = false
     }
     
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
+        case checkTextGuideClosed
         case moreButtonDidTap(Int)
         case copyButtonDidTap(String)
         case closeButtonDidTap
@@ -36,23 +39,27 @@ struct FeedStore: ReducerProtocol {
         BindingReducer()
         Reduce { state, action in
             switch action {
+            case .checkTextGuideClosed:
+                guard let isClosed = UserUtill.shared.getClosedTextGuide() else {
+                    state.closeButtonDidTap = false
+                    return .none
+                }
+                state.closeButtonDidTap = isClosed
             case .moreButtonDidTap:
-                // TODO: 바텀시트
-                let _ = print("more")
+                #warning("바텀시트")
             case let .copyButtonDidTap(text):
-                // TODO: 텍스트 복사
-                let _ = print("\(text)")
+                #warning("텍스트 복사")
             case .closeButtonDidTap:
-                // TODO: 텍스트 닫기 (UserDefault)
-                let _ = print("close")
+                UserUtill.shared.setUserDefaults(key: .closedTextGuide, value: true)
+                state.closeButtonDidTap = true
             case .clapButtonDidTap:
-                let _ = print("clap")
+                state.clapCount += 1
+                state.clapButtonDidTap = true
             case .shareButtonDidTap:
-                // TODO: 딥링크
-                let _ = print("share")
+                #warning("딥링크")
             case let .audioButtonDidTap(text):
-                // TODO: TTS
-                let _ = print("\(text)")
+                #warning("TTS")
+                state.audioButtonDidTap.toggle()
             default:
                 break
             }

@@ -57,6 +57,8 @@ struct ArchiveStore: ReducerProtocol {
                 let archive = archiveClient.fetchArchive()
                 let archiveInfo = archive.archiveInfo
                 let feeds = archive.feeds
+                var firstFeed = 0
+                if !feeds.isEmpty { firstFeed = feeds[0].id }
                 state.archiveInfo = archiveInfo
                 state.gridFeeds = archive.feeds
                 state.feeds = IdentifiedArrayOf(
@@ -64,6 +66,7 @@ struct ArchiveStore: ReducerProtocol {
                         FeedStore.State(
                             id: feed.id,
                             feed: feed,
+                            isFirstFeed: (firstFeed == feed.id) ? true : false,
                             textImage: feed.textImages[0],
                             clapButtonDidTap: feed.isClapped
                         )

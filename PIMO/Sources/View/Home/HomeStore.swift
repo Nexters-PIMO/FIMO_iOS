@@ -27,11 +27,14 @@ struct HomeStore: ReducerProtocol {
             switch action {
             case .fetchFeeds:
                 let feeds = homeClient.fetchFeeds()
+                var firstFeed = 0
+                if !feeds.isEmpty { firstFeed = feeds[0].id }
                 state.feeds = IdentifiedArrayOf(
                     uniqueElements: feeds.map { feed in
                         FeedStore.State(
                             id: feed.id,
                             feed: feed,
+                            isFirstFeed: (feed.id == firstFeed) ? true : false,
                             textImage: feed.textImages[0],
                             clapButtonDidTap: feed.isClapped
                         )
