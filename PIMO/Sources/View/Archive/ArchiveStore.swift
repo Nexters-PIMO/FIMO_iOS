@@ -34,6 +34,7 @@ struct ArchiveStore: ReducerProtocol {
         var pushToSettingView: Bool = false
         var pushToFriendView: Bool = false
         var feedsType: FeedsType = .basic
+        var feed: FeedStore.State?
     }
     
     enum Action: Equatable {
@@ -43,6 +44,8 @@ struct ArchiveStore: ReducerProtocol {
         case settingButtonDidTap
         case friendListButtonDidTap
         case feedsTypeButtonDidTap(FeedsType)
+        case feedDidTap(Feed)
+        case feedDetail(FeedStore.Action)
     }
     
     @Dependency(\.archiveClient) var archiveClient
@@ -67,28 +70,7 @@ struct ArchiveStore: ReducerProtocol {
                     }
                 )
             case let .feed(id: id, action: action):
-                switch action {
-                case .moreButtonDidTap:
-                    // TODO: 바텀시트
-                    let _ = print("feedId \(id)")
-                    let _ = print("more")
-                case let .copyButtonDidTap(text):
-                    // TODO: 텍스트 복사
-                    let _ = print("\(text)")
-                case .closeButtonDidTap:
-                    // TODO: 텍스트 닫기 (UserDefault)
-                    let _ = print("close")
-                case .clapButtonDidTap:
-                    let _ = print("clap")
-                case .shareButtonDidTap:
-                    // TODO: 딥링크
-                    let _ = print("share")
-                case let .audioButtonDidTap(text):
-                    // TODO: TTS
-                    let _ = print("\(text)")
-                default:
-                    break
-                }
+                break
             case .topBarButtonDidTap:
                 if state.archiveType == .myArchive {
                     // TODO: 내 피드 공유 (딥링크)
@@ -102,8 +84,22 @@ struct ArchiveStore: ReducerProtocol {
                 state.pushToFriendView = true
             case let .feedsTypeButtonDidTap(type):
                 state.feedsType = type
+                state.feed = nil
+            case let .feedDidTap(feed):
+                state.feed = FeedStore.State(
+                    id: feed.id,
+                    feed: feed,
+                    textImage: feed.textImages[0],
+                    clapCount: feed.clapCount,
+                    clapButtonDidTap: feed.isClapped
+                )
+            default:
+                break
             }
             return .none
+        }
+        .ifLet(\.feed, action: /Action.feedDetail) {
+            FeedStore()
         }
         .forEach(\.feeds, action: /Action.feed(id:action:)) {
             FeedStore()

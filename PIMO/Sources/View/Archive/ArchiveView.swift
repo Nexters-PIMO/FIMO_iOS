@@ -17,20 +17,22 @@ struct ArchiveView: View {
     let width = UIScreen.main.bounds.width - 5
     
     let columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 5),
+        GridItem(.flexible()),
         GridItem(.flexible())
     ]
     
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
-            VStack {
-                archiveTopBar
-                    .frame(height: 64)
-                
-                archiveFeedView(viewStore)
-            }
-            .onAppear {
-                viewStore.send(.fetchArchive)
+            NavigationStack {
+                VStack {
+                    archiveTopBar
+                        .frame(height: 64)
+                    
+                    archiveFeedView(viewStore)
+                }
+                .onAppear {
+                    viewStore.send(.fetchArchive)
+                }
             }
         }
     }
@@ -41,13 +43,20 @@ struct ArchiveView: View {
                 profileView(viewStore)
             }
             
-            if viewStore.feedsType == .basic {
-                basicFeedView(viewStore)
-            } else {
-                gridFeedView(viewStore)
+            IfLetStore(
+                self.store.scope(state: \.feed, action: { .feedDetail($0) })
+            ) {
+                feedDetail(viewStore, feedStore: $0)
+            } else: {
+                if viewStore.feedsType == .basic {
+                    basicFeedView(viewStore)
+                        .padding(.bottom, 72)
+                } else {
+                    gridFeedView(viewStore)
+                        .padding(.bottom, 72)
+                }
             }
         }
-        .padding(.bottom, 72)
         .scrollIndicators(.hidden)
     }
     
@@ -60,22 +69,20 @@ struct ArchiveView: View {
                         .frame(height: 180)
                     ArchiveEmptyView(archiveType: viewStore.archiveType)
                 } else {
-                    LazyVStack {
-                        ForEachStore(
-                            self.store.scope(
-                                state: \.feeds,
-                                action: ArchiveStore.Action.feed(id:action:)
-                            )
-                        ) {
-                            FeedView(store: $0)
-                            
-                            Spacer()
-                                .frame(height: 12)
-                            
-                            Divider()
-                                .background(Color(PIMOAsset.Assets.grayDivider.color))
-                                .padding([.leading, .trailing], 20)
-                        }
+                    ForEachStore(
+                        self.store.scope(
+                            state: \.feeds,
+                            action: ArchiveStore.Action.feed(id:action:)
+                        )
+                    ) {
+                        FeedView(store: $0)
+                        
+                        Spacer()
+                            .frame(height: 12)
+                        
+                        Divider()
+                            .background(Color(PIMOAsset.Assets.grayDivider.color))
+                            .padding([.leading, .trailing], 20)
                     }
                 }
             }
@@ -84,27 +91,79 @@ struct ArchiveView: View {
     
     // 피드 그리드 모드로 보기
     func gridFeedView(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>) -> some View {
-        LazyVStack(alignment: .center, pinnedViews: [.sectionHeaders]) {
+        LazyVGrid(
+            columns: columns,
+            alignment: .center,
+            spacing: 5,
+            pinnedViews: [.sectionHeaders]
+        ) {
             Section(header: feedsHeader(viewStore)) {
                 if viewStore.feeds.isEmpty {
                     Spacer()
                         .frame(height: 180)
                     ArchiveEmptyView(archiveType: viewStore.archiveType)
                 } else {
-                    LazyVGrid(columns: columns,
-                              spacing: 5) {
-                        ForEach(viewStore.state.gridFeeds, id: \.self) { feed in
-                            KFImage(URL(string: feed.textImages[0].imageURL))
-                                .placeholder {
-                                    Rectangle()
-                                        .foregroundColor(.gray)
-                                }
-                                .resizable()
-                                .frame(height: width/2)
-                        }
+                    ForEach(viewStore.state.gridFeeds, id: \.self) { feed in
+                        KFImage(URL(string: feed.textImages[0].imageURL))
+                            .placeholder {
+                                Rectangle()
+                                    .foregroundColor(.gray)
+                            }
+                            .resizable()
+                            .frame(height: width/2)
+                            .onTapGesture {
+                                viewStore.send(.feedDidTap(feed))
+                            }
                     }
                 }
             }
+        }
+    }
+    
+    // 글사진 상세
+    func feedDetail(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>, feedStore: Store<FeedStore.State, FeedStore.Action>) -> some View {
+        VStack {
+            Rectangle()
+                .fill(Color.white)
+                .frame(height: 1)
+                .shadow(color: Color(PIMOAsset.Assets.grayShadow.color).opacity(0.3), radius: 5, x: 0, y: 0)
+                .mask(Rectangle().padding(.bottom, -12))
+            
+            Spacer()
+                .frame(height: 20)
+            
+            ZStack {
+                HStack {
+                    Button {
+                        viewStore.send(.feedsTypeButtonDidTap(.grid))
+                    } label: {
+                        Image(uiImage: PIMOAsset.Assets.back.image)
+                    }
+                    .padding(.leading, 20)
+                    
+                    Spacer()
+                }
+                
+                HStack {
+                    Text("글사진")
+                        .font(Font(PIMOFontFamily.Pretendard.medium.font(size: 18)))
+                }
+                
+                Spacer()
+            }
+            
+            Divider()
+                .background(Color(PIMOAsset.Assets.grayDivider.color))
+                .padding([.leading, .trailing], 20)
+            
+            FeedView(store: feedStore)
+            
+            Spacer()
+                .frame(height: 16)
+            
+            Divider()
+                .background(Color(PIMOAsset.Assets.grayDivider.color))
+                .padding([.leading, .trailing], 20)
         }
     }
     
@@ -179,6 +238,7 @@ struct ArchiveView: View {
         }
         .frame(height: 52)
         .padding([.leading, .trailing], 20)
+        .foregroundColor(.black)
         .background(
             Color.white
                 .shadow(color: Color(PIMOAsset.Assets.grayShadow.color).opacity(0.1),
@@ -199,7 +259,7 @@ struct ArchiveView: View {
             case .me:
                 return Image(uiImage: PIMOAsset.Assets.meFriend.image)
             case .other:
-                return Image(uiImage: PIMOAsset.Assets.meFriend.image)
+                return Image(uiImage: PIMOAsset.Assets.otherFriend.image)
             case .neither:
                 return Image(uiImage: PIMOAsset.Assets.neitherFriend.image)
             }
