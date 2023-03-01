@@ -56,7 +56,7 @@ struct FeedView: View {
                     .frame(height: 8)
                 
                 // 글사진
-                ZStack(alignment: .top) {
+                ZStack {
                     TabView(selection: viewStore.binding(\.$textImage)) {
                         ForEach(viewStore.feed.textImages, id: \.self) {
                             FeedTextImageView(textImage: $0)
@@ -66,11 +66,9 @@ struct FeedView: View {
                     .tabViewStyle(.page(indexDisplayMode: .never))
                     .frame(height: width)
                     .cornerRadius(4)
-                    
-                    textCopyButton(viewStore)
-                    
-                    indexDisplay(viewStore)
                 }
+                .overlay(textCopyButton(viewStore), alignment: .topLeading)
+                .overlay(indexDisplay(viewStore), alignment: .bottom)
                 
                 Spacer()
                     .frame(height: 12)
@@ -90,6 +88,9 @@ struct FeedView: View {
                 }
             }
             .padding(EdgeInsets(top: 22, leading: 20, bottom: 0, trailing: 20))
+            .onAppear {
+                viewStore.send(.checkTextGuideClosed)
+            }
         }
     }
     
@@ -107,30 +108,36 @@ struct FeedView: View {
                 }
             }
             
-            ZStack {
-                Image(uiImage: PIMOAsset.Assets.textCopy.image)
+            if !viewStore.state.closeButtonDidTap && viewStore.state.isFirstFeed {
+                textGuideView(viewStore)
+            }
+        }
+        .padding(.leading, 16)
+        .padding(.top, 16)
+    }
+    
+    func textGuideView(_ viewStore: ViewStore<FeedStore.State, FeedStore.Action>) -> some View {
+        ZStack {
+            Image(uiImage: PIMOAsset.Assets.textCopy.image)
+            
+            HStack {
+                Spacer()
+                    .frame(width: 12)
                 
-                HStack {
-                    Spacer()
-                        .frame(width: 12)
-                    
-                    Text(PIMOStrings.textCopy)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.white)
-                    
-                    Spacer()
-                        .frame(width: 3)
-                    
-                    Button {
-                        viewStore.send(.closeButtonDidTap)
-                    } label: {
-                        Image(uiImage: PIMOAsset.Assets.close.image)
-                    }
+                Text(PIMOStrings.textCopy)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.white)
+                
+                Spacer()
+                    .frame(width: 3)
+                
+                Button {
+                    viewStore.send(.closeButtonDidTap)
+                } label: {
+                    Image(uiImage: PIMOAsset.Assets.close.image)
                 }
             }
         }
-        .padding(.leading, -(width)/2 + 36)
-        .padding(.top, 16)
     }
     
     @ViewBuilder
@@ -144,7 +151,7 @@ struct FeedView: View {
                             ($0 == viewStore.textImage) ? Color(PIMOAsset.Assets.orange.color) : Color(PIMOAsset.Assets.grayUnactive.color))
                 }
             }
-            .padding(.top, width - 12)
+            .padding(.bottom, 12)
         } else {
             EmptyView()
         }
