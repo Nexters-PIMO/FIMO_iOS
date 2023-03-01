@@ -31,9 +31,9 @@ extension ArchiveClient: DependencyKey {
                     friendType: .both,
                     archiveName: "밤에 쓰는 편지",
                     profile: Temp.profile,
-                    feedCount: 3
+                    feedCount: 2
                 ),
-                feeds: Temp.feeds
+                feeds: Temp.myFeeds
             )
         }
     )
