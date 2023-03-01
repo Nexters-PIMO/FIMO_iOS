@@ -43,6 +43,10 @@ struct TabBarStore: ReducerProtocol {
             case .setSheetState:
                 state.isSheetPresented = true
                 return .none
+            case .upload(.didTapCloseButton):
+                state.isSheetPresented = false
+                
+                return .none
             default:
                 return .none
             }
