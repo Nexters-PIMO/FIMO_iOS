@@ -11,7 +11,7 @@ import SwiftUI
 import ComposableArchitecture
 import Kingfisher
 
-struct FrientdsListView: View {
+struct FriendsListView: View {
     let store: StoreOf<FriendsListStore>
     @Namespace private var underLine
 
@@ -189,7 +189,7 @@ struct FrientdsListView: View {
 
 struct FrientdsListView_Previews: PreviewProvider {
     static var previews: some View {
-        FrientdsListView(
+        FriendsListView(
             store: Store(
                 initialState: FriendsListStore.State(),
                 reducer: FriendsListStore()
