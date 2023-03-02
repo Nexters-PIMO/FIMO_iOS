@@ -12,10 +12,10 @@ import ComposableArchitecture
 
 struct FeedStore: ReducerProtocol {
     struct State: Equatable, Identifiable {
+        @BindingState var textImage: TextImage = TextImage.EMPTY
         var id: Int = 0
         var feed: Feed = Feed.EMPTY
         var isFirstFeed: Bool = false
-        @BindingState var textImage: TextImage = TextImage.EMPTY
         var clapCount: Int = 0
         var plusClapCount: Int = 0
         var isClapped: Bool = false
@@ -51,8 +51,6 @@ struct FeedStore: ReducerProtocol {
                 state.closeButtonDidTap = isClosed
             case .moreButtonDidTap:
                 #warning("바텀시트")
-            case let .copyButtonDidTap(text):
-                #warning("텍스트 복사")
             case .closeButtonDidTap:
                 UserUtill.shared.setUserDefaults(key: .closedTextGuide, value: true)
                 state.closeButtonDidTap = true

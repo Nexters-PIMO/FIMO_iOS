@@ -28,6 +28,9 @@ struct HomeView: View {
             .onAppear {
                 viewStore.send(.fetchFeeds)
             }
+            .toast(isShowing: viewStore.binding(\.$isShowToast),
+                   title: viewStore.toastMessage.title,
+                   message: viewStore.toastMessage.message)
         }
     }
     
