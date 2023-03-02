@@ -239,7 +239,8 @@ struct FeedView: View {
     // 오디오 버튼
     func audioButton(_ viewStore: ViewStore<FeedStore.State, FeedStore.Action>) -> some View {
         Button {
-            viewStore.send(.audioButtonDidTap(viewStore.state.textImage.text))
+            let text = viewStore.state.feed.textImages.map { $0.text }.joined(separator: " ")
+            viewStore.send(.audioButtonDidTap(text))
         } label: {
             let audioButtonImage = viewStore.audioButtonDidTap ?
             PIMOAsset.Assets.audioSelected.image : PIMOAsset.Assets.audio.image
