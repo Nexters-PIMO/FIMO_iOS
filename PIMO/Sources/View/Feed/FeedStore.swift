@@ -65,8 +65,13 @@ struct FeedStore: ReducerProtocol {
             case .shareButtonDidTap:
                 #warning("딥링크")
             case let .audioButtonDidTap(text):
+                if state.audioButtonDidTap {
+                    TTSUtil.shared.stop()
+                } else {
+                    TTSUtil.shared.play(text)
+                }
                 state.audioButtonDidTap.toggle()
-                TTSUtil.shared.play(text)
+                
             default:
                 break
             }

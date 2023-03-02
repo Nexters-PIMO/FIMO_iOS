@@ -128,6 +128,7 @@ struct ArchiveStore: ReducerProtocol {
                     textImage: feed.textImages[0],
                     id: feed.id,
                     feed: feed,
+                    isFirstFeed: true,
                     clapCount: feed.clapCount,
                     isClapped: feed.isClapped
                 )
