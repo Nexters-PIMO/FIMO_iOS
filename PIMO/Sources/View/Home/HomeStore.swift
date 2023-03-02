@@ -36,7 +36,8 @@ struct HomeStore: ReducerProtocol {
                             feed: feed,
                             isFirstFeed: (feed.id == firstFeed) ? true : false,
                             textImage: feed.textImages[0],
-                            clapButtonDidTap: feed.isClapped
+                            clapCount: feed.clapCount,
+                            isClapped: feed.isClapped
                         )
                     }
                 )

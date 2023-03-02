@@ -17,7 +17,10 @@ struct FeedStore: ReducerProtocol {
         var isFirstFeed: Bool = false
         @BindingState var textImage: TextImage = TextImage.EMPTY
         var clapCount: Int = 0
+        var plusClapCount: Int = 0
+        var isClapped: Bool = false
         var clapButtonDidTap: Bool = false
+        var isClapPlusViewShowing: Bool = false
         var audioButtonDidTap: Bool = false
         var closeButtonDidTap: Bool = false
     }
@@ -29,6 +32,7 @@ struct FeedStore: ReducerProtocol {
         case copyButtonDidTap(String)
         case closeButtonDidTap
         case clapButtonDidTap
+        case clapButtonIsDone
         case shareButtonDidTap
         case audioButtonDidTap(String)
     }
@@ -53,8 +57,13 @@ struct FeedStore: ReducerProtocol {
                 UserUtill.shared.setUserDefaults(key: .closedTextGuide, value: true)
                 state.closeButtonDidTap = true
             case .clapButtonDidTap:
+                state.plusClapCount += 1
                 state.clapCount += 1
                 state.clapButtonDidTap = true
+                state.isClapPlusViewShowing = true
+            case .clapButtonIsDone:
+                state.plusClapCount = 0
+                state.isClapPlusViewShowing = false
             case .shareButtonDidTap:
                 #warning("딥링크")
             case let .audioButtonDidTap(text):

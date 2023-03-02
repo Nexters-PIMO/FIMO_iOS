@@ -68,7 +68,8 @@ struct ArchiveStore: ReducerProtocol {
                             feed: feed,
                             isFirstFeed: (firstFeed == feed.id) ? true : false,
                             textImage: feed.textImages[0],
-                            clapButtonDidTap: feed.isClapped
+                            clapCount: feed.clapCount,
+                            isClapped: feed.isClapped
                         )
                     }
                 )
@@ -94,7 +95,7 @@ struct ArchiveStore: ReducerProtocol {
                     feed: feed,
                     textImage: feed.textImages[0],
                     clapCount: feed.clapCount,
-                    clapButtonDidTap: feed.isClapped
+                    isClapped: feed.isClapped
                 )
             default:
                 break
