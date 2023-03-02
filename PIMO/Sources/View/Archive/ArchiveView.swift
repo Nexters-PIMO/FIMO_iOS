@@ -41,6 +41,12 @@ struct ArchiveView: View {
                         ) {
                             FriendsListView(store: $0)
                         }
+                    case .setting:
+                        IfLetStore(
+                            self.store.scope(state: \.setting, action: { .setting($0) })
+                        ) {
+                            SettingView(store: $0)
+                        }
                     default:
                         EmptyView()
                     }

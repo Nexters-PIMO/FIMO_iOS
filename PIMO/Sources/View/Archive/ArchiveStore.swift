@@ -43,6 +43,7 @@ struct ArchiveStore: ReducerProtocol {
         var feedsType: FeedsType = .basic
         var feed: FeedStore.State?
         var friends: FriendsListStore.State?
+        var setting: SettingStore.State?
     }
     
     enum Action: BindableAction, Equatable {
@@ -56,6 +57,7 @@ struct ArchiveStore: ReducerProtocol {
         case feedDidTap(Feed)
         case feedDetail(FeedStore.Action)
         case friends(FriendsListStore.Action)
+        case setting(SettingStore.Action)
     }
     
     @Dependency(\.archiveClient) var archiveClient
@@ -91,6 +93,13 @@ struct ArchiveStore: ReducerProtocol {
                 break
             case .settingButtonDidTap:
                 state.pushToSettingView = true
+                state.setting = SettingStore.State(
+                    nickname: state.archiveInfo.profile.nickName,
+                    archiveName: state.archiveInfo.archiveName,
+                    imageURLString: state.archiveInfo.profile.imageURL
+                )
+
+                state.path.append(.setting)
             case .friendListButtonDidTap:
                 state.pushToFriendView = true
                 // TODO: Friend List 받아오는 매개변수 주입 필요
