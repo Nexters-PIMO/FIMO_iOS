@@ -50,6 +50,8 @@ struct ProfileSettingStore: ReducerProtocol {
 
         case selectProfileImage(Image)
         case tappedCompleteButton
+
+        case tappedCompleteModifyButton
     }
 
     var body: some ReducerProtocol<State, Action> {
@@ -67,12 +69,13 @@ struct ProfileSettingStore: ReducerProtocol {
 
                 state.nicknameValidationType = checkValidation(isMatchCharactors: isKoreanEnglishAndNumber,
                                                               isBlack: isBlack,
-                                                              charactorCount: nicknameCount)
+                                                               charactorCount: nicknameCount,
+                                                               type: .nickname)
 
                 return .none
             case .checkDuplicateOnNickName:
                 #warning("중복 확인 네트워크 연결 필요")
-                state.isActiveButtonOnNickname = state.nicknameValidationType == .available
+                state.isActiveButtonOnNickname = state.nicknameValidationType == .availableNickName
 
                 return .none
             case .tappedNextButtonOnNickname:
@@ -90,12 +93,13 @@ struct ProfileSettingStore: ReducerProtocol {
 
                 state.archiveValidationType = checkValidation(isMatchCharactors: isKoreanEnglishAndNumber,
                                                               isBlack: isBlack,
-                                                              charactorCount: archiveCharactorCount)
+                                                              charactorCount: archiveCharactorCount,
+                                                              type: .archiveName)
 
                 return .none
             case .checkDuplicateOnArchive:
                 #warning("중복 확인 네트워크 연결 필요")
-                state.isActiveButtonOnArchive = state.archiveValidationType == .available
+                state.isActiveButtonOnArchive = state.archiveValidationType == .availableArchiveName
 
                 return .none
             case .tappedNextButtonOnArchive:
@@ -111,6 +115,10 @@ struct ProfileSettingStore: ReducerProtocol {
                 state.isActiveButtonOnImage = true
 
                 return .none
+            case .tappedCompleteModifyButton:
+                #warning("수정 네비게이션 적용")
+
+                return .none
             default:
                 return .none
             }
@@ -119,15 +127,18 @@ struct ProfileSettingStore: ReducerProtocol {
 
     private func checkValidation(isMatchCharactors: Bool,
                                  isBlack: Bool,
-                                 charactorCount: Int) -> CheckValidationType {
+                                 charactorCount: Int,
+                                 type: ProfileSettingFieldType) -> CheckValidationType {
         if isBlack {
             return .blank
         } else if isMatchCharactors {
             return .onlyKoreanEnglishAndNumber
         } else if charactorCount > 16 {
             return .exceededCharacters
+        } else if type == .nickname {
+            return .availableNickName
         } else {
-            return .available
+            return .availableArchiveName
         }
     }
 }
