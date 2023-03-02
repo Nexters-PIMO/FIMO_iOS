@@ -25,8 +25,15 @@ enum FrinedType {
     case neither
 }
 
+enum ArchiveScene: Hashable {
+    case archive
+    case friends
+    case setting
+}
+
 struct ArchiveStore: ReducerProtocol {
     struct State: Equatable {
+        @BindingState var path: [ArchiveScene] = []
         var archiveType: ArchiveType = .myArchive
         var archiveInfo: ArchiveInfo = .EMPTY
         var gridFeeds: [Feed] = []
@@ -35,9 +42,11 @@ struct ArchiveStore: ReducerProtocol {
         var pushToFriendView: Bool = false
         var feedsType: FeedsType = .basic
         var feed: FeedStore.State?
+        var friends: FriendsListStore.State?
     }
     
-    enum Action: Equatable {
+    enum Action: BindableAction, Equatable {
+        case binding(BindingAction<State>)
         case fetchArchive
         case feed(id: FeedStore.State.ID, action: FeedStore.Action)
         case topBarButtonDidTap
@@ -46,11 +55,13 @@ struct ArchiveStore: ReducerProtocol {
         case feedsTypeButtonDidTap(FeedsType)
         case feedDidTap(Feed)
         case feedDetail(FeedStore.Action)
+        case friends(FriendsListStore.Action)
     }
     
     @Dependency(\.archiveClient) var archiveClient
     
     var body: some ReducerProtocol<State, Action> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
             case .fetchArchive:
@@ -82,6 +93,9 @@ struct ArchiveStore: ReducerProtocol {
                 state.pushToSettingView = true
             case .friendListButtonDidTap:
                 state.pushToFriendView = true
+                // TODO: Friend List 받아오는 매개변수 주입 필요
+                state.friends = FriendsListStore.State(id: 0)
+                state.path.append(.friends)
             case let .feedsTypeButtonDidTap(type):
                 state.feedsType = type
                 state.feed = nil
@@ -100,6 +114,9 @@ struct ArchiveStore: ReducerProtocol {
         }
         .ifLet(\.feed, action: /Action.feedDetail) {
             FeedStore()
+        }
+        .ifLet(\.friends, action: /Action.friends) {
+            FriendsListStore()
         }
         .forEach(\.feeds, action: /Action.feed(id:action:)) {
             FeedStore()
