@@ -43,6 +43,7 @@ extension Project {
             name: name,
             organizationName: Environment.organizationName,
             settings: settings,
-            targets: targets)
+            targets: targets
+        )
     }
 }

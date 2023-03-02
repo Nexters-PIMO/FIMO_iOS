@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Profile: Decodable, Equatable {
+struct Profile: Decodable, Equatable, Hashable {
     let imageURL: String
     let nickName: String
     

@@ -27,7 +27,7 @@ struct TabBarView: View {
                     )
                     .tag(tabBarItems[0])
                     
-                    MyFeedView(
+                    ArchiveView(
                         store: store.scope(
                             state: \.myFeedState,
                             action: TabBarStore.Action.myFeed

@@ -38,28 +38,7 @@ struct HomeStore: ReducerProtocol {
                     }
                 )
             case let .feed(id: id, action: action):
-                switch action {
-                case .moreButtonDidTap:
-                    // TODO: 바텀시트
-                    let _ = print("feedId \(id)")
-                    let _ = print("more")
-                case let .copyButtonDidTap(text):
-                    // TODO: 텍스트 복사
-                    let _ = print("\(text)")
-                case .closeButtonDidTap:
-                    // TODO: 텍스트 닫기 (UserDefault)
-                    let _ = print("close")
-                case .clapButtonDidTap:
-                    let _ = print("clap")
-                case .shareButtonDidTap:
-                    // TODO: 딥링크
-                    let _ = print("share")
-                case let .audioButtonDidTap(text):
-                    // TODO: TTS
-                    let _ = print("\(text)")
-                default:
-                    break
-                }
+                break
             }
             return .none
         }
