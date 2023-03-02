@@ -22,7 +22,6 @@ struct FeedTextImageView: View {
             .placeholder { Image(systemName: "person.fill") }
             .resizable()
             .aspectRatio(contentMode: .fill)
-            .frame(width: 353, height: 353)
     }
 }
 

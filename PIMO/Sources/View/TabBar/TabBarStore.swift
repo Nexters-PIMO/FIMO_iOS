@@ -17,7 +17,7 @@ struct TabBarStore: ReducerProtocol {
         var profile: Profile?
         var homeState = HomeStore.State()
         var uploadState = UploadStore.State()
-        var myFeedState = MyFeedStore.State()
+        var myFeedState = ArchiveStore.State()
     }
     
     enum Action: BindableAction, Equatable {
@@ -26,7 +26,7 @@ struct TabBarStore: ReducerProtocol {
         case setSheetState
         case home(HomeStore.Action)
         case upload(UploadStore.Action)
-        case myFeed(MyFeedStore.Action)
+        case myFeed(ArchiveStore.Action)
     }
     
     @Dependency(\.profileClient) var profileClient
@@ -61,7 +61,7 @@ struct TabBarStore: ReducerProtocol {
         }
         
         Scope(state: \.myFeedState, action: /Action.myFeed) {
-            MyFeedStore()
+            ArchiveStore()
         }
     }
 }

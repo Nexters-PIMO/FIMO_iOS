@@ -44,7 +44,7 @@ extension HomeView {
                 }
             }
             .frame(maxHeight: .infinity, alignment: .top)
-            .padding(EdgeInsets(top: 20, leading: 20, bottom: 0, trailing: 20))
+            .padding([.top, .leading, .trailing], 20)
             .background(
                 Color.white
                     .shadow(color: Color(PIMOAsset.Assets.grayShadow.color).opacity(0.1),

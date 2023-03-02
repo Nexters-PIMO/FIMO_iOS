@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Feed: Decodable, Equatable {
+struct Feed: Decodable, Equatable, Hashable {
     let id: Int
     let profile: Profile
     let uploadTime: String

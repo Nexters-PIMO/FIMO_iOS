@@ -12,7 +12,7 @@ import ComposableArchitecture
 
 struct FeedStore: ReducerProtocol {
     struct State: Equatable, Identifiable {
-        var id: Int
+        var id: Int = 0
         var feed: Feed = Feed.EMPTY
         @BindingState var textImage: TextImage = TextImage.EMPTY
         var clapCount: Int = 0
@@ -36,12 +36,23 @@ struct FeedStore: ReducerProtocol {
         BindingReducer()
         Reduce { state, action in
             switch action {
-            case .binding:
-                break
+            case .moreButtonDidTap:
+                // TODO: 바텀시트
+                let _ = print("more")
+            case let .copyButtonDidTap(text):
+                // TODO: 텍스트 복사
+                let _ = print("\(text)")
+            case .closeButtonDidTap:
+                // TODO: 텍스트 닫기 (UserDefault)
+                let _ = print("close")
             case .clapButtonDidTap:
-                state.clapCount += 1
-            case .audioButtonDidTap:
-                state.audioButtonDidTap.toggle()
+                let _ = print("clap")
+            case .shareButtonDidTap:
+                // TODO: 딥링크
+                let _ = print("share")
+            case let .audioButtonDidTap(text):
+                // TODO: TTS
+                let _ = print("\(text)")
             default:
                 break
             }
