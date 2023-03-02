@@ -11,7 +11,6 @@ import SwiftUI
 struct TermsOfUseView: View {
     var body: some View {
         TextViewContainer(text: PIMOStrings.termsOfUse)
-            .navigationTitle("개인 정보 처리 방침 / 이용약관")
     }
 }
 
