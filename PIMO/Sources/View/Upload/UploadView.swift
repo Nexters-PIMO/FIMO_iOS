@@ -169,7 +169,7 @@ struct UploadView: View {
                             .overlay {
                                 if uploadedImage.id == .zero {
                                     RoundedRectangle(cornerRadius: 2)
-                                        .stroke(Color(asset: PIMOAsset.Assets.red3), lineWidth: 2)
+                                        .stroke(Color(PIMOAsset.Assets.red3.color), lineWidth: 2)
                                 }
                             }
                     }
@@ -207,13 +207,13 @@ struct UploadView: View {
         ZStack {
             if viewStore.state.uploadedImages.isEmpty {
                 RoundedRectangle(cornerRadius: 2)
-                    .foregroundColor(Color(asset: PIMOAsset.Assets.gray0))
+                    .foregroundColor(Color(PIMOAsset.Assets.gray0.color))
                     .frame(width: 353, height: 353)
                 
                 VStack {
                     Image(uiImage: PIMOAsset.Assets.simpleLogo.image)
                         .renderingMode(.template)
-                        .foregroundColor(Color(asset: PIMOAsset.Assets.gray4))
+                        .foregroundColor(Color(PIMOAsset.Assets.gray4.color))
                         .padding(.bottom, 15.2)
                     
                     Text("미리보기")
@@ -223,7 +223,7 @@ struct UploadView: View {
                     
                     Text("미리보고 싶은 썸네일을 선택해주세요")
                         .font(Font(PIMOFontFamily.Pretendard.medium.font(size: 14)))
-                        .foregroundColor(Color(asset: PIMOAsset.Assets.gray3))
+                        .foregroundColor(Color(PIMOAsset.Assets.gray3.color))
                 }
             } else {
                 Image(uiImage: viewStore.selectedImage?.image ?? UIImage())

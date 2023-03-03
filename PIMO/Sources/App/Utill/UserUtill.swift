@@ -44,4 +44,13 @@ class UserUtill: ObservableObject {
 
         return memberToken
     }
+    
+    func getClosedTextGuide() -> Bool? {
+        guard let closedTextGuide: Bool =
+                getUserDefaults(key: .closedTextGuide) else {
+            return false
+        }
+        
+        return closedTextGuide
+    }
 }
