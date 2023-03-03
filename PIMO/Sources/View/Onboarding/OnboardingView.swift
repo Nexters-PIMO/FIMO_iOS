@@ -15,7 +15,17 @@ struct OnboardingView: View {
 
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
-            ZStack {
+            ZStack(alignment: .top) {
+                if viewStore.pageType == OnboardingPageType.allCases.first {
+                    viewStore.pageType.backgroundImage
+                        .resizable()
+                        .ignoresSafeArea()
+                        .scaledToFill()
+                } else {
+                    viewStore.pageType.backgroundImage
+                        .padding(.top, 40)
+                }
+
                 TabView(selection: viewStore.binding(\.$pageType)) {
                     ForEach(OnboardingPageType.allCases, id: \.self) {
                         OnboardingDescriptionView(type: $0)

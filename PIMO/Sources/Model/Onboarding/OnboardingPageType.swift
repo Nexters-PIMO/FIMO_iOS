@@ -6,7 +6,7 @@
 //  Copyright © 2023 pimo. All rights reserved.
 //
 
-import Foundation
+import SwiftUI
 
 enum OnboardingPageType: String {
     case one
@@ -50,6 +50,19 @@ enum OnboardingPageType: String {
             return "STT"
         case .four:
             return "ARCHIVE"
+        }
+    }
+
+    var backgroundImage: Image {
+        switch self {
+        case .one:
+            return Image(uiImage: PIMOAsset.Assets.onboardingBackgroundOne.image)
+        case .two:
+            return Image(uiImage: PIMOAsset.Assets.onboardingBackgroundTwo.image)
+        case .three:
+            return Image(uiImage: PIMOAsset.Assets.onboardingBackgroundThree.image)
+        case .four:
+            return Image(uiImage: PIMOAsset.Assets.onboardingBackgroundFour.image)
         }
     }
 }
