@@ -10,6 +10,7 @@ import Foundation
 
 enum UserDefaultsKeys {
     case token
+    case closedTextGuide
 }
 
 extension UserDefaultsKeys: CustomStringConvertible {
@@ -17,6 +18,8 @@ extension UserDefaultsKeys: CustomStringConvertible {
         switch self {
         case .token:
             return "token"
+        case .closedTextGuide:
+            return "closedTextGuide"
         }
     }
 }

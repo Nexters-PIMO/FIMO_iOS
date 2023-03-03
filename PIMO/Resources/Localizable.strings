@@ -14,6 +14,8 @@ welcomeGuide = "본인 프로필 혹은 게시물 공유로\n친구를 맺고 �
 
 // Feed
 textCopy = "텍스트 복사하기";
+textCopyToastTitle = "글사진 텍스트 복사 완료!";
+textCopyToastMessage = "글사진 속 텍스트를 지인들에게 공유해보세요.";
 
 // Feeds
 archivingTextImage = "%d개의 글사진 아카이빙중";
@@ -24,8 +26,8 @@ emptyFeedGuide = "일상에서 마주친 글사진들을 피모에 저장해서\
 /// Example
 profileImage = "https://ifh.cc/g/gCgJSO.jpg";
 otherProfileImage = "https://ifh.cc/g/lSjXPZ.png";
-textImage = "https://ifh.cc/g/aBrbcB.png";
-textImage2 = "https://ifh.cc/g/rXVc5g.png";
+textImage = "https://ifh.cc/g/xYw5L7.jpg";
+textImage2 = "https://ifh.cc/g/O5n2G2.jpg";
 
 // Terms Of Use URL
 termsOfUseURL = "https://www.notion.so/moonpapereyo/fimo-980d8d8a12714927af90a057027c2142?pvs=4";

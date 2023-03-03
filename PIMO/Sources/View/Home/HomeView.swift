@@ -42,6 +42,9 @@ struct HomeView: View {
                     }
                 }
             }
+            .toast(isShowing: viewStore.binding(\.$isShowToast),
+                   title: viewStore.toastMessage.title,
+                   message: viewStore.toastMessage.message)
         }
     }
     

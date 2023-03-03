@@ -12,20 +12,27 @@ import ComposableArchitecture
 
 struct FeedStore: ReducerProtocol {
     struct State: Equatable, Identifiable {
+        @BindingState var textImage: TextImage = TextImage.EMPTY
         var id: Int = 0
         var feed: Feed = Feed.EMPTY
-        @BindingState var textImage: TextImage = TextImage.EMPTY
+        var isFirstFeed: Bool = false
         var clapCount: Int = 0
+        var plusClapCount: Int = 0
+        var isClapped: Bool = false
         var clapButtonDidTap: Bool = false
+        var isClapPlusViewShowing: Bool = false
         var audioButtonDidTap: Bool = false
+        var closeButtonDidTap: Bool = false
     }
     
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
+        case checkTextGuideClosed
         case moreButtonDidTap(Int)
         case copyButtonDidTap(String)
         case closeButtonDidTap
         case clapButtonDidTap
+        case clapButtonIsDone
         case shareButtonDidTap
         case audioButtonDidTap(String)
     }
@@ -36,23 +43,35 @@ struct FeedStore: ReducerProtocol {
         BindingReducer()
         Reduce { state, action in
             switch action {
+            case .checkTextGuideClosed:
+                guard let isClosed = UserUtill.shared.getClosedTextGuide() else {
+                    state.closeButtonDidTap = false
+                    return .none
+                }
+                state.closeButtonDidTap = isClosed
             case .moreButtonDidTap:
-                // TODO: 바텀시트
-                let _ = print("more")
-            case let .copyButtonDidTap(text):
-                // TODO: 텍스트 복사
-                let _ = print("\(text)")
+                #warning("바텀시트")
             case .closeButtonDidTap:
-                // TODO: 텍스트 닫기 (UserDefault)
-                let _ = print("close")
+                UserUtill.shared.setUserDefaults(key: .closedTextGuide, value: true)
+                state.closeButtonDidTap = true
             case .clapButtonDidTap:
-                let _ = print("clap")
+                state.plusClapCount += 1
+                state.clapCount += 1
+                state.clapButtonDidTap = true
+                state.isClapPlusViewShowing = true
+            case .clapButtonIsDone:
+                state.plusClapCount = 0
+                state.isClapPlusViewShowing = false
             case .shareButtonDidTap:
-                // TODO: 딥링크
-                let _ = print("share")
+                #warning("딥링크")
             case let .audioButtonDidTap(text):
-                // TODO: TTS
-                let _ = print("\(text)")
+                if state.audioButtonDidTap {
+                    TTSUtil.shared.stop()
+                } else {
+                    TTSUtil.shared.play(text)
+                }
+                state.audioButtonDidTap.toggle()
+                
             default:
                 break
             }
