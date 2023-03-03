@@ -12,14 +12,20 @@ struct CustomNavigationBar: View {
     @EnvironmentObject var sceneDelegate: SceneDelegate
     @Environment(\.presentationMode) var presentation
     let title: String
+    var trailingItemType: TrailingItemType = .none
+    var isShadowed: Bool = false
     var screenWidth: CGFloat {
         sceneDelegate.window?.bounds.width ?? 0
     }
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .center) {
             Color.white
-    
+
+            Text(title)
+                .font(Font(PIMOFontFamily.Pretendard.medium.font(size: 18)))
+                .frame(width: 150, height: 18)
+
             HStack {
                 Button {
                     presentation.wrappedValue.dismiss()
@@ -31,17 +37,15 @@ struct CustomNavigationBar: View {
                 }
                 .padding(.leading, 20)
 
-                Text(title)
-                    .font(Font(PIMOFontFamily.Pretendard.medium.font(size: 18)))
-                    .frame(width: 200, height: 18)
-                    .padding(.leading, (screenWidth - 200) / 2 - 44)
-
                 Spacer()
+
+                trailingItemType.view
+                    .padding(.trailing, 20)
             }
         }
         .frame(width: screenWidth, height: 64)
         .shadow(
-            color: Color(PIMOAsset.Assets.grayShadow.color).opacity(0.1),
+            color: isShadowed ? Color(PIMOAsset.Assets.grayShadow.color).opacity(0.1) : .clear,
             radius: 3,
             x: 0,
             y: 3

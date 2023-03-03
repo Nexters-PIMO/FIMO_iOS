@@ -16,6 +16,12 @@ struct ArchiveSettingView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack(alignment: .leading, spacing: 0) {
+                CustomNavigationBar(
+                    title: "프로필 생성",
+                    trailingItemType: .page(2, 3),
+                    isShadowed: false
+                )
+
                 ProgressView(value: 66, total: 100)
                     .tint(Color(PIMOAsset.Assets.red1.color))
 
@@ -42,6 +48,7 @@ struct ArchiveSettingView: View {
 
                 Spacer()
             }
+            .toolbar(.hidden, for: .navigationBar)
         }
     }
 

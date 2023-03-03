@@ -11,46 +11,89 @@ import SwiftUI
 import ComposableArchitecture
 
 struct OnboardingView: View {
-    let store: StoreOf<OnboardingStore>
+    let store: StoreOf<UnAuthenticatedStore>
 
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
-            ZStack(alignment: .top) {
-                if viewStore.pageType == OnboardingPageType.allCases.first {
-                    viewStore.pageType.backgroundImage
-                        .resizable()
-                        .ignoresSafeArea()
-                        .scaledToFill()
-                } else {
-                    viewStore.pageType.backgroundImage
-                        .padding(.top, 40)
-                }
+            NavigationStack(path: viewStore.binding(\.$path)) {
+                ZStack(alignment: .top) {
+                    if viewStore.pageType == OnboardingPageType.allCases.first {
+                        viewStore.pageType.backgroundImage
+                            .resizable()
+                            .scaledToFill()
+                            .ignoresSafeArea()
 
-                TabView(selection: viewStore.binding(\.$pageType)) {
-                    ForEach(OnboardingPageType.allCases, id: \.self) {
-                        OnboardingDescriptionView(type: $0)
-                            .tag($0)
-                    }
-                }
-                .ignoresSafeArea()
-                .tabViewStyle(.page(indexDisplayMode: .never))
-
-                ZStack {
-                    if viewStore.pageType != OnboardingPageType.allCases.last {
-                        skipButton(viewStore: viewStore)
-
-                        indexDisplay(viewStore: viewStore)
                     } else {
-                        startButton(viewStore: viewStore)
+                        viewStore.pageType.backgroundImage
+                            .padding(.top, 40)
+                    }
+
+                    TabView(selection: viewStore.binding(\.$pageType)) {
+                        ForEach(OnboardingPageType.allCases, id: \.self) {
+                            OnboardingDescriptionView(type: $0)
+                                .tag($0)
+                        }
+                    }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+
+                    ZStack {
+                        if viewStore.pageType != OnboardingPageType.allCases.last {
+                            skipButton(viewStore: viewStore)
+
+                            indexDisplay(viewStore: viewStore)
+                        } else {
+                            startButton(viewStore: viewStore)
+                        }
+                    }
+                    .transition(.opacity)
+                    .animation(.easeInOut, value: viewStore.pageType)
+                }
+                .navigationDestination(for: UnauthenticatedScene.self) { scene in
+                    switch scene {
+                    case .login:
+                        LoginView(
+                            store: store.scope(
+                                state: \.loginState,
+                                action: { UnAuthenticatedStore.Action.login($0) }
+                            )
+                        )
+                    case .nickName:
+                        NicknameSettingView(
+                            store: store.scope(
+                                state: \.profileSettingState,
+                                action: { UnAuthenticatedStore.Action.profileSetting($0) }
+                            )
+                        )
+                    case .archiveName:
+                        ArchiveSettingView(
+                            store: store.scope(
+                                state: \.profileSettingState,
+                                action: { UnAuthenticatedStore.Action.profileSetting($0) }
+                            )
+                        )
+                    case .profilePicture:
+                        ProfilePictureSettingView(
+                            store: store.scope(
+                                state: \.profileSettingState,
+                                action: { UnAuthenticatedStore.Action.profileSetting($0) }
+                            )
+                        )
+                    case .complete:
+                        CompleteSettingView(
+                            store: store.scope(
+                                state: \.profileSettingState,
+                                action: { UnAuthenticatedStore.Action.profileSetting($0) }
+                            )
+                        )
+                    default:
+                        EmptyView()
                     }
                 }
-                .transition(.opacity)
-                .animation(.easeInOut, value: viewStore.pageType)
             }
         }
     }
 
-    func startButton(viewStore: ViewStore<OnboardingStore.State, OnboardingStore.Action>) -> some View {
+    func startButton(viewStore: ViewStore<UnAuthenticatedStore.State, UnAuthenticatedStore.Action>) -> some View {
         VStack(alignment: .center) {
             Spacer()
             Button {
@@ -75,7 +118,7 @@ struct OnboardingView: View {
         }
     }
 
-    func skipButton(viewStore: ViewStore<OnboardingStore.State, OnboardingStore.Action>) -> some View {
+    func skipButton(viewStore: ViewStore<UnAuthenticatedStore.State, UnAuthenticatedStore.Action>) -> some View {
         VStack {
             HStack {
                 Spacer()
@@ -92,7 +135,7 @@ struct OnboardingView: View {
         }
     }
 
-    func indexDisplay(viewStore: ViewStore<OnboardingStore.State, OnboardingStore.Action>) -> some View {
+    func indexDisplay(viewStore: ViewStore<UnAuthenticatedStore.State, UnAuthenticatedStore.Action>) -> some View {
         VStack {
             Spacer()
             HStack(spacing: 4) {
@@ -114,8 +157,8 @@ struct OnboardingView_Previews: PreviewProvider {
     static var previews: some View {
         OnboardingView(
             store: Store(
-                initialState: OnboardingStore.State(),
-                reducer: OnboardingStore()
+                initialState: UnAuthenticatedStore.State(),
+                reducer: UnAuthenticatedStore()
             )
         )
     }

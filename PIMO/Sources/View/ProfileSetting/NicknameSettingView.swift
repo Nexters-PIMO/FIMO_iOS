@@ -16,6 +16,12 @@ struct NicknameSettingView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack(alignment: .leading, spacing: 0) {
+                CustomNavigationBar(
+                    title: "프로필 생성",
+                    trailingItemType: .page(1, 3),
+                    isShadowed: false
+                )
+
                 ProgressView(value: 33, total: 100)
                     .tint(Color(PIMOAsset.Assets.red1.color))
 
@@ -42,6 +48,7 @@ struct NicknameSettingView: View {
 
                 Spacer()
             }
+            .toolbar(.hidden, for: .navigationBar)
         }
     }
 

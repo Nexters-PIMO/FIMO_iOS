@@ -23,6 +23,7 @@ struct LoginStore: ReducerProtocol {
         case binding(BindingAction<State>)
         case tappedKakaoLoginButton
         case tappedAppleLoginButton
+        case onSuccessLogin(Bool)
         case showAlert
         case tappedAlertOKButton
     }
@@ -34,7 +35,8 @@ struct LoginStore: ReducerProtocol {
         Reduce { state, action in
             switch action {
             case .tappedAppleLoginButton:
-                return .none
+                // TODO: 로그인 분기 처리
+                return .send(.onSuccessLogin(true))
             case .tappedKakaoLoginButton:
                 var errorMessage = ""
                 var isSignIn = false
@@ -63,8 +65,8 @@ struct LoginStore: ReducerProtocol {
                 
                 state.errorMessage = errorMessage
                 state.isSignIn = isSignIn
-                
-                return .none
+
+                return .send(.onSuccessLogin(isSignIn))
             case .showAlert:
                 state.isAlertShowing = true
                 

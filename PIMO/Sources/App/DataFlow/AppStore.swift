@@ -12,8 +12,7 @@ import ComposableArchitecture
 
 struct AppStore: ReducerProtocol {
     struct State: Equatable {
-        var onboardingState = OnboardingStore.State()
-        var loginState = LoginStore.State()
+        var unAuthenticatedStore = UnAuthenticatedStore.State()
         var tabBarState = TabBarStore.State()
         var appDelegateState = AppDelegateStore.State()
         var userState = UserStore.State()
@@ -21,16 +20,13 @@ struct AppStore: ReducerProtocol {
     }
 
     enum Action: Equatable {
-        case onboarding(OnboardingStore.Action)
-        case login(LoginStore.Action)
+        case unAuthenticated(UnAuthenticatedStore.Action)
         case tabBar(TabBarStore.Action)
         case appDelegate(AppDelegateStore.Action)
         case user(UserStore.Action)
         case onAppear
         case hiddenLaunchScreen
     }
-
-    @Dependency(\.continuousClock) var clock
 
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
@@ -44,13 +40,12 @@ struct AppStore: ReducerProtocol {
             case .hiddenLaunchScreen:
                 state.isLoading = false
                 return .none
+            case .unAuthenticated(.profileSetting(.tappedCompleteButton)):
+                state.userState.status = .authenticated
+                return .none
             default:
                 return .none
             }
-        }
-
-        Scope(state: \.onboardingState, action: /Action.onboarding) {
-            OnboardingStore()
         }
 
         Scope(state: \.appDelegateState, action: /Action.appDelegate) {
@@ -65,8 +60,8 @@ struct AppStore: ReducerProtocol {
             TabBarStore()
         }
 
-        Scope(state: \.loginState, action: /Action.login) {
-            LoginStore()
+        Scope(state: \.unAuthenticatedStore, action: /Action.unAuthenticated) {
+            UnAuthenticatedStore()
         }
     }
 }
