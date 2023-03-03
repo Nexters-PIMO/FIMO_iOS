@@ -17,51 +17,58 @@ struct SettingView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack(alignment: .leading) {
-                HStack(alignment: .center) {
-                    KFImage(URL(string: viewStore.imageURLString))
-                        .retry(maxCount: 3, interval: .seconds(5))
-                        .cacheOriginalImage()
-                        .resizable()
-                        .placeholder({
-                            Image(systemName: "person.crop.circle")
-                                .font(.system(size: 40))
-                        })
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 40, height: 40)
-                        .mask {
-                            Circle()
+                ZStack(alignment: .top) {
+                    NavigationBarShadow()
+
+                    HStack(alignment: .center) {
+                        KFImage(URL(string: viewStore.imageURLString))
+                            .retry(maxCount: 3, interval: .seconds(5))
+                            .cacheOriginalImage()
+                            .resizable()
+                            .placeholder({
+                                Image(systemName: "person.crop.circle")
+                                    .font(.system(size: 40))
+                            })
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 40, height: 40)
+                            .mask {
+                                Circle()
+                            }
+
+                        VStack(alignment: .leading, spacing: 7) {
+                            Text(viewStore.nickname)
+                                .font(.system(size: 16, weight: .medium))
+
+                            Text(viewStore.archiveName)
+                                .font(.system(size: 16))
+                                .foregroundColor(Color(PIMOAsset.Assets.grayText.color))
                         }
+                        .padding(.leading, 16)
 
-                    VStack(alignment: .leading, spacing: 7) {
-                        Text(viewStore.nickname)
-                            .font(.system(size: 16, weight: .medium))
+                        Spacer()
 
-                        Text(viewStore.archiveName)
-                            .font(.system(size: 16))
-                            .foregroundColor(Color(PIMOAsset.Assets.grayText.color))
+                        Button {
+                            viewStore.send(.tappedProfileManagementButton)
+                        } label: {
+                            Text("프로필 관리")
+                                .foregroundColor(Color(PIMOAsset.Assets.grayText.color))
+                                .font(.system(size: 14))
+                                .padding(.vertical, 9)
+                                .padding(.horizontal, 9)
+                                .overlay(
+                                    Capsule()
+                                        .stroke(lineWidth: 1)
+                                        .foregroundColor(.gray)
+                                )
+                        }
                     }
-                    .padding(.leading, 16)
-
-                    Spacer()
-
-                    Button {
-                        viewStore.send(.tappedProfileManagementButton)
-                    } label: {
-                        Text("프로필 관리")
-                            .foregroundColor(Color(PIMOAsset.Assets.grayText.color))
-                            .font(.system(size: 14))
-                            .padding(.vertical, 9)
-                            .padding(.horizontal, 9)
-                            .overlay(
-                                Capsule()
-                                    .stroke(lineWidth: 1)
-                                    .foregroundColor(.gray)
-                            )
-                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
                 }
 
                 Divider()
                     .padding(.vertical, 24)
+                    .padding(.horizontal, 20)
 
                 VStack(alignment: .leading, spacing: 38) {
                     Button {
@@ -88,9 +95,11 @@ struct SettingView: View {
                             .foregroundColor(.black)
                     }
                 }
+                .padding(.horizontal, 20)
 
                 Divider()
                     .padding(.vertical, 24)
+                    .padding(.horizontal, 20)
 
                 VStack(alignment: .leading, spacing: 38) {
                     Button {
@@ -110,6 +119,7 @@ struct SettingView: View {
                             .foregroundColor(Color(PIMOAsset.Assets.grayText.color))
                     }
                 }
+                .padding(.horizontal, 20)
 
                 Spacer()
 
@@ -123,11 +133,18 @@ struct SettingView: View {
                         .border(width: 1, edges: [.bottom], color: Color(PIMOAsset.Assets.grayText.color))
                         .padding(.bottom, 120)
                 }
+                .padding(.horizontal, 20)
             }
-            .padding(.horizontal, 20)
             .logoutPopup(isShowing: viewStore.binding(\.$isShowLogoutPopup), store: viewStore)
             .withdrawalPopup(isShowing: viewStore.binding(\.$isShowWithdrawalPopup), store: viewStore)
             .backPopup(isShowing: viewStore.binding(\.$isShowBackPopup), store: viewStore)
+            .navigationTitle("설정")
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    CustomBackButton()
+                }
+            }
         }
         
     }
