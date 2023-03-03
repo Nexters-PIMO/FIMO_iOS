@@ -10,10 +10,11 @@ import Foundation
 
 struct FriendList {
     let count: Int
+    let nickName: String
     let friendType: FriendType
     let friends: [Friend]
 }
 
 extension FriendList: Equatable {
-    static var EMPTY: FriendList = .init(count: 0, friendType: .mutualFriends, friends: [Friend]())
+    static var EMPTY: FriendList = .init(count: 0, nickName: "", friendType: .mutualFriends, friends: [Friend]())
 }

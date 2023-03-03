@@ -33,8 +33,8 @@ struct CustomNavigationBar: View {
 
                 Text(title)
                     .font(Font(PIMOFontFamily.Pretendard.medium.font(size: 18)))
-                    .frame(width: 69, height: 18)
-                    .padding(.leading, (screenWidth - 69) / 2 - 44)
+                    .frame(width: 200, height: 18)
+                    .padding(.leading, (screenWidth - 200) / 2 - 44)
 
                 Spacer()
             }

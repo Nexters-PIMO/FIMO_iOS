@@ -23,15 +23,19 @@ struct FriendsListView: View {
                         friendsList(viewStore)
                     } header: {
                         if viewStore.friendsList.count > 0 {
-                            header(viewStore)
+                            VStack {
+                                CustomNavigationBar(title: viewStore.selectedFriendsList.nickName)
+                                header(viewStore)
+                            }
+
                         }
                     }
                 }
             }
-            .padding(.horizontal, 20)
             .onAppear {
                 viewStore.send(.onAppear)
             }
+            .toolbar(.hidden, for: .navigationBar)
         }
     }
 
@@ -41,6 +45,7 @@ struct FriendsListView: View {
                 friendCell(store, friend: friend)
             }
         }
+        .padding(.horizontal, 20)
     }
 
     func friendCell(_ store: ViewStore<FriendsListStore.State, FriendsListStore.Action>, friend: Friend) -> some View {
@@ -149,6 +154,7 @@ struct FriendsListView: View {
 
             CustomDivider()
         }
+        .padding(.horizontal, 20)
     }
 
     func tabBarItem(_ store: ViewStore<FriendsListStore.State, FriendsListStore.Action>, title: String, count: Int, index: Int) -> some View {
