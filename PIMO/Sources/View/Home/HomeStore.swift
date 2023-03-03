@@ -10,19 +10,31 @@ import Foundation
 
 import ComposableArchitecture
 
+enum HomeScene: Hashable {
+    case home
+    case setting
+}
+
 struct HomeStore: ReducerProtocol {
     struct State: Equatable {
+        @BindingState var path: [HomeScene] = []
         var feeds: IdentifiedArrayOf<FeedStore.State> = []
+        var setting: SettingStore.State?
     }
     
-    enum Action: Equatable {
+    enum Action: BindableAction, Equatable {
+        case binding(BindingAction<State>)
         case fetchFeeds
         case feed(id: FeedStore.State.ID, action: FeedStore.Action)
+        case settingButtonDidTap
+        case receiveProfileInfo(Profile)
+        case setting(SettingStore.Action)
     }
     
     @Dependency(\.homeClient) var homeClient
     
     var body: some ReducerProtocol<State, Action> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
             case .fetchFeeds:
@@ -39,8 +51,19 @@ struct HomeStore: ReducerProtocol {
                 )
             case let .feed(id: id, action: action):
                 break
+            case .receiveProfileInfo(let profile):
+                // TODO: API 연결 시 보완 예정
+                state.setting = SettingStore.State(nickname: profile.nickName,
+                                                   archiveName: "",
+                                                   imageURLString: profile.imageURL)
+                state.path.append(.setting)
+            default:
+                break
             }
             return .none
+        }
+        .ifLet(\.setting, action: /Action.setting) {
+            SettingStore()
         }
         .forEach(\.feeds, action: /Action.feed(id:action:)) {
             FeedStore()

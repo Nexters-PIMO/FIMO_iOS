@@ -55,6 +55,7 @@ struct ArchiveStore: ReducerProtocol {
         case friendListButtonDidTap
         case feedsTypeButtonDidTap(FeedsType)
         case feedDidTap(Feed)
+        case receiveProfileInfo(Profile)
         case feedDetail(FeedStore.Action)
         case friends(FriendsListStore.Action)
         case setting(SettingStore.Action)
@@ -91,14 +92,11 @@ struct ArchiveStore: ReducerProtocol {
                     // TODO: 친구 서버 (POST)
                 }
                 break
-            case .settingButtonDidTap:
-                state.pushToSettingView = true
-                state.setting = SettingStore.State(
-                    nickname: state.archiveInfo.profile.nickName,
-                    archiveName: state.archiveInfo.archiveName,
-                    imageURLString: state.archiveInfo.profile.imageURL
-                )
-
+            case .receiveProfileInfo(let profile):
+                // TODO: API 연결 시 보완 예정
+                state.setting = SettingStore.State(nickname: profile.nickName,
+                                                   archiveName: state.archiveInfo.archiveName,
+                                                   imageURLString: profile.imageURL)
                 state.path.append(.setting)
             case .friendListButtonDidTap:
                 state.pushToFriendView = true
@@ -120,6 +118,9 @@ struct ArchiveStore: ReducerProtocol {
                 break
             }
             return .none
+        }
+        .ifLet(\.setting, action: /Action.setting) {
+            SettingStore()
         }
         .ifLet(\.feed, action: /Action.feedDetail) {
             FeedStore()

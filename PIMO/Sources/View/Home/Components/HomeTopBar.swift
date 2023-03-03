@@ -27,8 +27,12 @@ extension HomeView {
                     Image(uiImage: PIMOAsset.Assets.fimoLogo.image)
                     
                     Spacer()
-                    
-                    Image(uiImage: PIMOAsset.Assets.setting.image)
+
+                    Button {
+                        viewState.send(.settingButtonDidTap)
+                    } label: {
+                        Image(uiImage: PIMOAsset.Assets.setting.image)
+                    }
                 }
                 
                 HStack {
