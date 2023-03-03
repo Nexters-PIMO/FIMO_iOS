@@ -27,8 +27,15 @@ enum FrinedType {
     case neither
 }
 
+enum ArchiveScene: Hashable {
+    case archive
+    case friends
+    case setting
+}
+
 struct ArchiveStore: ReducerProtocol {
     struct State: Equatable {
+        @BindingState var path: [ArchiveScene] = []
         @BindingState var isShowToast: Bool = false
         var toastMessage: ToastModel = ToastModel(title: PIMOStrings.textCopyToastTitle,
                                                   message: PIMOStrings.textCopyToastMessage)
@@ -40,6 +47,8 @@ struct ArchiveStore: ReducerProtocol {
         var pushToFriendView: Bool = false
         var feedsType: FeedsType = .basic
         var feed: FeedStore.State?
+        var friends: FriendsListStore.State?
+        var setting: SettingStore.State?
     }
     
     enum Action: BindableAction, Equatable {
@@ -53,7 +62,10 @@ struct ArchiveStore: ReducerProtocol {
         case friendListButtonDidTap
         case feedsTypeButtonDidTap(FeedsType)
         case feedDidTap(Feed)
+        case receiveProfileInfo(Profile)
         case feedDetail(FeedStore.Action)
+        case friends(FriendsListStore.Action)
+        case setting(SettingStore.Action)
     }
     
     @Dependency(\.archiveClient) var archiveClient
@@ -116,10 +128,17 @@ struct ArchiveStore: ReducerProtocol {
                     // TODO: 친구 서버 (POST)
                 }
                 break
-            case .settingButtonDidTap:
-                state.pushToSettingView = true
+            case .receiveProfileInfo(let profile):
+                // TODO: API 연결 시 보완 예정
+                state.setting = SettingStore.State(nickname: profile.nickName,
+                                                   archiveName: state.archiveInfo.archiveName,
+                                                   imageURLString: profile.imageURL)
+                state.path.append(.setting)
             case .friendListButtonDidTap:
                 state.pushToFriendView = true
+                // TODO: Friend List 받아오는 매개변수 주입 필요
+                state.friends = FriendsListStore.State(id: 0)
+                state.path.append(.friends)
             case let .feedsTypeButtonDidTap(type):
                 state.feedsType = type
                 state.feed = nil
@@ -137,8 +156,14 @@ struct ArchiveStore: ReducerProtocol {
             }
             return .none
         }
+        .ifLet(\.setting, action: /Action.setting) {
+            SettingStore()
+        }
         .ifLet(\.feed, action: /Action.feedDetail) {
             FeedStore()
+        }
+        .ifLet(\.friends, action: /Action.friends) {
+            FriendsListStore()
         }
         .forEach(\.feeds, action: /Action.feed(id:action:)) {
             FeedStore()

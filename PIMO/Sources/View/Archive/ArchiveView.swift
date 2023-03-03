@@ -23,7 +23,7 @@ struct ArchiveView: View {
     
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
-            NavigationStack {
+            NavigationStack(path: viewStore.binding(\.$path)) {
                 VStack {
                     archiveTopBar
                         .frame(height: 64)
@@ -32,6 +32,24 @@ struct ArchiveView: View {
                 }
                 .onAppear {
                     viewStore.send(.fetchArchive)
+                }
+                .navigationDestination(for: ArchiveScene.self) { scene in
+                    switch scene {
+                    case .friends:
+                        IfLetStore(
+                            self.store.scope(state: \.friends, action: { .friends($0) })
+                        ) {
+                            FriendsListView(store: $0)
+                        }
+                    case .setting:
+                        IfLetStore(
+                            self.store.scope(state: \.setting, action: { .setting($0) })
+                        ) {
+                            SettingView(store: $0)
+                        }
+                    default:
+                        EmptyView()
+                    }
                 }
                 .toast(isShowing: viewStore.binding(\.$isShowToast),
                        title: viewStore.toastMessage.title,
@@ -199,7 +217,7 @@ struct ArchiveView: View {
                 Rectangle()
                     .frame(width: 64, height: 40)
                     .foregroundColor(Color(PIMOAsset.Assets.grayButton.color))
-                
+
                 Image(uiImage: PIMOAsset.Assets.friendlist.image)
             }
             .onTapGesture {

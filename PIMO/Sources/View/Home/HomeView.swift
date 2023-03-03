@@ -15,18 +15,32 @@ struct HomeView: View {
     
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
-            VStack {
-                homeTopBar
-                    .frame(height: 116)
-                
-                if viewStore.feeds.isEmpty {
-                    homeWelcome
-                } else {
-                    homeFeedView(viewStore: viewStore)
+            NavigationStack(path: viewStore.binding(\.$path)) {
+                VStack {
+                    homeTopBar
+                        .frame(height: 116)
+
+                    if viewStore.feeds.isEmpty {
+                        homeWelcome
+                    } else {
+                        homeFeedView(viewStore: viewStore)
+                    }
                 }
-            }
-            .onAppear {
-                viewStore.send(.fetchFeeds)
+                .onAppear {
+                    viewStore.send(.fetchFeeds)
+                }
+                .navigationDestination(for: HomeScene.self) { scene in
+                    switch scene {
+                    case .setting:
+                        IfLetStore(
+                            self.store.scope(state: \.setting, action: { .setting($0) })
+                        ) {
+                            SettingView(store: $0)
+                        }
+                    default:
+                        EmptyView()
+                    }
+                }
             }
             .toast(isShowing: viewStore.binding(\.$isShowToast),
                    title: viewStore.toastMessage.title,

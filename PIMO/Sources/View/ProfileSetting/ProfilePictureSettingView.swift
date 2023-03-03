@@ -16,6 +16,12 @@ struct ProfilePictureSettingView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack(alignment: .leading, spacing: 0) {
+                CustomNavigationBar(
+                    title: "프로필 생성",
+                    trailingItemType: .page(3, 3),
+                    isShadowed: false
+                )
+
                 ProgressView(value: 100, total: 100)
                     .tint(Color(PIMOAsset.Assets.red1.color))
 
@@ -34,6 +40,7 @@ struct ProfilePictureSettingView: View {
 
                 Spacer()
             }
+            .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: viewStore.binding(\.$isShowImagePicker)) {
                 ImagePicker { uiImage in
                     let image = Image(uiImage: uiImage)
@@ -85,7 +92,7 @@ struct ProfilePictureSettingView: View {
 
     func nextButton(_ viewStore: ViewStore<ProfileSettingStore.State, ProfileSettingStore.Action>) -> some View {
         Button {
-
+            viewStore.send(.tappedNextButtonOnProfilePicture)
         } label: {
             Text("완료")
                 .font(.system(size: 16))

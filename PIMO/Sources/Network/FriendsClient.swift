@@ -25,9 +25,9 @@ extension DependencyValues {
 extension FriendsClient: DependencyKey {
     static let liveValue = Self.init { friendType in
         // TODO: 서버 통신
-        return FriendList(count: 2, friendType: .mutualFriends, friends: [
-            .init(friendType: .mutualFriends, profileImageURL: "", name: "김옥현", archiveName: "하루", count: 2,  isMyRelationship: true),
-            .init(friendType: .mutualFriends, profileImageURL: "", name: "김김김", archiveName: "이틀", count: 1, isMyRelationship: true)
+        return FriendList(count: 2, nickName: "EOEUNNOO", friendType: friendType, friends: [
+            .init(friendType: friendType, profileImageURL: PIMOStrings.otherProfileImage, name: "CHERISHER_Y", archiveName: "하루", count: 2,  isMyRelationship: true),
+            .init(friendType: friendType, profileImageURL: PIMOStrings.profileImage, name: "0inn", archiveName: "파도의 거품", count: 1, isMyRelationship: true)
         ])
     }
 }

@@ -11,7 +11,7 @@ import SwiftUI
 import ComposableArchitecture
 import Kingfisher
 
-struct FrientdsListView: View {
+struct FriendsListView: View {
     let store: StoreOf<FriendsListStore>
     @Namespace private var underLine
 
@@ -23,15 +23,19 @@ struct FrientdsListView: View {
                         friendsList(viewStore)
                     } header: {
                         if viewStore.friendsList.count > 0 {
-                            header(viewStore)
+                            VStack {
+                                CustomNavigationBar(title: viewStore.selectedFriendsList.nickName)
+                                header(viewStore)
+                            }
+
                         }
                     }
                 }
             }
-            .padding(.horizontal, 20)
             .onAppear {
                 viewStore.send(.onAppear)
             }
+            .toolbar(.hidden, for: .navigationBar)
         }
     }
 
@@ -41,6 +45,7 @@ struct FrientdsListView: View {
                 friendCell(store, friend: friend)
             }
         }
+        .padding(.horizontal, 20)
     }
 
     func friendCell(_ store: ViewStore<FriendsListStore.State, FriendsListStore.Action>, friend: Friend) -> some View {
@@ -149,6 +154,7 @@ struct FrientdsListView: View {
 
             CustomDivider()
         }
+        .padding(.horizontal, 20)
     }
 
     func tabBarItem(_ store: ViewStore<FriendsListStore.State, FriendsListStore.Action>, title: String, count: Int, index: Int) -> some View {
@@ -189,7 +195,7 @@ struct FrientdsListView: View {
 
 struct FrientdsListView_Previews: PreviewProvider {
     static var previews: some View {
-        FrientdsListView(
+        FriendsListView(
             store: Store(
                 initialState: FriendsListStore.State(),
                 reducer: FriendsListStore()

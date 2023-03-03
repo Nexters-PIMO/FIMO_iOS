@@ -47,6 +47,10 @@ struct TabBarStore: ReducerProtocol {
                 state.isSheetPresented = false
                 
                 return .none
+            case .home(.settingButtonDidTap):
+                return .send(.home(.receiveProfileInfo(state.profile ?? Profile.EMPTY)))
+            case .myFeed(.settingButtonDidTap):
+                return .send(.myFeed(.receiveProfileInfo(state.profile ?? Profile.EMPTY)))
             default:
                 return .none
             }

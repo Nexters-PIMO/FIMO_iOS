@@ -19,7 +19,10 @@ struct LoginView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             ZStack {
-                Color.blue // TODO: 추후 이미지로 대체되야 함
+                Image(uiImage: PIMOAsset.Assets.onboardingBackgroundOne.image)
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
                 
                 VStack {
                     Spacer()
@@ -69,6 +72,7 @@ struct LoginView: View {
                     .padding(.bottom, 50)
                 }
             }
+            .toolbar(.hidden, for: .navigationBar)
         }
         .ignoresSafeArea()
     }

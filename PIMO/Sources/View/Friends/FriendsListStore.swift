@@ -12,6 +12,7 @@ import ComposableArchitecture
 
 struct FriendsListStore: ReducerProtocol {
     struct State: Equatable {
+        var id: Int?
         var currentTab: FriendType = .mutualFriends
         var selectedSort: FriendListSortType = .newest
         var friendsList: [FriendList] = Array(repeating: .EMPTY, count: FriendType.allCases.count)
@@ -56,4 +57,3 @@ struct FriendsListStore: ReducerProtocol {
         }
     }
 }
-

@@ -17,6 +17,8 @@ struct SettingView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack(alignment: .leading) {
+                CustomNavigationBar(title: "설정")
+
                 HStack(alignment: .center) {
                     KFImage(URL(string: viewStore.imageURLString))
                         .retry(maxCount: 3, interval: .seconds(5))
@@ -59,9 +61,12 @@ struct SettingView: View {
                             )
                     }
                 }
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
 
                 Divider()
                     .padding(.vertical, 24)
+                    .padding(.horizontal, 20)
 
                 VStack(alignment: .leading, spacing: 38) {
                     Button {
@@ -80,17 +85,17 @@ struct SettingView: View {
                             .foregroundColor(.black)
                     }
 
-                    Button {
-                        viewStore.send(.tappedTermsOfUseButton)
-                    } label: {
-                        Text("개인정보 처리 방침 / 이용약관")
+                    if let url = viewStore.termsOfUseURL {
+                        Link("개인정보 처리 방침 / 이용약관", destination: url)
                             .font(.system(size: 18))
                             .foregroundColor(.black)
                     }
                 }
+                .padding(.horizontal, 20)
 
                 Divider()
                     .padding(.vertical, 24)
+                    .padding(.horizontal, 20)
 
                 VStack(alignment: .leading, spacing: 38) {
                     Button {
@@ -110,6 +115,7 @@ struct SettingView: View {
                             .foregroundColor(Color(PIMOAsset.Assets.grayText.color))
                     }
                 }
+                .padding(.horizontal, 20)
 
                 Spacer()
 
@@ -123,11 +129,12 @@ struct SettingView: View {
                         .border(width: 1, edges: [.bottom], color: Color(PIMOAsset.Assets.grayText.color))
                         .padding(.bottom, 120)
                 }
+                .padding(.horizontal, 20)
             }
-            .padding(.horizontal, 20)
             .logoutPopup(isShowing: viewStore.binding(\.$isShowLogoutPopup), store: viewStore)
             .withdrawalPopup(isShowing: viewStore.binding(\.$isShowWithdrawalPopup), store: viewStore)
             .backPopup(isShowing: viewStore.binding(\.$isShowBackPopup), store: viewStore)
+            .toolbar(.hidden, for: .navigationBar)
         }
         
     }

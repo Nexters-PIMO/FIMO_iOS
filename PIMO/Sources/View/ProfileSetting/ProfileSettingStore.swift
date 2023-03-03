@@ -49,6 +49,8 @@ struct ProfileSettingStore: ReducerProtocol {
         case tappedNextButtonOnArchive
 
         case selectProfileImage(Image)
+        case tappedNextButtonOnProfilePicture
+
         case tappedCompleteButton
 
         case tappedCompleteModifyButton

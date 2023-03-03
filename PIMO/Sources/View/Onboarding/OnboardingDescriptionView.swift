@@ -17,7 +17,7 @@ struct OnboardingDescriptionView: View {
 
             LazyVStack(alignment: .leading, spacing: 0) {
                 if type == .one {
-                    Image("logo")
+                    Image(uiImage: PIMOAsset.Assets.logo.image)
                         .padding(.bottom, 19)
                 } else {
                     Text(type.categoryTitle)
@@ -32,7 +32,9 @@ struct OnboardingDescriptionView: View {
                         .lineSpacing(8)
 
                     if type == .one {
-                        Image(uiImage: PIMOAsset.Assets.fimo.image)
+                        Image(uiImage: PIMOAsset.Assets.whitefimo.image)
+                            .resizable()
+                            .frame(width: 72, height: 20)
                             .padding([.bottom, .leading], 4)
                     }
                 }
@@ -42,6 +44,7 @@ struct OnboardingDescriptionView: View {
                     .font(.system(size: 15))
                     .lineSpacing(8)
             }
+            .foregroundColor(type == .one ? .white : .black)
             .padding(.leading, 40)
             .padding(.trailing, 20)
         }
