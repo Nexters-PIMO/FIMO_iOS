@@ -85,10 +85,8 @@ struct SettingView: View {
                             .foregroundColor(.black)
                     }
 
-                    Button {
-                        viewStore.send(.tappedTermsOfUseButton)
-                    } label: {
-                        Text("개인정보 처리 방침 / 이용약관")
+                    if let url = viewStore.termsOfUseURL {
+                        Link("개인정보 처리 방침 / 이용약관", destination: url)
                             .font(.system(size: 18))
                             .foregroundColor(.black)
                     }

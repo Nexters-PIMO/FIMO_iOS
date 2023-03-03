@@ -18,6 +18,7 @@ struct SettingStore: ReducerProtocol {
         var nickname: String = "닉네임"
         var archiveName: String = "아카이브 이름"
         var imageURLString: String = ""
+        var termsOfUseURL: URL? = URL(string: PIMOStrings.termsOfUseURL)
 
         var version: String {
             guard let dictionary = Bundle.main.infoDictionary,
@@ -46,6 +47,9 @@ struct SettingStore: ReducerProtocol {
         BindingReducer()
         Reduce { state, action in
             switch action {
+            case .tappedTermsOfUseButton:
+                Link("Learn SwiftUI", destination: URL(string: "https://www.hackingwithswift.com/quick-start/swiftui")!)
+                return .none
             default:
                 return .none
             }
