@@ -6,7 +6,7 @@
 //  Copyright © 2023 pimo. All rights reserved.
 //
 
-import UIKit
+import SwiftUI
 
 import ComposableArchitecture
 
