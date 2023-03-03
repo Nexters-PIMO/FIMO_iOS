@@ -11,28 +11,37 @@ struct PIMOApp: App {
     var body: some Scene {
         WindowGroup {
             WithViewStore(
-                appDelegate.store.scope(state: \.userState.status)
+                appDelegate.store
             ) { viewStore in
-                switch viewStore.state {
-                case .unAuthenticated:
-                    OnboardingView(
-                        store: appDelegate.store.scope(
-                            state: \.onboardingState,
-                            action: AppStore.Action.onboarding
+                ZStack {
+                    switch viewStore.state.userState.status {
+                    case .unAuthenticated:
+                        TabBarView(
+                            store: appDelegate.store.scope(
+                                state: \.tabBarState,
+                                action: AppStore.Action.tabBar
+                            )
                         )
-                    )
-                    .onOpenURL { url in
-                        if AuthApi.isKakaoTalkLoginUrl(url) {
-                            AuthController.handleOpenUrl(url: url)
+                        .onOpenURL { url in
+                            if AuthApi.isKakaoTalkLoginUrl(url) {
+                                AuthController.handleOpenUrl(url: url)
+                            }
                         }
-                    }
-                case .authenticated:
-                    TabBarView(
-                        store: appDelegate.store.scope(
-                            state: \.tabBarState,
-                            action: AppStore.Action.tabBar
+                    case .authenticated:
+                        TabBarView(
+                            store: appDelegate.store.scope(
+                                state: \.tabBarState,
+                                action: AppStore.Action.tabBar
+                            )
                         )
-                    )
+                    }
+
+                    if viewStore.isLoading {
+                        LaunchScreen()
+                    }
+                }
+                .onAppear {
+                    viewStore.send(.onAppear)
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: .tokenExpired)) { _ in
