@@ -11,43 +11,104 @@ import SwiftUI
 import ComposableArchitecture
 
 struct OnboardingView: View {
+    @EnvironmentObject var sceneDelegate: SceneDelegate
     let store: StoreOf<UnAuthenticatedStore>
+
+    var isOverflowBottomText: Bool {
+        sceneDelegate.window?.bounds.height ?? .zero * 0.35 < 281
+    }
 
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             NavigationStack(path: viewStore.binding(\.$path)) {
-                ZStack(alignment: .top) {
-                    if viewStore.pageType == OnboardingPageType.allCases.first {
-                        viewStore.pageType.backgroundImage
-                            .resizable()
-                            .scaledToFill()
-                            .ignoresSafeArea()
-
-                    } else {
-                        viewStore.pageType.backgroundImage
-                            .padding(.top, 40)
-                    }
+                ZStack {
+                    Color.white
+                        .ignoresSafeArea()
 
                     TabView(selection: viewStore.binding(\.$pageType)) {
-                        ForEach(OnboardingPageType.allCases, id: \.self) {
-                            OnboardingDescriptionView(type: $0)
-                                .tag($0)
+                        ForEach(OnboardingPageType.allCases, id: \.self) { type in
+                            ZStack {
+                                VStack(spacing: 0) {
+                                    VStack {
+                                        Spacer()
+
+                                        if viewStore.pageType != .one {
+                                            viewStore.pageType.backgroundImage
+                                                .resizable()
+                                                .frame(maxHeight: .infinity)
+                                                .padding(.top, 40)
+                                                .aspectRatio(contentMode: .fit)
+                                        }
+                                    }
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .background(
+                                        viewStore.pageType == .one
+                                        ? Color.clear
+                                        : Color(PIMOAsset.Assets.gray1.color)
+                                    )
+
+                                    VStack(alignment: .leading, spacing: 0) {
+                                        if viewStore.pageType == .one {
+                                            Image(uiImage: PIMOAsset.Assets.logo.image)
+                                                .padding(.leading, 40)
+                                                .padding(.bottom, -20)
+                                        }
+
+                                        VStack(spacing: 0) {
+                                            OnboardingDescriptionView(type: type)
+
+                                            Spacer()
+
+                                            if viewStore.pageType == .four {
+                                                startButton(viewStore: viewStore)
+                                            } else {
+                                                Rectangle()
+                                                    .foregroundColor(.clear)
+                                                    .frame(width: 313, height: 56)
+                                                    .padding(.bottom, 60)
+                                            }
+                                        }
+                                        .if(isOverflowBottomText) { view in
+                                            view.frame(height: 281)
+                                        }
+
+                                        Spacer()
+                                    }
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .ignoresSafeArea()
+                                    .background(
+                                        viewStore.pageType == .one
+                                        ? Color.clear
+                                        : Color.white
+                                    )
+                                }
+                            }
+                            .ignoresSafeArea()
+                            .tag(type)
                         }
                     }
+                    .ignoresSafeArea()
                     .tabViewStyle(.page(indexDisplayMode: .never))
+                    .background(
+                        viewStore.pageType.backgroundImage
+                            .resizable()
+                            .ignoresSafeArea()
+                            .scaledToFill()
+                    )
 
-                    ZStack {
-                        if viewStore.pageType != OnboardingPageType.allCases.last {
+                    if viewStore.pageType != .four {
+                        ZStack {
                             skipButton(viewStore: viewStore)
 
                             indexDisplay(viewStore: viewStore)
-                        } else {
-                            startButton(viewStore: viewStore)
                         }
+                        .transition(.opacity)
+                        .animation(.easeInOut, value: viewStore.pageType)
+                        .zIndex(1)
                     }
-                    .transition(.opacity)
-                    .animation(.easeInOut, value: viewStore.pageType)
                 }
+                .ignoresSafeArea()
+                .zIndex(0)
                 .navigationDestination(for: UnauthenticatedScene.self) { scene in
                     switch scene {
                     case .login:
@@ -95,7 +156,6 @@ struct OnboardingView: View {
 
     func startButton(viewStore: ViewStore<UnAuthenticatedStore.State, UnAuthenticatedStore.Action>) -> some View {
         VStack(alignment: .center) {
-            Spacer()
             Button {
                 viewStore.send(.startButtonTapped)
             } label: {
@@ -129,7 +189,8 @@ struct OnboardingView: View {
                         .font(.system(size: 18, weight: .regular))
                         .foregroundColor(Color(PIMOAsset.Assets.red1.color))
                 }
-                .padding([.top, .trailing], 20)
+                .padding(.top, 20 + (sceneDelegate.window?.safeAreaInsets.top ?? .zero))
+                .padding(.trailing, 20 + (sceneDelegate.window?.safeAreaInsets.right ?? .zero))
             }
             Spacer()
         }
@@ -161,5 +222,20 @@ struct OnboardingView_Previews: PreviewProvider {
                 reducer: UnAuthenticatedStore()
             )
         )
+    }
+}
+
+extension View {
+    /// Applies the given transform if the given condition evaluates to `true`.
+    /// - Parameters:
+    ///   - condition: The condition to evaluate.
+    ///   - transform: The transform to apply to the source `View`.
+    /// - Returns: Either the original `View` or the modified `View` if the condition is `true`.
+    @ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
+        }
     }
 }
