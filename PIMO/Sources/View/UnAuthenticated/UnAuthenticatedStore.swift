@@ -20,9 +20,11 @@ enum UnauthenticatedScene: Hashable {
 }
 
 struct UnAuthenticatedStore: ReducerProtocol {
+    @Environment(\.presentationMode) var presentation
+
     struct State: Equatable {
         @BindingState var path: [UnauthenticatedScene] = []
-        @BindingState var pageType: OnboardingPageType = .one
+        var onboardingState = OnboardingStore.State()
         var loginState = LoginStore.State()
         var profileSettingState = ProfileSettingStore.State()
     }
@@ -31,21 +33,21 @@ struct UnAuthenticatedStore: ReducerProtocol {
         case binding(BindingAction<State>)
         case login(LoginStore.Action)
         case profileSetting(ProfileSettingStore.Action)
-        case startButtonTapped
-        case skipButtonTapped
+        case onboarding(OnboardingStore.Action)
+        case transitionSceneOnOnboarding
     }
 
     var body: some ReducerProtocol<State, Action> {
         BindingReducer()
         Reduce { state, action in
             switch action {
-            case .startButtonTapped:
+            case .onboarding(.startButtonTapped):
+                return .send(.transitionSceneOnOnboarding)
+            case .onboarding(.skipButtonTapped):
+                return .send(.transitionSceneOnOnboarding)
+            case .transitionSceneOnOnboarding:
                 state.path.append(.login)
-                state.pageType = .one
-                return .none
-            case .skipButtonTapped:
-                state.path.append(.login)
-                state.pageType = .one
+                state.onboardingState.pageType = .one
                 return .none
             case .login(.onSuccessLogin(let onSuccess)):
                 if onSuccess {
@@ -64,6 +66,10 @@ struct UnAuthenticatedStore: ReducerProtocol {
             default:
                 return .none
             }
+        }
+
+        Scope(state: \.onboardingState, action: /Action.onboarding) {
+            OnboardingStore()
         }
 
         Scope(state: \.loginState, action: /Action.login) {

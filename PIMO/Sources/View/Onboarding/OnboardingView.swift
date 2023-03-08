@@ -12,7 +12,7 @@ import ComposableArchitecture
 
 struct OnboardingView: View {
     @EnvironmentObject var sceneDelegate: SceneDelegate
-    let store: StoreOf<UnAuthenticatedStore>
+    let store: StoreOf<OnboardingStore>
 
     var isOverflowBottomText: Bool {
         sceneDelegate.window?.bounds.height ?? .zero * 0.35 < 281
@@ -20,141 +20,98 @@ struct OnboardingView: View {
 
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
-            NavigationStack(path: viewStore.binding(\.$path)) {
-                ZStack {
-                    Color.white
-                        .ignoresSafeArea()
-
-                    TabView(selection: viewStore.binding(\.$pageType)) {
-                        ForEach(OnboardingPageType.allCases, id: \.self) { type in
-                            ZStack {
-                                VStack(spacing: 0) {
-                                    VStack {
-                                        Spacer()
-
-                                        if viewStore.pageType != .one {
-                                            viewStore.pageType.backgroundImage
-                                                .resizable()
-                                                .frame(maxHeight: .infinity)
-                                                .padding(.top, 40)
-                                                .aspectRatio(contentMode: .fit)
-                                        }
-                                    }
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    .background(
-                                        viewStore.pageType == .one
-                                        ? Color.clear
-                                        : Color(PIMOAsset.Assets.gray1.color)
-                                    )
-
-                                    VStack(alignment: .leading, spacing: 0) {
-                                        if viewStore.pageType == .one {
-                                            Image(uiImage: PIMOAsset.Assets.logo.image)
-                                                .padding(.leading, 40)
-                                                .padding(.bottom, -20)
-                                        }
-
-                                        VStack(spacing: 0) {
-                                            OnboardingDescriptionView(type: type)
-
-                                            Spacer()
-
-                                            if viewStore.pageType == .four {
-                                                startButton(viewStore: viewStore)
-                                            } else {
-                                                Rectangle()
-                                                    .foregroundColor(.clear)
-                                                    .frame(width: 313, height: 56)
-                                                    .padding(.bottom, 60)
-                                            }
-                                        }
-                                        .if(isOverflowBottomText) { view in
-                                            view.frame(height: 281)
-                                        }
-
-                                        Spacer()
-                                    }
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    .ignoresSafeArea()
-                                    .background(
-                                        viewStore.pageType == .one
-                                        ? Color.clear
-                                        : Color.white
-                                    )
-                                }
-                            }
-                            .ignoresSafeArea()
-                            .tag(type)
-                        }
-                    }
+            ZStack {
+                Color.white
                     .ignoresSafeArea()
-                    .tabViewStyle(.page(indexDisplayMode: .never))
-                    .background(
-                        viewStore.pageType.backgroundImage
-                            .resizable()
-                            .ignoresSafeArea()
-                            .scaledToFill()
-                    )
 
-                    if viewStore.pageType != .four {
+                TabView(selection: viewStore.binding(\.$pageType)) {
+                    ForEach(OnboardingPageType.allCases, id: \.self) { type in
                         ZStack {
-                            skipButton(viewStore: viewStore)
+                            VStack(spacing: 0) {
+                                VStack {
+                                    Spacer()
 
-                            indexDisplay(viewStore: viewStore)
+                                    if viewStore.pageType != .one {
+                                        viewStore.pageType.backgroundImage
+                                            .resizable()
+                                            .frame(maxHeight: .infinity)
+                                            .padding(.top, 40)
+                                            .aspectRatio(contentMode: .fit)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .background(
+                                    viewStore.pageType == .one
+                                    ? Color.clear
+                                    : Color(PIMOAsset.Assets.gray1.color)
+                                )
+
+                                VStack(alignment: .leading, spacing: 0) {
+                                    if viewStore.pageType == .one {
+                                        Image(uiImage: PIMOAsset.Assets.logo.image)
+                                            .padding(.leading, 40)
+                                            .padding(.bottom, -20)
+                                    }
+
+                                    VStack(spacing: 0) {
+                                        OnboardingDescriptionView(type: type)
+
+                                        Spacer()
+
+                                        if viewStore.pageType == .four {
+                                            startButton(viewStore: viewStore)
+                                        } else {
+                                            Rectangle()
+                                                .foregroundColor(.clear)
+                                                .frame(width: 313, height: 56)
+                                                .padding(.bottom, 60)
+                                        }
+                                    }
+                                    .if(isOverflowBottomText) { view in
+                                        view.frame(height: 281)
+                                    }
+
+                                    Spacer()
+                                }
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .ignoresSafeArea()
+                                .background(
+                                    viewStore.pageType == .one
+                                    ? Color.clear
+                                    : Color.white
+                                )
+                            }
                         }
-                        .transition(.opacity)
-                        .animation(.easeInOut, value: viewStore.pageType)
-                        .zIndex(1)
+                        .ignoresSafeArea()
+                        .tag(type)
                     }
                 }
                 .ignoresSafeArea()
-                .zIndex(0)
-                .navigationDestination(for: UnauthenticatedScene.self) { scene in
-                    switch scene {
-                    case .login:
-                        LoginView(
-                            store: store.scope(
-                                state: \.loginState,
-                                action: { UnAuthenticatedStore.Action.login($0) }
-                            )
-                        )
-                    case .nickName:
-                        NicknameSettingView(
-                            store: store.scope(
-                                state: \.profileSettingState,
-                                action: { UnAuthenticatedStore.Action.profileSetting($0) }
-                            )
-                        )
-                    case .archiveName:
-                        ArchiveSettingView(
-                            store: store.scope(
-                                state: \.profileSettingState,
-                                action: { UnAuthenticatedStore.Action.profileSetting($0) }
-                            )
-                        )
-                    case .profilePicture:
-                        ProfilePictureSettingView(
-                            store: store.scope(
-                                state: \.profileSettingState,
-                                action: { UnAuthenticatedStore.Action.profileSetting($0) }
-                            )
-                        )
-                    case .complete:
-                        CompleteSettingView(
-                            store: store.scope(
-                                state: \.profileSettingState,
-                                action: { UnAuthenticatedStore.Action.profileSetting($0) }
-                            )
-                        )
-                    default:
-                        EmptyView()
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .background(
+                    viewStore.pageType.backgroundImage
+                        .resizable()
+                        .ignoresSafeArea()
+                        .scaledToFill()
+                )
+
+                if viewStore.pageType != .four {
+                    ZStack {
+                        skipButton(viewStore: viewStore)
+
+                        indexDisplay(viewStore: viewStore)
                     }
+                    .transition(.opacity)
+                    .animation(.easeInOut, value: viewStore.pageType)
+                    .zIndex(1)
                 }
             }
+            .ignoresSafeArea()
+            .zIndex(0)
         }
     }
 
-    func startButton(viewStore: ViewStore<UnAuthenticatedStore.State, UnAuthenticatedStore.Action>) -> some View {
+    func startButton(viewStore: ViewStore<OnboardingStore.State, OnboardingStore.Action>) -> some View {
         VStack(alignment: .center) {
             Button {
                 viewStore.send(.startButtonTapped)
@@ -164,7 +121,7 @@ struct OnboardingView: View {
                         .resizable()
                         .frame(width: 30, height: 20)
 
-                    Text("피모 시작하기")
+                    Text(viewStore.isAgainGuideReview ? "돌아가기" : "피모 시작하기")
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.white)
                         .padding(14)
@@ -178,7 +135,7 @@ struct OnboardingView: View {
         }
     }
 
-    func skipButton(viewStore: ViewStore<UnAuthenticatedStore.State, UnAuthenticatedStore.Action>) -> some View {
+    func skipButton(viewStore: ViewStore<OnboardingStore.State, OnboardingStore.Action>) -> some View {
         VStack {
             HStack {
                 Spacer()
@@ -196,7 +153,7 @@ struct OnboardingView: View {
         }
     }
 
-    func indexDisplay(viewStore: ViewStore<UnAuthenticatedStore.State, UnAuthenticatedStore.Action>) -> some View {
+    func indexDisplay(viewStore: ViewStore<OnboardingStore.State, OnboardingStore.Action>) -> some View {
         VStack {
             Spacer()
             HStack(spacing: 4) {
@@ -218,24 +175,9 @@ struct OnboardingView_Previews: PreviewProvider {
     static var previews: some View {
         OnboardingView(
             store: Store(
-                initialState: UnAuthenticatedStore.State(),
-                reducer: UnAuthenticatedStore()
+                initialState: OnboardingStore.State(),
+                reducer: OnboardingStore()
             )
         )
-    }
-}
-
-extension View {
-    /// Applies the given transform if the given condition evaluates to `true`.
-    /// - Parameters:
-    ///   - condition: The condition to evaluate.
-    ///   - transform: The transform to apply to the source `View`.
-    /// - Returns: Either the original `View` or the modified `View` if the condition is `true`.
-    @ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
-        if condition {
-            transform(self)
-        } else {
-            self
-        }
     }
 }

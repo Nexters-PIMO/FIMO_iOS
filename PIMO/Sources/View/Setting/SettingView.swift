@@ -134,6 +134,13 @@ struct SettingView: View {
             .logoutPopup(isShowing: viewStore.binding(\.$isShowLogoutPopup), store: viewStore)
             .withdrawalPopup(isShowing: viewStore.binding(\.$isShowWithdrawalPopup), store: viewStore)
             .backPopup(isShowing: viewStore.binding(\.$isShowBackPopup), store: viewStore)
+            .fullScreenCover(isPresented: viewStore.binding(\.$isSheetPresented)) {
+                IfLetStore(
+                    self.store.scope(state: \.onboarding, action: { .onboarding($0) })
+                ) {
+                    OnboardingView(store: $0)
+                }
+            }
             .toolbar(.hidden, for: .navigationBar)
         }
         
