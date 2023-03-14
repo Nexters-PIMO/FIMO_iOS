@@ -11,8 +11,6 @@ import SwiftUI
 import ComposableArchitecture
 
 struct OnboardingStore: ReducerProtocol {
-    @Environment(\.presentationMode) var presentation
-
     struct State: Equatable {
         @BindingState var pageType: OnboardingPageType = .one
         var isAgainGuideReview: Bool = false
