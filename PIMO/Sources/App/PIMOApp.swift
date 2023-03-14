@@ -16,7 +16,7 @@ struct PIMOApp: App {
                 ZStack {
                     switch viewStore.state.userState.status {
                     case .unAuthenticated:
-                        OnboardingView(
+                        UnAuthenticatedView(
                             store:
                                 appDelegate.store.scope(
                                     state: \.unAuthenticatedStore,

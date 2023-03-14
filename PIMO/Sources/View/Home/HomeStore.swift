@@ -34,6 +34,7 @@ struct HomeStore: ReducerProtocol {
         case settingButtonDidTap
         case receiveProfileInfo(Profile)
         case setting(SettingStore.Action)
+        case onboarding(OnboardingStore.Action)
     }
     
     @Dependency(\.homeClient) var homeClient
