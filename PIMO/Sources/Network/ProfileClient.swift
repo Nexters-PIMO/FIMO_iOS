@@ -12,7 +12,7 @@ import Foundation
 import ComposableArchitecture
 
 struct ProfileClient {
-    let fetchProfile: () -> Profile
+    let fetchMyProfile: () -> EffectTask<Result<Profile, NetworkError>>
 }
 
 extension DependencyValues {
@@ -24,7 +24,9 @@ extension DependencyValues {
 
 extension ProfileClient: DependencyKey {
     static let liveValue = Self.init {
-        // TODO: 서버 통신
-        return Temp.profile
+        let request = ProfileRequest()
+
+        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            .catchToEffect()
     }
 }

@@ -132,7 +132,7 @@ struct ArchiveStore: ReducerProtocol {
                 // TODO: API 연결 시 보완 예정
                 state.setting = SettingStore.State(nickname: profile.nickName,
                                                    archiveName: state.archiveInfo.archiveName,
-                                                   imageURLString: profile.imageURL)
+                                                   imageURLString: profile.profileImgUrl)
                 state.path.append(.setting)
             case .friendListButtonDidTap:
                 state.pushToFriendView = true
