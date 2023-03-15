@@ -11,6 +11,7 @@ import Foundation
 enum HTTPHeaderType {
     case contentType
     case multiPartFormData
+    case authorization
 
     var header: String {
         switch self {
@@ -18,6 +19,9 @@ enum HTTPHeaderType {
             return "application/json"
         case .multiPartFormData:
             return "multipart/form-data"
+        case .authorization:
+            #warning("로그인 구현 후 교체")
+            return "Bearer DEV admin1"
         }
     }
 }

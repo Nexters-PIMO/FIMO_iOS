@@ -14,7 +14,10 @@ struct TabBarStore: ReducerProtocol {
     struct State: Equatable {
         @BindingState var tabBarItem: TabBarItem = .home
         @BindingState var isSheetPresented: Bool = false
-        var profile: Profile?
+        @BindingState var isShowToast: Bool = false
+        var toastMessage: ToastModel = ToastModel(title: PIMOStrings.textCopyToastTitle,
+                                                  message: PIMOStrings.textCopyToastMessage)
+        var myProfile: Profile?
         var homeState = HomeStore.State()
         var uploadState = UploadStore.State()
         var myFeedState = ArchiveStore.State()
@@ -22,11 +25,18 @@ struct TabBarStore: ReducerProtocol {
     
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
+        case sendToast(ToastModel)
+        case sendToastDone
         case fetchProfile
+        case fetchProfileDone(Result<Profile, NetworkError>)
         case setSheetState
         case home(HomeStore.Action)
         case upload(UploadStore.Action)
         case myFeed(ArchiveStore.Action)
+    }
+
+    struct CancelID: Hashable {
+        let id = String(describing: TabBarStore.self)
     }
     
     @Dependency(\.profileClient) var profileClient
@@ -35,25 +45,46 @@ struct TabBarStore: ReducerProtocol {
         BindingReducer()
         Reduce { state, action in
             switch action {
-            case .binding:
-                return .none
+            case let .sendToast(toastModel):
+                if state.isShowToast {
+                    return EffectTask<Action>(value: .sendToast(toastModel))
+                        .delay(for: .milliseconds(1000), scheduler: DispatchQueue.main)
+                        .eraseToEffect()
+                } else {
+                    state.isShowToast = true
+                    state.toastMessage = toastModel
+                    return EffectTask<Action>(value: .sendToastDone)
+                        .delay(for: .milliseconds(2000), scheduler: DispatchQueue.main)
+                        .eraseToEffect()
+                }
+            case .sendToastDone:
+                state.isShowToast = false
             case .fetchProfile:
-                state.profile = profileClient.fetchProfile()
-                return .none
+                return profileClient.fetchMyProfile()
+                    .map(Action.fetchProfileDone)
+                    .cancellable(id: TabBarStore.CancelID())
+            case .fetchProfileDone(let result):
+                switch result {
+                case .success(let myProfile):
+                    state.myProfile = myProfile
+                case .failure(let error):
+                    state.toastMessage = .init(title: error.errorDescription ?? "")
+                    state.isShowToast = true
+                }
             case .setSheetState:
                 state.isSheetPresented = true
-                return .none
             case .upload(.didTapCloseButton):
                 state.isSheetPresented = false
-                
-                return .none
+
             case .home(.settingButtonDidTap):
-                return .send(.home(.receiveProfileInfo(state.profile ?? Profile.EMPTY)))
+                return .send(.home(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
             case .myFeed(.settingButtonDidTap):
-                return .send(.myFeed(.receiveProfileInfo(state.profile ?? Profile.EMPTY)))
+                return .send(.myFeed(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
             default:
                 return .none
             }
+
+            return .none
         }
         
         Scope(state: \.homeState, action: /Action.home) {
