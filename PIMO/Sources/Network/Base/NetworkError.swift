@@ -10,14 +10,16 @@ import Foundation
 
 import Alamofire
 
-struct NetworkError: Error {
-    var initialError: AFError?
+struct NetworkError: Error, Equatable {
     let errorType: NetworkErrorType?
 }
 
-enum NetworkErrorType {
+enum NetworkErrorType: Equatable {
     case tokenExpired
     case nilValue
+    case decodingError
+    case serverError(String)
+    case unknown
 }
 
 extension NetworkError: LocalizedError {
@@ -27,8 +29,12 @@ extension NetworkError: LocalizedError {
             return "토큰이 만료됐습니다."
         case .nilValue:
             return "값이 존재하지 않습니다."
+        case .decodingError:
+            return "디코딩 에러"
+        case .serverError(let errorDescription):
+            return errorDescription
         default:
-            return initialError?.localizedDescription ?? "알 수 없는 에러입니다."
+            return "알 수 없는 에러입니다."
         }
     }
 }

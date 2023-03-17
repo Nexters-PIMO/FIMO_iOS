@@ -12,7 +12,7 @@ import Foundation
 import ComposableArchitecture
 
 struct LoginClient {
-    let appleLogin: (Int) -> EffectPublisher<AppleLogin, Error>
+    let appleLogin: (Int) -> EffectPublisher<AppleLogin, NetworkError>
 }
 
 extension DependencyValues {

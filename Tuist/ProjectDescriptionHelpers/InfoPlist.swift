@@ -9,6 +9,7 @@ extension Project {
         "UIUserInterfaceStyle": "Light",
         "LSApplicationQueriesSchemes": ["kakaokompassauth"],
         "KAKAO_NATIVE_APP_KEY": "${KAKAO_NATIVE_APP_KEY}",
+        "BaseURL": "${BASE_URL}",
         "CFBundleURLTypes": [
             [
                 "CFBundleTypeRole": "Editor",

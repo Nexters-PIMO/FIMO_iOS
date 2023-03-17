@@ -87,7 +87,7 @@ struct HomeStore: ReducerProtocol {
                 // TODO: API 연결 시 보완 예정
                 state.setting = SettingStore.State(nickname: profile.nickName,
                                                    archiveName: "",
-                                                   imageURLString: profile.imageURL)
+                                                   imageURLString: profile.profileImgUrl)
                 state.path.append(.setting)
             default:
                 break

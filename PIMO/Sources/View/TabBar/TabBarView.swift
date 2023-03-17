@@ -41,11 +41,12 @@ struct TabBarView: View {
                 }
                 
                 TabBar(selected: viewStore.binding(\.$tabBarItem),
-                       profileImage: viewStore.state.profile?.imageURL)
+                       profileImage: viewStore.state.myProfile?.profileImgUrl)
                 
                 uploadButton(viewStore: viewStore)
             }
             .ignoresSafeArea(.all)
+            .toast(isShowing: viewStore.binding(\.$isShowToast), title: viewStore.toastMessage.title)
         }
     }
     
