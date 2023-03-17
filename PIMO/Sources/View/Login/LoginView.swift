@@ -41,14 +41,15 @@ struct LoginView: View {
                         .foregroundColor(.white)
                         .padding(.top, 0)
                         .padding(.bottom, 18)
-                    Button {
-                        viewStore.send(.tappedKakaoLoginButton)
-                    } label: {
-                        Image(uiImage: PIMOAsset.Assets.kakaoLoginMediumWide.image)
-                            .resizable()
-                            .renderingMode(.original)
-                            .scaledToFill()
-                            .cornerRadius(8)
+                    KakaoLoginButton(viewStore: viewStore) { token in
+                        DispatchQueue.main.async {
+                            viewStore.send(.tappedKakaoLoginButton(token))
+                        }
+                    }
+                    .alert("로그인이 실패했습니다", isPresented: viewStore.$isAlertShowing) {
+                        Button("확인", role: .cancel) {
+                            viewStore.send(.tappedAlertOKButton)
+                        }
                     }
                     .frame(width: 360, height: 54)
                     .padding(.top, 0)
@@ -58,8 +59,10 @@ struct LoginView: View {
                         viewStore: viewStore,
                         window: sceneDelegate.window!,
                         title: "Apple로 로그인",
-                        action: {
-                            viewStore.send(.tappedAppleLoginButton)
+                        action: { token in
+                            DispatchQueue.main.async {
+                                viewStore.send(.tappedAppleLoginButton(token))
+                            }
                         })
                     .alert("로그인이 실패했습니다", isPresented: viewStore.$isAlertShowing) {
                         Button("확인", role: .cancel) {
