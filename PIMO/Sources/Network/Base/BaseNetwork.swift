@@ -42,17 +42,17 @@ struct BaseNetwork: BaseNetworkInterface {
                       let status = json["status"] as? String,
                       let message = json["message"] as? String,
                       let dataJson = json["data"] else {
-
                     throw NetworkError(errorType: .unknown)
-                }
-
-                guard let data = try? JSONSerialization.data(withJSONObject: dataJson),
-                      let value = try? BaseNetwork.decoder.decode(API.Response.self, from: data) else {
-                    throw NetworkError(errorType: .decodingError)
                 }
 
                 guard status == "OK" else {
                     throw NetworkError(errorType: .serverError(message))
+                }
+
+                guard JSONSerialization.isValidJSONObject(dataJson),
+                      let data = try? JSONSerialization.data(withJSONObject: dataJson),
+                      let value = try? BaseNetwork.decoder.decode(API.Response.self, from: data) else {
+                    throw NetworkError(errorType: .decodingError)
                 }
 
                 return value
