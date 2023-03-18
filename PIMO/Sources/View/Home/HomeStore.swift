@@ -13,6 +13,7 @@ import ComposableArchitecture
 enum HomeScene: Hashable {
     case home
     case setting
+    case openSourceLicence
 }
 
 struct HomeStore: ReducerProtocol {
@@ -89,6 +90,8 @@ struct HomeStore: ReducerProtocol {
                                                    archiveName: "",
                                                    imageURLString: profile.profileImgUrl)
                 state.path.append(.setting)
+            case .setting(.tappedLicenceButton):
+                state.path.append(.openSourceLicence)
             default:
                 break
             }
