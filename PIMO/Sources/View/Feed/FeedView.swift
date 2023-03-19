@@ -239,7 +239,7 @@ struct FeedView: View {
     // 오디오 버튼
     func audioButton(_ viewStore: ViewStore<FeedStore.State, FeedStore.Action>) -> some View {
         Button {
-            let text = viewStore.state.feed.textImages.map { $0.text }.joined(separator: " ")
+            let text = viewStore.state.textImage.text
             viewStore.send(.audioButtonDidTap(text))
         } label: {
             let audioButtonImage = viewStore.audioButtonDidTap ?
