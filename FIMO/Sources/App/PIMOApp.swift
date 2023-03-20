@@ -16,18 +16,12 @@ struct PIMOApp: App {
                 ZStack {
                     switch viewStore.state.userState.status {
                     case .unAuthenticated:
-                        OnboardingView(
-                            store:
-                                appDelegate.store.scope(
-                                    state: \.unAuthenticatedStore,
-                                    action: AppStore.Action.unAuthenticated
-                                )
+                        TabBarView(
+                            store: appDelegate.store.scope(
+                                state: \.tabBarState,
+                                action: AppStore.Action.tabBar
+                            )
                         )
-                        .onOpenURL { url in
-                            if AuthApi.isKakaoTalkLoginUrl(url) {
-                                AuthController.handleOpenUrl(url: url)
-                            }
-                        }
                     case .authenticated:
                         TabBarView(
                             store: appDelegate.store.scope(
