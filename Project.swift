@@ -5,7 +5,7 @@ import MyPlugin
 let localHelper = LocalHelper(name: "MyPlugin")
 
 let project = Project.app(
-    name: "FIMO",
+    name: "PIMO",
     platform: .iOS,
     dependencies: [
         .external(name: "Alamofire"),
