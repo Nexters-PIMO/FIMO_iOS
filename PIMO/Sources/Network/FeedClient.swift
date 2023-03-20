@@ -26,16 +26,15 @@ extension DependencyValues {
 
 extension FeedClient: DependencyKey {
     static var liveValue: Self {
-        let tts = TTSManager()
-        
         return Self(
-            play: { text in tts.play(text) },
-            stop: { tts.stop() }
+            play: { text in TTSManager.shared.play(text) },
+            stop: { TTSManager.shared.stop() }
         )
     }
 }
 
-private class TTSManager: NSObject {
+class TTSManager: NSObject {
+    static let shared = TTSManager()
     var delegate: Delegate?
     private var synthesizer: AVSpeechSynthesizer?
     
@@ -56,7 +55,6 @@ private class TTSManager: NSObject {
             let utterance = AVSpeechUtterance(string: text)
             utterance.voice = AVSpeechSynthesisVoice(language: "ko-KR")
             utterance.rate = 0.4
-            self.synthesizer?.stopSpeaking(at: .immediate)
             self.synthesizer?.speak(utterance)
         }
         
@@ -71,9 +69,13 @@ private class TTSManager: NSObject {
         
         return stop.eraseToEffect()
     }
+    
+    func stopBeforePlaying() {
+        self.synthesizer?.stopSpeaking(at: .immediate)
+    }
 }
 
-private final class Delegate: NSObject, AVSpeechSynthesizerDelegate {
+final class Delegate: NSObject, AVSpeechSynthesizerDelegate {
     let didFinishPlaying: () -> Void
     
     init(didFinishPlaying: @escaping () -> Void) {

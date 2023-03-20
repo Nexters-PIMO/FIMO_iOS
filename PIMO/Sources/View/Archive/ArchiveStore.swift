@@ -49,6 +49,7 @@ struct ArchiveStore: ReducerProtocol {
         var feed: FeedStore.State?
         var friends: FriendsListStore.State?
         var setting: SettingStore.State?
+        var audioPlayingFeedId: Int?
     }
     
     enum Action: BindableAction, Equatable {
@@ -110,11 +111,20 @@ struct ArchiveStore: ReducerProtocol {
                         )
                     }
                 )
-            case let .feed(id: _, action: action):
+            case let .feed(id: id, action: action):
                 switch action {
                 case let .copyButtonDidTap(text):
                     pasteboard.string = text
                     state.isShowToast = true
+                case .audioButtonDidTap:
+                    guard let feedId = state.audioPlayingFeedId else {
+                        state.audioPlayingFeedId = id
+                        break
+                    }
+                    if state.feeds[id: feedId]?.audioButtonDidTap ?? false && feedId != id {
+                        state.feeds[id: feedId]?.audioButtonDidTap.toggle()
+                    }
+                    state.audioPlayingFeedId = id
                 default:
                     break
                 }
