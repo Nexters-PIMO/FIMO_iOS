@@ -24,7 +24,7 @@ struct FeedView: View {
                 VStack {
                     // 피드 상단
                     HStack {
-                        KFImage(URL(string: viewStore.feed.profile.imageURL))
+                        KFImage(URL(string: viewStore.feed.profile.profileImgUrl))
                             .placeholder { Image(systemName: "person") }
                             .resizable()
                             .aspectRatio(contentMode: .fill)

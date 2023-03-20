@@ -191,7 +191,7 @@ struct ArchiveView: View {
     // 아카이브 상단 프로필 뷰
     func profileView(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>) -> some View {
         HStack {
-            KFImage(URL(string: viewStore.archiveInfo.profile.imageURL))
+            KFImage(URL(string: viewStore.archiveInfo.profile.profileImgUrl))
                 .placeholder { Image(systemName: "person") }
                 .resizable()
                 .frame(width: 52, height: 52)

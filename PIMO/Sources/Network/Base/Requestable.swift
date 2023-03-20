@@ -25,7 +25,11 @@ extension Requestable {
     }
 
     var baseURL: String {
-        return ""
+        guard let baseURL = Bundle.main.infoDictionary?["BaseURL"] as? String else {
+            return ""
+        }
+        
+        return baseURL
     }
 
     func asURLRequest() throws -> URLRequest {

@@ -12,7 +12,7 @@ import Foundation
 import Alamofire
 
 protocol BaseNetworkInterface {
-    func request<API: Requestable>(api: API, isInterceptive: Bool) -> AnyPublisher<API.Response, Error>
+    func request<API: Requestable>(api: API, isInterceptive: Bool) -> AnyPublisher<API.Response, NetworkError>
 }
 
 struct BaseNetwork: BaseNetworkInterface {
@@ -21,6 +21,7 @@ struct BaseNetwork: BaseNetworkInterface {
     private let interceptorAuthenticator: RequestInterceptor
 
     static let shared: BaseNetworkInterface = BaseNetwork()
+    static let decoder: JSONDecoder = JSONDecoder()
 
     private init(interceptorAuthenticator: RequestInterceptor = InterceptorAuthenticator()) {
         self.interceptorAuthenticator = interceptorAuthenticator
@@ -31,16 +32,33 @@ struct BaseNetwork: BaseNetworkInterface {
         self.session = Session(configuration: configuration)
     }
 
-    func request<API: Requestable>(api: API, isInterceptive: Bool) -> AnyPublisher<API.Response, Error> {
+    func request<API: Requestable>(api: API, isInterceptive: Bool) -> AnyPublisher<API.Response, NetworkError> {
         session.request(api, interceptor: isInterceptive ? interceptorAuthenticator : nil)
             .validate(statusCode: 200..<500)
-            .publishDecodable(type: API.Response.self)
+            .publishData()
             .tryMap({
-                guard let value = $0.value else {
-                    throw NetworkError.init(initialError: $0.error, errorType: .nilValue)
+                guard let responseData = $0.value,
+                      let json = try JSONSerialization.jsonObject(with: responseData) as? [String: Any],
+                      let status = json["status"] as? String,
+                      let message = json["message"] as? String,
+                      let dataJson = json["data"] else {
+                    throw NetworkError(errorType: .unknown)
+                }
+
+                guard status == "OK" else {
+                    throw NetworkError(errorType: .serverError(message))
+                }
+
+                guard JSONSerialization.isValidJSONObject(dataJson),
+                      let data = try? JSONSerialization.data(withJSONObject: dataJson),
+                      let value = try? BaseNetwork.decoder.decode(API.Response.self, from: data) else {
+                    throw NetworkError(errorType: .decodingError)
                 }
 
                 return value
+            })
+            .mapError({ error in
+                error as? NetworkError ?? .init(errorType: .unknown)
             })
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.main)

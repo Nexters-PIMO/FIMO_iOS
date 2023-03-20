@@ -13,18 +13,13 @@ struct OnboardingDescriptionView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Spacer()
-
             LazyVStack(alignment: .leading, spacing: 0) {
-                if type == .one {
-                    Image(uiImage: PIMOAsset.Assets.logo.image)
-                        .padding(.bottom, 19)
-                } else {
+                if type != .one {
                     Text(type.categoryTitle)
                         .font(.system(size: 16, weight: .bold))
                         .foregroundColor(Color(PIMOAsset.Assets.red1.color))
                         .padding(.bottom, 12)
-                }
+                } 
 
                 HStack(alignment: .bottom, spacing: 0) {
                     Text(type.title)
@@ -44,12 +39,13 @@ struct OnboardingDescriptionView: View {
                     .font(.system(size: 15))
                     .lineSpacing(8)
             }
+            .minimumScaleFactor(0.01)
             .foregroundColor(type == .one ? .white : .black)
             .padding(.leading, 40)
             .padding(.trailing, 20)
         }
         .frame(maxWidth: .infinity)
-        .padding(.bottom, 161)
+        .padding(.top, 39)
     }
 }
 

@@ -12,9 +12,10 @@ import Alamofire
 
 class InterceptorAuthenticator: RequestInterceptor {
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
-        let request = urlRequest
+        var request = urlRequest
 
         // TODO: 로그인 정책에 따른 adapt 구현
+        request.setValue(HTTPHeaderType.authorization.header, forHTTPHeaderField: HTTPFields.authorization.rawValue)
 
         completion(.success(request))
     }

@@ -11,26 +11,26 @@ import Foundation
 struct Temp {
     static let feeds: [Feed] = [
         Feed(id: 1,
-             profile: Profile(imageURL: PIMOStrings.otherProfileImage, nickName: "EOEUNOO"),
+             profile: Profile(userId: "", nickName: "EOEUNOO", profileImgUrl: PIMOStrings.otherProfileImage, status: "", updatedAt: "", createdAt: ""),
              uploadTime: "5분 전",
              textImages: [TextImage(id: 1, imageURL: PIMOStrings.textImage, text: "옳은 일을 하는 것은 결코 잘못이 아니다"),
                           TextImage(id: 2, imageURL: PIMOStrings.textImage2, text: "음악 소리가 안들린다. 보고타 축 쳐져서 일할 거야? 음악 어디 갔어?")],
              clapCount: 310,
              isClapped: false),
         Feed(id: 2,
-             profile: Profile(imageURL: PIMOStrings.profileImage, nickName: "CHERISHER_Y"),
+             profile: Profile(userId: "", nickName: "CHERISHER_Y", profileImgUrl: PIMOStrings.otherProfileImage, status: "", updatedAt: "", createdAt: ""),
              uploadTime: "10분 전",
              textImages: [TextImage(id: 3, imageURL: PIMOStrings.textImage2, text: "음악 소리가 안들린다. 보고타 축 쳐져서 일할 거야? 음악 어디 갔어?")],
              clapCount: 320,
              isClapped: true),
         Feed(id: 3,
-             profile: Profile(imageURL: PIMOStrings.profileImage, nickName: "0inn"),
+             profile: Profile(userId: "", nickName: "0inn", profileImgUrl: PIMOStrings.otherProfileImage, status: "", updatedAt: "", createdAt: ""),
              uploadTime: "30분 전",
              textImages: [TextImage(id: 4, imageURL: PIMOStrings.textImage, text: "옳은 일을 하는 것은 결코 잘못이 아니다")],
              clapCount: 320,
              isClapped: true),
         Feed(id: 4,
-             profile: Profile(imageURL: PIMOStrings.profileImage, nickName: "0inn"),
+             profile: Profile(userId: "", nickName: "0inn", profileImgUrl: PIMOStrings.otherProfileImage, status: "", updatedAt: "", createdAt: ""),
              uploadTime: "힌 시간 전",
              textImages: [TextImage(id: 5, imageURL: PIMOStrings.textImage2, text: "음악 소리가 안들린다. 보고타 축 쳐져서 일할 거야? 음악 어디 갔어?")],
              clapCount: 320,
@@ -39,13 +39,13 @@ struct Temp {
     
     static let myFeeds: [Feed] = [
         Feed(id: 3,
-             profile: Profile(imageURL: PIMOStrings.profileImage, nickName: "0inn"),
+             profile: Profile(userId: "", nickName: "0inn", profileImgUrl: PIMOStrings.otherProfileImage, status: "", updatedAt: "", createdAt: ""),
              uploadTime: "30분 전",
              textImages: [TextImage(id: 3, imageURL: PIMOStrings.textImage, text: "옳은 일을 하는 것은 결코 잘못이 아니다")],
              clapCount: 320,
              isClapped: true),
         Feed(id: 4,
-             profile: Profile(imageURL: PIMOStrings.profileImage, nickName: "0inn"),
+             profile: Profile(userId: "", nickName: "0inn", profileImgUrl: PIMOStrings.otherProfileImage, status: "", updatedAt: "", createdAt: ""),
              uploadTime: "힌 시간 전",
              textImages: [TextImage(id: 5, imageURL: PIMOStrings.textImage2, text: "음악 소리가 안들린다. 보고타 축 쳐져서 일할 거야? 음악 어디 갔어?")],
              clapCount: 320,
@@ -53,12 +53,20 @@ struct Temp {
     ]
     
     static let profile: Profile = Profile(
-        imageURL: PIMOStrings.profileImage,
-        nickName: "0inn"
+        userId: "",
+        nickName: "0inn",
+        profileImgUrl: PIMOStrings.otherProfileImage,
+        status: "",
+        updatedAt: "",
+        createdAt: ""
     )
     
     static let otherProfile: Profile = Profile(
-        imageURL: PIMOStrings.otherProfileImage,
-        nickName: "EOEUNOO"
+        userId: "",
+        nickName: "EOEUNOO",
+        profileImgUrl: PIMOStrings.otherProfileImage,
+        status: "",
+        updatedAt: "",
+        createdAt: ""
     )
 }

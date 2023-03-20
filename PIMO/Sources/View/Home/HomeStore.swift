@@ -35,6 +35,7 @@ struct HomeStore: ReducerProtocol {
         case settingButtonDidTap
         case receiveProfileInfo(Profile)
         case setting(SettingStore.Action)
+        case onboarding(OnboardingStore.Action)
     }
     
     @Dependency(\.homeClient) var homeClient
@@ -96,7 +97,7 @@ struct HomeStore: ReducerProtocol {
                 #warning("API연결")
                 state.setting = SettingStore.State(nickname: profile.nickName,
                                                    archiveName: "",
-                                                   imageURLString: profile.imageURL)
+                                                   imageURLString: profile.profileImgUrl)
                 state.path.append(.setting)
             default:
                 break

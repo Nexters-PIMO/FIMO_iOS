@@ -16,11 +16,12 @@ struct PIMOApp: App {
                 ZStack {
                     switch viewStore.state.userState.status {
                     case .unAuthenticated:
-                        TabBarView(
-                            store: appDelegate.store.scope(
-                                state: \.tabBarState,
-                                action: AppStore.Action.tabBar
-                            )
+                        UnAuthenticatedView(
+                            store:
+                                appDelegate.store.scope(
+                                    state: \.unAuthenticatedStore,
+                                    action: AppStore.Action.unAuthenticated
+                                )
                         )
                     case .authenticated:
                         TabBarView(
