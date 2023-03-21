@@ -21,8 +21,12 @@ struct LoginView: View {
             ZStack {
                 Image(uiImage: PIMOAsset.Assets.onboardingBackgroundOne.image)
                     .resizable()
+                    .renderingMode(.original)
                     .scaledToFill()
-                    .ignoresSafeArea()
+                    .frame(
+                        width: sceneDelegate.window?.bounds.width,
+                        height: sceneDelegate.window?.bounds.height
+                    )
                 
                 VStack {
                     Spacer()
