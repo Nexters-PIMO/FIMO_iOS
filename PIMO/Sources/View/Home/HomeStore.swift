@@ -23,6 +23,7 @@ struct HomeStore: ReducerProtocol {
                                                   message: PIMOStrings.textCopyToastMessage)
         var feeds: IdentifiedArrayOf<FeedStore.State> = []
         var setting: SettingStore.State?
+        var audioPlayingFeedId: Int?
     }
     
     enum Action: BindableAction, Equatable {
@@ -75,16 +76,25 @@ struct HomeStore: ReducerProtocol {
                         )
                     }
                 )
-            case let .feed(id: _, action: action):
+            case let .feed(id: id, action: action):
                 switch action {
                 case let .copyButtonDidTap(text):
                     pasteboard.string = text
                     state.isShowToast = true
+                case .audioButtonDidTap:
+                    guard let feedId = state.audioPlayingFeedId else {
+                        state.audioPlayingFeedId = id
+                        break
+                    }
+                    if state.feeds[id: feedId]?.audioButtonDidTap ?? false && feedId != id {
+                        state.feeds[id: feedId]?.audioButtonDidTap.toggle()
+                    }
+                    state.audioPlayingFeedId = id
                 default:
                     break
                 }
             case .receiveProfileInfo(let profile):
-                // TODO: API 연결 시 보완 예정
+                #warning("API연결")
                 state.setting = SettingStore.State(nickname: profile.nickName,
                                                    archiveName: "",
                                                    imageURLString: profile.profileImgUrl)

@@ -35,9 +35,10 @@ struct FeedStore: ReducerProtocol {
         case clapButtonIsDone
         case shareButtonDidTap
         case audioButtonDidTap(String)
+        case audioDidFinish
     }
     
-    private enum FeedID { }
+    @Dependency(\.feedClient) var feedClient
     
     var body: some ReducerProtocol<State, Action> {
         BindingReducer()
@@ -65,13 +66,17 @@ struct FeedStore: ReducerProtocol {
             case .shareButtonDidTap:
                 #warning("딥링크")
             case let .audioButtonDidTap(text):
-                if state.audioButtonDidTap {
-                    TTSUtil.shared.stop()
-                } else {
-                    TTSUtil.shared.play(text)
-                }
+                TTSManager.shared.stopPlaying()
                 state.audioButtonDidTap.toggle()
-                
+                if !state.audioButtonDidTap {
+                    return feedClient.stop().map { Action.audioDidFinish }
+                } else {
+                    return feedClient.play(text).map { Action.audioDidFinish }
+                }
+            case .audioDidFinish:
+                if state.audioButtonDidTap {
+                    state.audioButtonDidTap.toggle()
+                }
             default:
                 break
             }
