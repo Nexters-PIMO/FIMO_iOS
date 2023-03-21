@@ -12,13 +12,14 @@ import ComposableArchitecture
 
 struct BottomSheetStore: ReducerProtocol {
     struct State: Equatable {
+        var feedId: Int = 0
         var bottomSheetType: BottomSheetType = .me
     }
     
     enum Action: Equatable {
-        case editButtonDidTap
-        case deleteButtonDidTap
-        case declationButtonDidTap
+        case editButtonDidTap(Int)
+        case deleteButtonDidTap(Int)
+        case declationButtonDidTap(Int)
     }
     
     var body: some ReducerProtocol<State, Action> {

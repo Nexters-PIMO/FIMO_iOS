@@ -121,7 +121,7 @@ struct ArchiveStore: ReducerProtocol {
                     state.isShowToast = true
                 case let .moreButtonDidTap(id):
                     state.isBottomSheetPresented = true
-                    state.bottomSheet = BottomSheetStore.State(bottomSheetType: .me)
+                    state.bottomSheet = BottomSheetStore.State(feedId: id, bottomSheetType: .me)
                 case .audioButtonDidTap:
                     guard let feedId = state.audioPlayingFeedId else {
                         state.audioPlayingFeedId = id
@@ -141,7 +141,7 @@ struct ArchiveStore: ReducerProtocol {
                     state.isShowToast = true
                 case let .moreButtonDidTap(id):
                     state.isBottomSheetPresented = true
-                    state.bottomSheet = BottomSheetStore.State(bottomSheetType: .me)
+                    state.bottomSheet = BottomSheetStore.State(feedId: id, bottomSheetType: .me)
                 default:
                     break
                 }

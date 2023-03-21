@@ -29,8 +29,8 @@ struct TabBarView: View {
                     
                     ArchiveView(
                         store: store.scope(
-                            state: \.myFeedState,
-                            action: TabBarStore.Action.myFeed
+                            state: \.archiveState,
+                            action: TabBarStore.Action.archive
                         )
                     )
                     .tag(tabBarItems[1])
@@ -47,6 +47,7 @@ struct TabBarView: View {
             }
             .ignoresSafeArea(.all)
             .toast(isShowing: viewStore.binding(\.$isShowToast), title: viewStore.toastMessage.title)
+            .removePopup(isShowing: viewStore.binding(\.$isShowRemovePopup), store: viewStore)
         }
     }
     

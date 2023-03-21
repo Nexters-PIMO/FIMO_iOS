@@ -19,7 +19,7 @@ struct HomeStore: ReducerProtocol {
     struct State: Equatable {
         @BindingState var path: [HomeScene] = []
         @BindingState var isShowToast: Bool = false
-        @BindingState var isBottomSheetPresented = false
+        @BindingState var isBottomSheetPresented: Bool = false
         var toastMessage: ToastModel = ToastModel(title: PIMOStrings.textCopyToastTitle,
                                                   message: PIMOStrings.textCopyToastMessage)
         var feeds: IdentifiedArrayOf<FeedStore.State> = []
@@ -86,7 +86,7 @@ struct HomeStore: ReducerProtocol {
                     state.isShowToast = true
                 case let .moreButtonDidTap(id):
                     state.isBottomSheetPresented = true
-                    state.bottomSheet = BottomSheetStore.State(bottomSheetType: .me)
+                    state.bottomSheet = BottomSheetStore.State(feedId: id, bottomSheetType: .me)
                 case .audioButtonDidTap:
                     guard let feedId = state.audioPlayingFeedId else {
                         state.audioPlayingFeedId = id

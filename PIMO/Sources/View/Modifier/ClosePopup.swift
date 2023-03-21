@@ -11,9 +11,9 @@ import SwiftUI
 import ComposableArchitecture
 
 extension View {
-    func closePopup(isShowing: Binding<Bool>) -> some View {
-        return self.modifier(RemovePopupViewModifier(isShowing: isShowing))
-    }
+//    func closePopup(isShowing: Binding<Bool>) -> some View {
+//        return self.modifier(RemovePopupViewModifier(isShowing: isShowing))
+//    }
 }
 
 struct ClosePopupViewModifier: ViewModifier {
