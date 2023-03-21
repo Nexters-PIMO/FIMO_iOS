@@ -11,7 +11,7 @@ import Foundation
 import Alamofire
 
 struct AppleLoginRequest: Requestable {
-    typealias Response = AppleLogin
+    typealias Response = AppleToken
 
     var path: String {
         return "/login/token"

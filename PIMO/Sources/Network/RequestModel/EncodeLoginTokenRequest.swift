@@ -11,7 +11,7 @@ import Foundation
 import Alamofire
 
 struct EncodeLoginTokenRequest: Requestable {
-    typealias Response = EncodeLogin
+    typealias Response = EncodedToken
 
     var path: String {
         return "/login/encode"

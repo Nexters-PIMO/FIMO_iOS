@@ -51,9 +51,10 @@ struct LoginView: View {
                             viewStore.send(.tappedAlertOKButton)
                         }
                     }
-                    .frame(width: 360, height: 54)
+                    .frame(height: 54)
                     .padding(.top, 0)
                     .padding(.bottom, 18)
+                    .padding([.leading, .trailing], 16)
                         
                     AppleLoginButton(
                         viewStore: viewStore,
@@ -70,9 +71,10 @@ struct LoginView: View {
                         }
                     }
                     .cornerRadius(8)
-                    .frame(width: 360, height: 54)
+                    .frame(height: 54)
                     .padding(.top, 0)
                     .padding(.bottom, 50)
+                    .padding([.leading, .trailing], 16)
                 }
             }
             .toolbar(.hidden, for: .navigationBar)

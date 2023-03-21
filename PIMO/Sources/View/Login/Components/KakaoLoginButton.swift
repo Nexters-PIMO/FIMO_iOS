@@ -64,7 +64,7 @@ struct KakaoLoginButton: UIViewRepresentable {
         let button = UIButton()
 
         button.setImage(
-            PIMOAsset.Assets.kakaoLoginMediumWide.image.withRenderingMode(.alwaysOriginal),
+            PIMOAsset.Assets.kakaoLoginLargeWide.image.withRenderingMode(.alwaysOriginal),
             for: .normal
         )
         button.contentVerticalAlignment = .fill

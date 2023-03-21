@@ -12,9 +12,9 @@ import Foundation
 import ComposableArchitecture
 
 struct LoginClient {
-    let getAppleLoginToken: (String) -> EffectPublisher<Result<AppleLogin, NetworkError>, Never>
-    let encodeAppleLoginToken: (String) -> EffectPublisher<Result<EncodeLogin, NetworkError>, Never>
-    let encodeKakaoLoginToken: (String) -> EffectPublisher<Result<EncodeLogin, NetworkError>, Never>
+    let getAppleLoginToken: (String) -> EffectPublisher<Result<AppleToken, NetworkError>, Never>
+    let encodeAppleLoginToken: (String) -> EffectPublisher<Result<EncodedToken, NetworkError>, Never>
+    let encodeKakaoLoginToken: (String) -> EffectPublisher<Result<EncodedToken, NetworkError>, Never>
 }
 
 extension DependencyValues {

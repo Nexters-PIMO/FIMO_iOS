@@ -28,8 +28,8 @@ struct LoginStore: ReducerProtocol {
         case onSuccessLogin(Bool)
         case showAlert
         case tappedAlertOKButton
-        case tappedAppleLoginButtonDone(Result<AppleLogin, NetworkError>)
-        case encodeTokenDone(Result<EncodeLogin, NetworkError>)
+        case tappedAppleLoginButtonDone(Result<AppleToken, NetworkError>)
+        case encodeTokenDone(Result<EncodedToken, NetworkError>)
     }
     
     @Dependency(\.loginClient) var loginClient
@@ -53,10 +53,8 @@ struct LoginStore: ReducerProtocol {
             case .tappedAppleLoginButtonDone(let result):
                 switch result {
                 case .success(let appleLogin):
-                    guard let accessToken = appleLogin.data?.accessToken else {
-                        return .none
-                    }
-
+                    let accessToken = appleLogin.accessToken
+                    
                     return loginClient.encodeAppleLoginToken(accessToken).map { Action.encodeTokenDone($0) }
                 case .failure:
                     return .init(value: Action.showAlert)
@@ -65,15 +63,13 @@ struct LoginStore: ReducerProtocol {
                 return loginClient.encodeKakaoLoginToken(token).map { Action.encodeTokenDone($0) }
             case .encodeTokenDone(let result):
                 switch result {
-                case .success(let encodeLogin):
-                    guard let encodedAccessToken = encodeLogin.data?.accessToken else {
-                        return .none
-                    }
+                case .success(let encodedToken):
+                    let encodedAccessToken = encodedToken.accessToken
 
                     let memberToken = MemberToken(accessToken: encodedAccessToken, refreshToken: nil)
                     UserUtill.shared.setUserDefaults(key: .token, value: memberToken)
 
-                    // TODO: - 메인 탭바로 연결해줘야 함.
+                    
                 case .failure:
                     return .init(value: Action.showAlert)
                 }
