@@ -152,6 +152,7 @@ struct ArchiveStore: ReducerProtocol {
             case let .feedsTypeButtonDidTap(type):
                 state.feedsType = type
                 state.feed = nil
+                TTSManager.shared.stopPlaying()
             case let .feedDidTap(feed):
                 state.feed = FeedStore.State(
                     textImage: feed.textImages[0],

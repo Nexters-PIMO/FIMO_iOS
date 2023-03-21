@@ -70,7 +70,7 @@ class TTSManager: NSObject {
         return stop.eraseToEffect()
     }
     
-    func stopBeforePlaying() {
+    func stopPlaying() {
         self.synthesizer?.stopSpeaking(at: .immediate)
     }
 }
