@@ -35,7 +35,7 @@ extension FeedClient: DependencyKey {
 
 class TTSManager: NSObject {
     static let shared = TTSManager()
-    var delegate: Delegate?
+    weak var delegate: Delegate?
     private var synthesizer: AVSpeechSynthesizer?
     
     override init() {
