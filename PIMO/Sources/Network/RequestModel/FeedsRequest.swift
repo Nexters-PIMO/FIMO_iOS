@@ -1,5 +1,5 @@
 //
-//  HomeRequest.swift
+//  FeedsRequest.swift
 //  PIMO
 //
 //  Created by 김영인 on 2023/02/18.
@@ -10,8 +10,14 @@ import Foundation
 
 import Alamofire
 
-struct HomeRequest: Requestable {
+enum FeedsTarget {
+    case fetchHomeFeeds
+    case fetchOtherFeeds
+}
+
+struct FeedsRequest: Requestable {
     typealias Response = [FeedDTO]
+    let target: FeedsTarget
     
     var path: String {
         #warning("로그인 후 수정")

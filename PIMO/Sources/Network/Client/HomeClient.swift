@@ -25,7 +25,7 @@ extension DependencyValues {
 extension HomeClient: DependencyKey {
     static let liveValue = Self.init(
         fetchFeeds: {
-            let request = HomeRequest()
+            let request = FeedsRequest(target: .fetchHomeFeeds)
             
             return BaseNetwork.shared.request(api: request, isInterceptive: true)
                 .catchToEffect()
