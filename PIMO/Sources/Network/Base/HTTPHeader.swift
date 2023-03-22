@@ -21,7 +21,7 @@ enum HTTPHeaderType {
             return "multipart/form-data"
         case .authorization:
             #warning("로그인 구현 후 교체")
-            return "Bearer DEV admin1"
+            return "Bearer \(PIMOStrings.accessToken)"
         }
     }
 }
