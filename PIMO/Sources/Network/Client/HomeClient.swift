@@ -27,7 +27,7 @@ extension HomeClient: DependencyKey {
         fetchFeeds: {
             let request = FeedsRequest(target: .fetchHomeFeeds)
             
-            return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            return BaseNetwork.shared.request(api: request, isInterceptive: false)
                 .catchToEffect()
         })
 }
