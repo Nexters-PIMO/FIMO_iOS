@@ -11,15 +11,22 @@ import Foundation
 import Alamofire
 
 struct HomeRequest: Requestable {
-    typealias Response = [Feed]
+    typealias Response = [FeedDTO]
     
     var path: String {
-        return ""
+        #warning("로그인 후 수정")
+        return "/users/\(PIMOStrings.userId)/home"
     }
     
     var method: HTTPMethod {
         return .get
     }
     
-    var parameters: Parameters
+    var parameters: Parameters = [:]
+    
+    var header: [HTTPFields: String] {
+        return [
+            HTTPFields.authorization: HTTPHeaderType.authorization.header
+        ]
+    }
 }
