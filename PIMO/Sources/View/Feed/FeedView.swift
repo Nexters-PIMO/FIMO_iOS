@@ -24,7 +24,7 @@ struct FeedView: View {
                 VStack {
                     // 피드 상단
                     HStack {
-                        #warning("서버")
+#warning("서버")
                         KFImage(URL(string: PIMOStrings.profileImage))
                             .placeholder { Image(systemName: "person") }
                             .resizable()
@@ -37,7 +37,7 @@ struct FeedView: View {
                         Spacer()
                             .frame(width: 12)
                         
-                        #warning("서버")
+#warning("서버")
                         Text("0inn")
                             .font(.system(size: 14, weight: .medium))
                         
@@ -185,7 +185,6 @@ struct FeedView: View {
         } label: {
             ZStack {
                 Rectangle()
-                    .frame(width: 86, height: 38)
                     .foregroundColor(Color(PIMOAsset.Assets.grayButton.color))
                     .cornerRadius(20)
                 
@@ -194,12 +193,21 @@ struct FeedView: View {
                     PIMOAsset.Assets.clapSelected.image : PIMOAsset.Assets.clap.image
                     
                     Image(uiImage: clapButtonImage)
+                        .frame(width: 24, height: 26)
                     
-                    Text("\(viewStore.state.clapCount)")
-                        .font(.system(size: 16))
-                        .foregroundColor(.black)
+                    HStack {
+                        Spacer()
+                        
+                        Text("\(viewStore.state.clapCount)")
+                            .font(Font(PIMOFontFamily.Pretendard.regular.font(size: 16)))
+                            .foregroundColor(.black)
+                        
+                        Spacer()
+                    }
                 }
+                .padding([.leading, .trailing], 8)
             }
+            .frame(width: 86, height: 38)
         }
     }
     
