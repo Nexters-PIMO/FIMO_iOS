@@ -12,7 +12,7 @@ import Foundation
 import ComposableArchitecture
 
 struct HomeClient {
-    let fetchFeeds: () -> [Feed]
+    let fetchFeeds: () -> EffectPublisher<Result<[FeedDTO], NetworkError>, Never>
 }
 
 extension DependencyValues {
@@ -23,10 +23,11 @@ extension DependencyValues {
 }
 
 extension HomeClient: DependencyKey {
-    static let liveValue = Self.init (
+    static let liveValue = Self.init(
         fetchFeeds: {
-            // TODO: 서버 통신
-            return Temp.feeds
-        }
-    )
+            let request = HomeRequest()
+            
+            return BaseNetwork.shared.request(api: request, isInterceptive: true)
+                .catchToEffect()
+        })
 }
