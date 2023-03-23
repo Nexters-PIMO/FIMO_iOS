@@ -19,10 +19,12 @@ struct HomeStore: ReducerProtocol {
     struct State: Equatable {
         @BindingState var path: [HomeScene] = []
         @BindingState var isShowToast: Bool = false
+        @BindingState var isBottomSheetPresented: Bool = false
         var toastMessage: ToastModel = ToastModel(title: PIMOStrings.textCopyToastTitle,
                                                   message: PIMOStrings.textCopyToastMessage)
         var feeds: IdentifiedArrayOf<FeedStore.State> = []
         var setting: SettingStore.State?
+        var bottomSheet: BottomSheetStore.State?
         var audioPlayingFeedId: Int?
     }
     
@@ -36,6 +38,7 @@ struct HomeStore: ReducerProtocol {
         case receiveProfileInfo(Profile)
         case setting(SettingStore.Action)
         case onboarding(OnboardingStore.Action)
+        case bottomSheet(BottomSheetStore.Action)
     }
     
     @Dependency(\.homeClient) var homeClient
@@ -81,6 +84,9 @@ struct HomeStore: ReducerProtocol {
                 case let .copyButtonDidTap(text):
                     pasteboard.string = text
                     state.isShowToast = true
+                case let .moreButtonDidTap(id):
+                    state.isBottomSheetPresented = true
+                    state.bottomSheet = BottomSheetStore.State(feedId: id, bottomSheetType: .me)
                 case .audioButtonDidTap:
                     guard let feedId = state.audioPlayingFeedId else {
                         state.audioPlayingFeedId = id
@@ -92,6 +98,15 @@ struct HomeStore: ReducerProtocol {
                     state.audioPlayingFeedId = id
                 default:
                     break
+                }
+            case let .bottomSheet(action):
+                switch action {
+                case .editButtonDidTap:
+                    state.isBottomSheetPresented = false
+                case .deleteButtonDidTap:
+                    state.isBottomSheetPresented = false
+                case .declationButtonDidTap:
+                    state.isBottomSheetPresented = false
                 }
             case .receiveProfileInfo(let profile):
                 #warning("API연결")
@@ -106,6 +121,9 @@ struct HomeStore: ReducerProtocol {
         }
         .ifLet(\.setting, action: /Action.setting) {
             SettingStore()
+        }
+        .ifLet(\.bottomSheet, action: /Action.bottomSheet) {
+            BottomSheetStore()
         }
         .forEach(\.feeds, action: /Action.feed(id:action:)) {
             FeedStore()

@@ -50,8 +50,6 @@ struct FeedStore: ReducerProtocol {
                     return .none
                 }
                 state.closeButtonDidTap = isClosed
-            case .moreButtonDidTap:
-                #warning("바텀시트")
             case .closeButtonDidTap:
                 UserUtill.shared.setUserDefaults(key: .closedTextGuide, value: true)
                 state.closeButtonDidTap = true
