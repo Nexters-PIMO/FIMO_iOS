@@ -31,7 +31,7 @@ struct ArchiveView: View {
                     archiveFeedView(viewStore)
                 }
                 .onAppear {
-                    viewStore.send(.fetchArchive)
+                    viewStore.send(.onAppear)
                 }
                 .navigationDestination(for: ArchiveScene.self) { scene in
                     switch scene {

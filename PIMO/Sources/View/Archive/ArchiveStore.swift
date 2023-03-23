@@ -58,7 +58,9 @@ struct ArchiveStore: ReducerProtocol {
         case binding(BindingAction<State>)
         case sendToast(ToastModel)
         case sendToastDone
-        case fetchArchive
+        case onAppear
+        case fetchArchiveFeeds(Result<[FeedDTO], NetworkError>)
+        case fetchArchiveProfile(Result<Profile, NetworkError>)
         case feed(id: FeedStore.State.ID, action: FeedStore.Action)
         case topBarButtonDidTap
         case settingButtonDidTap
@@ -94,26 +96,38 @@ struct ArchiveStore: ReducerProtocol {
                 }
             case .sendToastDone:
                 state.isShowToast = false
-            case .fetchArchive:
-                let archive = archiveClient.fetchArchive()
-                let archiveInfo = archive.archiveInfo
-                let feeds = archive.feeds
-                var firstFeed = 0
-                if !feeds.isEmpty { firstFeed = feeds[0].id }
-                state.archiveInfo = archiveInfo
-                state.gridFeeds = archive.feeds
-                state.feeds = IdentifiedArrayOf(
-                    uniqueElements: feeds.map { feed in
-                        FeedStore.State(
-                            textImage: feed.textImages[0],
-                            id: feed.id,
-                            feed: feed,
-                            isFirstFeed: (firstFeed == feed.id) ? true : false,
-                            clapCount: feed.clapCount,
-                            isClapped: feed.isClapped
-                        )
-                    }
-                )
+            case .onAppear:
+                return archiveClient.fetchArchiveFeeds().map {
+                    Action.fetchArchiveFeeds($0)
+                }
+            case let .fetchArchiveProfile(result):
+                switch result {
+                case let .success(profile):
+                default:
+                    let _ = print("error")
+                }
+            case let .fetchArchiveFeeds(result):
+                switch result {
+                case let .success(feeds):
+                    let feeds = feeds.map { $0.toModel() }
+                    var firstFeed = 0
+                    if !feeds.isEmpty { firstFeed = feeds[0].id }
+                    state.gridFeeds = feeds
+                    state.feeds = IdentifiedArrayOf(
+                        uniqueElements: feeds.map { feed in
+                            FeedStore.State(
+                                textImage: feed.textImages[0],
+                                id: feed.id,
+                                feed: feed,
+                                isFirstFeed: (firstFeed == feed.id) ? true : false,
+                                clapCount: feed.clapCount,
+                                isClapped: feed.isClapped
+                            )
+                        }
+                    )
+                default:
+                    let _ = print("error")
+                }
             case let .feed(id: id, action: action):
                 switch action {
                 case let .copyButtonDidTap(text):

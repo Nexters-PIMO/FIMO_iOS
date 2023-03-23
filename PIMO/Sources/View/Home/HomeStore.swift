@@ -72,7 +72,7 @@ struct HomeStore: ReducerProtocol {
                 switch result {
                 case let .success(feeds):
                     var firstFeed = 0
-                    if feeds.count != 0 { firstFeed = feeds[0].id }
+                    if !feeds.isEmpty { firstFeed = feeds[0].id }
                     state.feeds = IdentifiedArrayOf(
                         uniqueElements: feeds.map { $0.toModel() }.map { feed in
                             FeedStore.State(
