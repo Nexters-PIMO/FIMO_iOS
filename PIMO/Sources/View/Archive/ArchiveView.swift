@@ -95,9 +95,8 @@ struct ArchiveView: View {
         LazyVStack(alignment: .center, pinnedViews: [.sectionHeaders]) {
             Section(header: feedsHeader(viewStore)) {
                 if viewStore.feeds.isEmpty {
-                    Spacer()
-                        .frame(height: 180)
                     ArchiveEmptyView(archiveType: viewStore.archiveType)
+                        .frame(height: UIScreen.screenHeight - 350)
                 } else {
                     ForEachStore(
                         self.store.scope(
@@ -122,16 +121,16 @@ struct ArchiveView: View {
     // 피드 그리드 모드로 보기
     func gridFeedView(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>) -> some View {
         LazyVGrid(
-            columns: columns,
+            columns: viewStore.feeds.isEmpty
+            ? [GridItem(.flexible())] : columns,
             alignment: .center,
             spacing: 5,
             pinnedViews: [.sectionHeaders]
         ) {
             Section(header: feedsHeader(viewStore)) {
                 if viewStore.feeds.isEmpty {
-                    Spacer()
-                        .frame(height: 180)
                     ArchiveEmptyView(archiveType: viewStore.archiveType)
+                        .frame(height: UIScreen.screenHeight - 344)
                 } else {
                     ForEach(viewStore.state.gridFeeds, id: \.self) { feed in
                         KFImage(URL(string: feed.textImages[0].imageURL))
@@ -226,7 +225,7 @@ struct ArchiveView: View {
                 Rectangle()
                     .frame(width: 64, height: 40)
                     .foregroundColor(Color(PIMOAsset.Assets.grayButton.color))
-
+                
                 Image(uiImage: PIMOAsset.Assets.friendlist.image)
             }
             .onTapGesture {
