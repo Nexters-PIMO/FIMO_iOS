@@ -21,7 +21,7 @@ struct FeedDTO: Decodable, Equatable {
         return Feed(
             id: self.id,
             userId: self.userId,
-            uploadTime: self.createdAt,
+            uploadTime: self.createdAt.toUploadTime(),
             textImages: self.contents.map { $0.toModel() },
             clapCount: self.clapCount,
             isClapped: self.clapped
