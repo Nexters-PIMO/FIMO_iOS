@@ -100,12 +100,10 @@ struct ArchiveStore: ReducerProtocol {
                 state.isShowToast = false
             case .onAppear:
                 return .merge(
-                    archiveClient.fetchArchiveFeeds().map {
-                        Action.fetchArchiveFeeds($0)
-                    },
                     profileClient.fetchMyProfile().map {
                         Action.fetchArchiveProfile($0)
-                    }
+                    },
+                    .send(.feedsTypeButtonDidTap(.basic))
                 )
             case let .fetchArchiveProfile(result):
                 switch result {
@@ -189,6 +187,9 @@ struct ArchiveStore: ReducerProtocol {
                 state.feedsType = type
                 state.feed = nil
                 TTSManager.shared.stopPlaying()
+                return archiveClient.fetchArchiveFeeds().map {
+                    Action.fetchArchiveFeeds($0)
+                }
             case let .bottomSheet(action):
                 switch action {
                 case .editButtonDidTap:
@@ -201,7 +202,7 @@ struct ArchiveStore: ReducerProtocol {
             case let .deleteFeed(result):
                 switch result {
                 case .success:
-                    #warning("피드 상세에서 삭제했을 때 로직 구현")
+#warning("피드 상세에서 삭제했을 때 로직 구현")
                     return .send(.onAppear)
                 default:
                     print("error")
