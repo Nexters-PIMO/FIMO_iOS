@@ -41,7 +41,7 @@ struct ArchiveStore: ReducerProtocol {
         var toastMessage: ToastModel = ToastModel(title: PIMOStrings.textCopyToastTitle,
                                                   message: PIMOStrings.textCopyToastMessage)
         var archiveType: ArchiveType = .myArchive
-        var archiveInfo: ArchiveInfo = .EMPTY
+        var archiveProfile: Profile = .EMPTY
         var gridFeeds: [Feed] = []
         var feeds: IdentifiedArrayOf<FeedStore.State> = []
         var pushToSettingView: Bool = false
@@ -75,6 +75,7 @@ struct ArchiveStore: ReducerProtocol {
     }
     
     @Dependency(\.archiveClient) var archiveClient
+    @Dependency(\.profileClient) var profileClient
     
     private let pasteboard = UIPasteboard.general
     
@@ -97,12 +98,18 @@ struct ArchiveStore: ReducerProtocol {
             case .sendToastDone:
                 state.isShowToast = false
             case .onAppear:
-                return archiveClient.fetchArchiveFeeds().map {
-                    Action.fetchArchiveFeeds($0)
-                }
+                return .merge(
+                    archiveClient.fetchArchiveFeeds().map {
+                        Action.fetchArchiveFeeds($0)
+                    },
+                    profileClient.fetchMyProfile().map {
+                        Action.fetchArchiveProfile($0)
+                    }
+                )
             case let .fetchArchiveProfile(result):
                 switch result {
                 case let .success(profile):
+                    state.archiveProfile = profile
                 default:
                     let _ = print("error")
                 }
@@ -169,7 +176,7 @@ struct ArchiveStore: ReducerProtocol {
             case .receiveProfileInfo(let profile):
                 // TODO: API 연결 시 보완 예정
                 state.setting = SettingStore.State(nickname: profile.nickName,
-                                                   archiveName: state.archiveInfo.archiveName,
+                                                   archiveName: state.archiveProfile.nickName,
                                                    imageURLString: profile.profileImgUrl)
                 state.path.append(.setting)
             case .friendListButtonDidTap:

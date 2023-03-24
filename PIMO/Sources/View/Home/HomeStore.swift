@@ -34,6 +34,7 @@ struct HomeStore: ReducerProtocol {
         case sendToast(ToastModel)
         case sendToastDone
         case fetchFeeds(Result<[FeedDTO], NetworkError>)
+        case fetchFeedProfile(Result<Profile, NetworkError>)
         case feed(id: FeedStore.State.ID, action: FeedStore.Action)
         case settingButtonDidTap
         case receiveProfileInfo(Profile)
