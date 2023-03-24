@@ -43,9 +43,14 @@ struct BottomSheetView: View {
     }
     
     func bottomSheetText(text: String) -> some View {
-        Text(text)
-            .font(Font(PIMOFontFamily.Pretendard.regular.font(size: 18)))
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding([.leading], 20)
+        ZStack {
+            Rectangle()
+                .foregroundColor(.white)
+            
+            Text(text)
+                .font(Font(PIMOFontFamily.Pretendard.regular.font(size: 18)))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding([.leading], 20)
+        }
     }
 }
