@@ -19,11 +19,12 @@ struct LoginStore: ReducerProtocol {
         var isSignIn = false
         var errorMessage = ""
         var appleIdentityToken = ""
+        var kakaoRefreshToken = ""
     }
     
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
-        case tappedKakaoLoginButton(String)
+        case tappedKakaoLoginButton(String, String)
         case tappedAppleLoginButton(String)
         case onSuccessLogin(Bool)
         case showAlert
@@ -59,14 +60,15 @@ struct LoginStore: ReducerProtocol {
                 case .failure:
                     return .init(value: Action.showAlert)
                 }
-            case .tappedKakaoLoginButton(let token):
-                return loginClient.encodeKakaoLoginToken(token).map { Action.encodeTokenDone($0) }
+            case let .tappedKakaoLoginButton(accessToken, refreshToken):
+                state.kakaoRefreshToken = refreshToken
+                return loginClient.encodeKakaoLoginToken(accessToken).map { Action.encodeTokenDone($0) }
             case .encodeTokenDone(let result):
                 switch result {
                 case .success(let encodedToken):
                     let encodedAccessToken = encodedToken.accessToken
 
-                    let memberToken = MemberToken(accessToken: encodedAccessToken, refreshToken: nil)
+                    let memberToken = MemberToken(accessToken: encodedAccessToken, refreshToken: state.kakaoRefreshToken)
                     UserUtill.shared.setUserDefaults(key: .token, value: memberToken)
 
                     return .init(value: Action.onSuccessLogin(true))

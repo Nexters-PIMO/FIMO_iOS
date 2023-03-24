@@ -14,7 +14,7 @@ import KakaoSDKUser
 
 struct KakaoLoginButton: UIViewRepresentable {
     let viewStore: ViewStore<LoginStore.State, LoginStore.Action>
-    let action: (String) -> Void
+    let action: ((String, String)) -> Void
 
     var kakaoLoginButton = UIButton()
 
@@ -43,7 +43,7 @@ struct KakaoLoginButton: UIViewRepresentable {
                     if error != nil {
                         self.kakaoLoginButton.viewStore.send(.showAlert)
                     } else {
-                        self.kakaoLoginButton.action(oauthToken?.accessToken ?? "")
+                        self.kakaoLoginButton.action((oauthToken?.accessToken ?? "", oauthToken?.refreshToken ?? ""))
                     }
                 }
             } else {
@@ -53,7 +53,7 @@ struct KakaoLoginButton: UIViewRepresentable {
                     if error != nil {
                         self.kakaoLoginButton.viewStore.send(.showAlert)
                     } else {
-                        self.kakaoLoginButton.action(oauthToken?.accessToken ?? "")
+                        self.kakaoLoginButton.action((oauthToken?.accessToken ?? "", oauthToken?.refreshToken ?? ""))
                     }
                 }
             }

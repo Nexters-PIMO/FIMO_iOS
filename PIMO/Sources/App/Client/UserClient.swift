@@ -27,6 +27,6 @@ extension UserClient: DependencyKey {
     static let liveValue = Self.init {
         UserUtill.shared.getToken()
     } setToken: { token in
-        UserUtill.shared.setUserDefaults(key: UserDefaultsKeys.token, value: token)
+        UserUtill.shared.setUserDefaults(key: .token, value: token)
     }
 }

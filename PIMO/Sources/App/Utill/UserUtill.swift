@@ -19,11 +19,11 @@ class UserUtill: ObservableObject {
     static let shared = UserUtill()
     
     var accessToken: String {
-        return self.getToken().accessToken
+        return self.getToken()?.accessToken ?? ""
     }
     
     var refreshToken: String {
-        return self.getToken().refreshToken ?? ""
+        return self.getToken()?.refreshToken ?? ""
     }
 
     private init() { }
@@ -45,9 +45,9 @@ class UserUtill: ObservableObject {
         return object
     }
 
-    func getToken() -> MemberToken {
+    func getToken() -> MemberToken? {
         guard let memberToken: MemberToken = getUserDefaults(key: UserDefaultsKeys.token) else {
-            return MemberToken.EMPTY
+            return nil
         }
 
         return memberToken
