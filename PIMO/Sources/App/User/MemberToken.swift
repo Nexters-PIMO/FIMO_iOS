@@ -10,7 +10,7 @@ import Foundation
 
 struct MemberToken {
     let accessToken: String
-    let refreshToken: String
+    let refreshToken: String?
 }
 
 extension MemberToken: Codable, Equatable { }
