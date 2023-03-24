@@ -69,12 +69,10 @@ struct LoginStore: ReducerProtocol {
                     let memberToken = MemberToken(accessToken: encodedAccessToken, refreshToken: nil)
                     UserUtill.shared.setUserDefaults(key: .token, value: memberToken)
 
-                    
+                    return .init(value: Action.onSuccessLogin(true))
                 case .failure:
                     return .init(value: Action.showAlert)
                 }
-                
-                return .none
             case .showAlert:
                 state.isAlertShowing = true
                 
