@@ -1,5 +1,5 @@
 //
-//  String+.swift
+//  String+Date.swift
 //  PIMO
 //
 //  Created by 김영인 on 2023/03/22.
@@ -17,7 +17,7 @@ extension String {
     
     func toUploadTime() -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyyMMddhhmmss"
+        dateFormatter.dateFormat = "yyyyMMddHHmmss"
         
         guard let date = dateFormatter.date(from: self) else {
             return "-"
