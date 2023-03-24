@@ -15,12 +15,13 @@ struct TabBarStore: ReducerProtocol {
         @BindingState var tabBarItem: TabBarItem = .home
         @BindingState var isSheetPresented: Bool = false
         @BindingState var isShowToast: Bool = false
+        @BindingState var isShowRemovePopup: Bool = false
         var toastMessage: ToastModel = ToastModel(title: PIMOStrings.textCopyToastTitle,
                                                   message: PIMOStrings.textCopyToastMessage)
         var myProfile: Profile?
         var homeState = HomeStore.State()
         var uploadState = UploadStore.State()
-        var myFeedState = ArchiveStore.State()
+        var archiveState = ArchiveStore.State()
     }
     
     enum Action: BindableAction, Equatable {
@@ -32,7 +33,8 @@ struct TabBarStore: ReducerProtocol {
         case setSheetState
         case home(HomeStore.Action)
         case upload(UploadStore.Action)
-        case myFeed(ArchiveStore.Action)
+        case archive(ArchiveStore.Action)
+        case deleteFeed
     }
 
     struct CancelID: Hashable {
@@ -75,11 +77,16 @@ struct TabBarStore: ReducerProtocol {
                 state.isSheetPresented = true
             case .upload(.didTapCloseButton):
                 state.isSheetPresented = false
-
             case .home(.settingButtonDidTap):
                 return .send(.home(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
-            case .myFeed(.settingButtonDidTap):
-                return .send(.myFeed(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
+            case .home(.bottomSheet(.deleteButtonDidTap(let feedId))):
+                state.isShowRemovePopup = true
+                let _ = print(feedId)
+            case .archive(.settingButtonDidTap):
+                return .send(.archive(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
+            case .archive(.bottomSheet(.deleteButtonDidTap(let feedId))):
+                state.isShowRemovePopup = true
+                let _ = print(feedId)
             default:
                 return .none
             }
@@ -95,7 +102,7 @@ struct TabBarStore: ReducerProtocol {
             UploadStore()
         }
         
-        Scope(state: \.myFeedState, action: /Action.myFeed) {
+        Scope(state: \.archiveState, action: /Action.archive) {
             ArchiveStore()
         }
     }

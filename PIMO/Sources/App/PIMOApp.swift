@@ -23,11 +23,6 @@ struct PIMOApp: App {
                                     action: AppStore.Action.unAuthenticated
                                 )
                         )
-                        .onOpenURL { url in
-                            if AuthApi.isKakaoTalkLoginUrl(url) {
-                                AuthController.handleOpenUrl(url: url)
-                            }
-                        }
                     case .authenticated:
                         TabBarView(
                             store: appDelegate.store.scope(

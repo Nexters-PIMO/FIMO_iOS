@@ -38,6 +38,7 @@ struct ArchiveStore: ReducerProtocol {
     struct State: Equatable {
         @BindingState var path: [ArchiveScene] = []
         @BindingState var isShowToast: Bool = false
+        @BindingState var isBottomSheetPresented = false
         var toastMessage: ToastModel = ToastModel(title: PIMOStrings.textCopyToastTitle,
                                                   message: PIMOStrings.textCopyToastMessage)
         var archiveType: ArchiveType = .myArchive
@@ -50,6 +51,8 @@ struct ArchiveStore: ReducerProtocol {
         var feed: FeedStore.State?
         var friends: FriendsListStore.State?
         var setting: SettingStore.State?
+        var bottomSheet: BottomSheetStore.State?
+        var audioPlayingFeedId: Int?
     }
     
     enum Action: BindableAction, Equatable {
@@ -67,6 +70,7 @@ struct ArchiveStore: ReducerProtocol {
         case feedDetail(FeedStore.Action)
         case friends(FriendsListStore.Action)
         case setting(SettingStore.Action)
+        case bottomSheet(BottomSheetStore.Action)
     }
     
     @Dependency(\.archiveClient) var archiveClient
@@ -111,17 +115,37 @@ struct ArchiveStore: ReducerProtocol {
                         )
                     }
                 )
-            case let .feed(id: _, action: action):
+            case let .feed(id: id, action: action):
                 switch action {
                 case let .copyButtonDidTap(text):
                     pasteboard.string = text
                     state.isShowToast = true
+                case let .moreButtonDidTap(id):
+                    state.isBottomSheetPresented = true
+                    state.bottomSheet = BottomSheetStore.State(feedId: id, bottomSheetType: .me)
+                case .audioButtonDidTap:
+                    guard let feedId = state.audioPlayingFeedId else {
+                        state.audioPlayingFeedId = id
+                        break
+                    }
+                    if state.feeds[id: feedId]?.audioButtonDidTap ?? false && feedId != id {
+                        state.feeds[id: feedId]?.audioButtonDidTap.toggle()
+                    }
+                    state.audioPlayingFeedId = id
                 default:
                     break
                 }
-            case let .feedDetail(.copyButtonDidTap(text)):
-                pasteboard.string = text
-                state.isShowToast = true
+            case let .feedDetail(action):
+                switch action {
+                case let .copyButtonDidTap(text):
+                    pasteboard.string = text
+                    state.isShowToast = true
+                case let .moreButtonDidTap(id):
+                    state.isBottomSheetPresented = true
+                    state.bottomSheet = BottomSheetStore.State(feedId: id, bottomSheetType: .me)
+                default:
+                    break
+                }
             case .topBarButtonDidTap:
                 if state.archiveType == .myArchive {
                     // TODO: 내 피드 공유 (딥링크)
@@ -145,6 +169,16 @@ struct ArchiveStore: ReducerProtocol {
             case let .feedsTypeButtonDidTap(type):
                 state.feedsType = type
                 state.feed = nil
+                TTSManager.shared.stopPlaying()
+            case let .bottomSheet(action):
+                switch action {
+                case .editButtonDidTap:
+                    state.isBottomSheetPresented = false
+                case .deleteButtonDidTap:
+                    state.isBottomSheetPresented = false
+                case .declationButtonDidTap:
+                    state.isBottomSheetPresented = false
+                }
             case let .feedDidTap(feed):
                 state.feed = FeedStore.State(
                     textImage: feed.textImages[0],
@@ -167,6 +201,9 @@ struct ArchiveStore: ReducerProtocol {
         }
         .ifLet(\.friends, action: /Action.friends) {
             FriendsListStore()
+        }
+        .ifLet(\.bottomSheet, action: /Action.bottomSheet) {
+            BottomSheetStore()
         }
         .forEach(\.feeds, action: /Action.feed(id:action:)) {
             FeedStore()

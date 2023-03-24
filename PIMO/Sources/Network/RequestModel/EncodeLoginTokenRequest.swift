@@ -1,8 +1,8 @@
 //
-//  LoginRequest.swift
+//  EncodeLoginTokenRequest.swift
 //  PIMO
 //
-//  Created by Ok Hyeon Kim on 2023/01/21.
+//  Created by 양호준 on 2023/03/17.
 //  Copyright © 2023 pimo. All rights reserved.
 //
 
@@ -10,13 +10,13 @@ import Foundation
 
 import Alamofire
 
-struct AppleLoginRequest: Requestable {
-    typealias Response = AppleToken
+struct EncodeLoginTokenRequest: Requestable {
+    typealias Response = EncodedToken
 
     var path: String {
-        return "/login/token"
+        return "/login/encode"
     }
-    
+
     var method: Alamofire.HTTPMethod {
         return .get
     }

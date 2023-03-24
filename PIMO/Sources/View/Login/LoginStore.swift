@@ -7,6 +7,7 @@
 //
 
 import AuthenticationServices
+import Combine
 import Foundation
 
 import ComposableArchitecture
@@ -17,15 +18,18 @@ struct LoginStore: ReducerProtocol {
         @BindingState var isAlertShowing = false
         var isSignIn = false
         var errorMessage = ""
+        var appleIdentityToken = ""
     }
     
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
-        case tappedKakaoLoginButton
-        case tappedAppleLoginButton
+        case tappedKakaoLoginButton(String)
+        case tappedAppleLoginButton(String)
         case onSuccessLogin(Bool)
         case showAlert
         case tappedAlertOKButton
+        case tappedAppleLoginButtonDone(Result<AppleToken, NetworkError>)
+        case encodeTokenDone(Result<EncodedToken, NetworkError>)
     }
     
     @Dependency(\.loginClient) var loginClient
@@ -34,39 +38,41 @@ struct LoginStore: ReducerProtocol {
         BindingReducer()
         Reduce { state, action in
             switch action {
-            case .tappedAppleLoginButton:
-                // TODO: 로그인 분기 처리
-                return .send(.onSuccessLogin(true))
-            case .tappedKakaoLoginButton:
-                var errorMessage = ""
-                var isSignIn = false
-                
-                if UserApi.isKakaoTalkLoginAvailable() {
-                    UserApi.shared.loginWithKakaoTalk { (oauthToken, error) in
-                        if let error {
-                            errorMessage = error.localizedDescription
-                        } else {
-                            isSignIn = true
-
-                            UserUtill.shared.setUserDefaults(key: .token, value: oauthToken?.accessToken)
-                        }
-                    }
-                } else {
-                    UserApi.shared.loginWithKakaoAccount { (oauthToken, error) in
-                        if let error = error {
-                            errorMessage = error.localizedDescription
-                        } else {
-                            isSignIn = true
-
-                            UserUtill.shared.setUserDefaults(key: .token, value: oauthToken?.accessToken)
-                        }
-                    }
+            case .tappedAppleLoginButton(let token):
+                guard token != "" else {
+                    return .none
                 }
                 
-                state.errorMessage = errorMessage
-                state.isSignIn = isSignIn
+                state.appleIdentityToken = token
+                
+                let tokenResult = loginClient.getAppleLoginToken(token)
 
-                return .send(.onSuccessLogin(isSignIn))
+                return tokenResult.map {
+                    Action.tappedAppleLoginButtonDone($0)
+                }
+            case .tappedAppleLoginButtonDone(let result):
+                switch result {
+                case .success(let appleLogin):
+                    let accessToken = appleLogin.accessToken
+                    
+                    return loginClient.encodeAppleLoginToken(accessToken).map { Action.encodeTokenDone($0) }
+                case .failure:
+                    return .init(value: Action.showAlert)
+                }
+            case .tappedKakaoLoginButton(let token):
+                return loginClient.encodeKakaoLoginToken(token).map { Action.encodeTokenDone($0) }
+            case .encodeTokenDone(let result):
+                switch result {
+                case .success(let encodedToken):
+                    let encodedAccessToken = encodedToken.accessToken
+
+                    let memberToken = MemberToken(accessToken: encodedAccessToken, refreshToken: nil)
+                    UserUtill.shared.setUserDefaults(key: .token, value: memberToken)
+
+                    return .init(value: Action.onSuccessLogin(true))
+                case .failure:
+                    return .init(value: Action.showAlert)
+                }
             case .showAlert:
                 state.isAlertShowing = true
                 

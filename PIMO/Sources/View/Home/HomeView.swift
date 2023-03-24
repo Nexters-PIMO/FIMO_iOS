@@ -47,6 +47,15 @@ struct HomeView: View {
             .toast(isShowing: viewStore.binding(\.$isShowToast),
                    title: viewStore.toastMessage.title,
                    message: viewStore.toastMessage.message)
+            .sheet(isPresented: viewStore.binding(\.$isBottomSheetPresented)) {
+                IfLetStore(
+                    self.store.scope(state: \.bottomSheet, action: { .bottomSheet($0) })
+                ) {
+                    BottomSheetView(store: $0)
+                        .presentationDragIndicator(.visible)
+                        .presentationDetents([.height((viewStore.bottomSheet?.bottomSheetType == .me) ? 110 : 60)])
+                }
+            }
         }
     }
     

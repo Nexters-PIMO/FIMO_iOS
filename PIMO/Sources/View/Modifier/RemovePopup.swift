@@ -8,15 +8,17 @@
 
 import SwiftUI
 
+import ComposableArchitecture
+
 extension View {
-    func removePopup(isShowing: Binding<Bool>) -> some View {
-        return self.modifier(RemovePopupViewModifier(isShowing: isShowing))
+    func removePopup(isShowing: Binding<Bool>, store: ViewStore<TabBarStore.State, TabBarStore.Action>) -> some View {
+        return self.modifier(RemovePopupViewModifier(isShowing: isShowing, store: store))
     }
 }
 
 struct RemovePopupViewModifier: ViewModifier {
-    // TODO: Store 추가 필요
     @Binding var isShowing: Bool
+    let store: ViewStore<TabBarStore.State, TabBarStore.Action>
 
     func body(content: Content) -> some View {
         ZStack {
@@ -53,15 +55,9 @@ struct RemovePopupViewModifier: ViewModifier {
                     }, type: .cancel),
                     PopupButton(buttonText: "삭제하기", buttonCompletionHandler: {
                         isShowing = false
+                        store.send(.deleteFeed)
                     }, type: .destructive)
                 ])
         }
-    }
-}
-
-struct RemovePopupViewModifier_Previews: PreviewProvider {
-    static var previews: some View {
-        Text("Hello World!")
-            .removePopup(isShowing: .constant(true))
     }
 }

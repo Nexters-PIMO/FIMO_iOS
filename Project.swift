@@ -12,5 +12,6 @@ let project = Project.app(
         .external(name: "ComposableArchitecture"),
         .external(name: "Kingfisher"),
         .external(name: "AcknowList"),
-        .external(name: "KakaoSDK")
+        .external(name: "KakaoSDK"),
+        .external(name: "FLAnimatedImage")
     ])
