@@ -11,6 +11,11 @@ import Foundation
 struct MemberToken {
     let accessToken: String
     let refreshToken: String?
+    
+    static var EMPTY: MemberToken = .init(
+        accessToken: "",
+        refreshToken: ""
+    )
 }
 
 extension MemberToken: Codable, Equatable { }
