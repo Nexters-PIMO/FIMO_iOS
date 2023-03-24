@@ -72,6 +72,7 @@ struct ArchiveStore: ReducerProtocol {
         case friends(FriendsListStore.Action)
         case setting(SettingStore.Action)
         case bottomSheet(BottomSheetStore.Action)
+        case deleteFeed(Result<Bool, NetworkError>)
     }
     
     @Dependency(\.archiveClient) var archiveClient
@@ -111,7 +112,7 @@ struct ArchiveStore: ReducerProtocol {
                 case let .success(profile):
                     state.archiveProfile = profile
                 default:
-                    let _ = print("error")
+                    print("error")
                 }
             case let .fetchArchiveFeeds(result):
                 switch result {
@@ -133,7 +134,7 @@ struct ArchiveStore: ReducerProtocol {
                         }
                     )
                 default:
-                    let _ = print("error")
+                    print("error")
                 }
             case let .feed(id: id, action: action):
                 switch action {
@@ -196,6 +197,14 @@ struct ArchiveStore: ReducerProtocol {
                     state.isBottomSheetPresented = false
                 case .declationButtonDidTap:
                     state.isBottomSheetPresented = false
+                }
+            case let .deleteFeed(result):
+                switch result {
+                case .success:
+                    #warning("피드 상세에서 삭제했을 때 로직 구현")
+                    return .send(.onAppear)
+                default:
+                    print("error")
                 }
             case let .feedDidTap(feed):
                 state.feed = FeedStore.State(

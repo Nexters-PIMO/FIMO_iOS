@@ -41,6 +41,7 @@ struct HomeStore: ReducerProtocol {
         case setting(SettingStore.Action)
         case onboarding(OnboardingStore.Action)
         case bottomSheet(BottomSheetStore.Action)
+        case deleteFeed(Result<Bool, NetworkError>)
     }
     
     @Dependency(\.homeClient) var homeClient
@@ -117,6 +118,13 @@ struct HomeStore: ReducerProtocol {
                     state.isBottomSheetPresented = false
                 case .declationButtonDidTap:
                     state.isBottomSheetPresented = false
+                }
+            case let .deleteFeed(result):
+                switch result {
+                case .success:
+                    return .send(.onAppear)
+                default:
+                    print("error")
                 }
             case .receiveProfileInfo(let profile):
                 #warning("API연결")

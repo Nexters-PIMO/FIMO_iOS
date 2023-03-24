@@ -12,6 +12,7 @@ import Alamofire
 
 enum FeedTarget {
     case postClap(Int)
+    case deleteFeed(Int)
     case postDeclaration(Int)
 }
 
@@ -19,18 +20,25 @@ struct FeedRequest: Requestable {
     typealias Response = Bool
     let target: FeedTarget
     
-    #warning("로그인 후 수정")
+#warning("로그인 후 수정")
     var path: String {
         switch target {
         case let .postClap(feedId):
             return "/users/\(PIMOStrings.userId)/feeds/\(feedId)/clap"
+        case let .deleteFeed(feedId):
+            return "/users/\(PIMOStrings.userId)/feeds/\(feedId)"
         case let .postDeclaration(feedId):
             return "/users/\(PIMOStrings.userId)/feeds/\(feedId)/reports"
         }
     }
     
     var method: HTTPMethod {
-        return .post
+        switch target {
+        case .postClap, .postDeclaration:
+            return .post
+        case .deleteFeed:
+            return .delete
+        }
     }
     
     var parameters: Parameters = [:]
