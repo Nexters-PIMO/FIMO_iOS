@@ -12,7 +12,9 @@ import Foundation
 import ComposableArchitecture
 
 struct LoginClient {
-    let appleLogin: (Int) -> EffectPublisher<AppleLogin, NetworkError>
+    let getAppleLoginToken: (String) -> EffectPublisher<Result<AppleToken, NetworkError>, Never>
+    let encodeAppleLoginToken: (String) -> EffectPublisher<Result<EncodedToken, NetworkError>, Never>
+    let encodeKakaoLoginToken: (String) -> EffectPublisher<Result<EncodedToken, NetworkError>, Never>
 }
 
 extension DependencyValues {
@@ -25,10 +27,30 @@ extension DependencyValues {
 extension LoginClient: DependencyKey {
     static let liveValue = Self.init { identityToken in
         let request = AppleLoginRequest(parameters: [
-            "identityToken": identityToken
+            "state": "apple",
+            "code": identityToken
         ])
+        let effect = BaseNetwork.shared.request(api: request, isInterceptive: false)
+            .catchToEffect()
 
-        return BaseNetwork.shared.request(api: request, isInterceptive: false)
-            .eraseToEffect()
+        return effect
+    } encodeAppleLoginToken: { accessToken in
+        let request = EncodeLoginTokenRequest(parameters: [
+            "state": "apple",
+            "token": accessToken
+        ])
+        let effect = BaseNetwork.shared.request(api: request, isInterceptive: false)
+            .catchToEffect()
+
+        return effect
+    } encodeKakaoLoginToken: { accessToken in
+        let request = EncodeLoginTokenRequest(parameters: [
+            "state": "kakao",
+            "token": accessToken
+        ])
+        let effect = BaseNetwork.shared.request(api: request, isInterceptive: false)
+            .catchToEffect()
+
+        return effect
     }
 }

@@ -32,6 +32,5 @@ textImage2 = "https://ifh.cc/g/O5n2G2.jpg";
 // Terms Of Use URL
 termsOfUseURL = "https://www.notion.so/moonpapereyo/fimo-980d8d8a12714927af90a057027c2142?pvs=4";
 
-// Temp
-accessToken = "SzJIWldKLUYwNnBscjhMa2tGTmZWWmlRTXVJQmFRYzN6WkxYOU9DZm9DajExWEFBQUFZY1JnQzFo";
+// 처음 사용자 정보 저장 API 호출 후 userId UserDefault에 저장해야 함
 userId = "2714113576";
