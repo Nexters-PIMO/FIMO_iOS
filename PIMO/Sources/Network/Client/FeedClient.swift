@@ -32,13 +32,13 @@ extension FeedClient: DependencyKey {
             play: { text in TTSManager.shared.play(text) },
             stop: { TTSManager.shared.stop() },
             postClap: { feedId in
-                let request = FeedRequest(target: .postClap(feedId))
+                let request = FeedActionRequest(target: .postClap(feedId))
                 
                 return BaseNetwork.shared.requestWithNoResponse(api: request, isInterceptive: false)
                     .catchToEffect()
             },
             deleteFeed: { feedId in
-                let request = FeedRequest(target: .deleteFeed(feedId))
+                let request = FeedActionRequest(target: .deleteFeed(feedId))
                 
                 return BaseNetwork.shared.requestWithNoResponse(api: request, isInterceptive: false)
                     .catchToEffect()

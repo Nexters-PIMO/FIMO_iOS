@@ -48,6 +48,7 @@ struct ArchiveStore: ReducerProtocol {
         var pushToFriendView: Bool = false
         var feedsType: FeedsType = .basic
         var feed: FeedStore.State?
+        var feedId: Int?
         var friends: FriendsListStore.State?
         var setting: SettingStore.State?
         var bottomSheet: BottomSheetStore.State?
@@ -58,15 +59,17 @@ struct ArchiveStore: ReducerProtocol {
         case binding(BindingAction<State>)
         case sendToast(ToastModel)
         case sendToastDone
+        case refresh
         case onAppear
-        case fetchArchiveFeeds(Result<[FeedDTO], NetworkError>)
         case fetchArchiveProfile(Result<Profile, NetworkError>)
+        case fetchArchiveFeeds(Result<[FeedDTO], NetworkError>)
+        case fetchFeed(Result<FeedDTO, NetworkError>)
         case feed(id: FeedStore.State.ID, action: FeedStore.Action)
         case topBarButtonDidTap
         case settingButtonDidTap
         case friendListButtonDidTap
         case feedsTypeButtonDidTap(FeedsType)
-        case feedDidTap(Feed)
+        case feedDidTap(Int)
         case receiveProfileInfo(Profile)
         case feedDetail(FeedStore.Action)
         case friends(FriendsListStore.Action)
@@ -105,6 +108,11 @@ struct ArchiveStore: ReducerProtocol {
                     },
                     .send(.feedsTypeButtonDidTap(.basic))
                 )
+            case .refresh:
+                guard let feedId = state.feedId else {
+                    return .send(.feedsTypeButtonDidTap(state.feedsType))
+                }
+                return .send(.feedDidTap(feedId))
             case let .fetchArchiveProfile(result):
                 switch result {
                 case let .success(profile):
@@ -186,6 +194,7 @@ struct ArchiveStore: ReducerProtocol {
             case let .feedsTypeButtonDidTap(type):
                 state.feedsType = type
                 state.feed = nil
+                state.feedId = nil
                 TTSManager.shared.stopPlaying()
                 return archiveClient.fetchArchiveFeeds().map {
                     Action.fetchArchiveFeeds($0)
@@ -207,15 +216,26 @@ struct ArchiveStore: ReducerProtocol {
                 default:
                     print("error")
                 }
-            case let .feedDidTap(feed):
-                state.feed = FeedStore.State(
-                    textImage: feed.textImages[0],
-                    id: feed.id,
-                    feed: feed,
-                    isFirstFeed: true,
-                    clapCount: feed.clapCount,
-                    isClapped: feed.isClapped
-                )
+            case let .feedDidTap(feedId):
+                state.feedId = feedId
+                return archiveClient.fetchFeed(feedId).map {
+                    Action.fetchFeed($0)
+                }
+            case let .fetchFeed(result):
+                switch result {
+                case let .success(feed):
+                    let feed = feed.toModel()
+                    state.feed = FeedStore.State(
+                        textImage: feed.textImages[0],
+                        id: feed.id,
+                        feed: feed,
+                        isFirstFeed: true,
+                        clapCount: feed.clapCount,
+                        isClapped: feed.isClapped
+                    )
+                default:
+                    print("error")
+                }
             default:
                 break
             }

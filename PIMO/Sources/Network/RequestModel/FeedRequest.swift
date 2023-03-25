@@ -2,7 +2,7 @@
 //  FeedRequest.swift
 //  PIMO
 //
-//  Created by 김영인 on 2023/03/22.
+//  Created by 김영인 on 2023/03/25.
 //  Copyright © 2023 pimo. All rights reserved.
 //
 
@@ -10,42 +10,24 @@ import Foundation
 
 import Alamofire
 
-enum FeedTarget {
-    case postClap(Int)
-    case deleteFeed(Int)
-    case postDeclaration(Int)
-}
-
 struct FeedRequest: Requestable {
-    typealias Response = Bool
-    let target: FeedTarget
+    typealias Response = FeedDTO
+    let feedId: Int
     
-#warning("로그인 후 수정")
     var path: String {
-        switch target {
-        case let .postClap(feedId):
-            return "/users/\(PIMOStrings.userId)/feeds/\(feedId)/clap"
-        case let .deleteFeed(feedId):
-            return "/users/\(PIMOStrings.userId)/feeds/\(feedId)"
-        case let .postDeclaration(feedId):
-            return "/users/\(PIMOStrings.userId)/feeds/\(feedId)/reports"
-        }
+        return "/users/\(PIMOStrings.userId)/feeds/\(feedId)"
     }
     
     var method: HTTPMethod {
-        switch target {
-        case .postClap, .postDeclaration:
-            return .post
-        case .deleteFeed:
-            return .delete
-        }
+        return .get
     }
     
     var parameters: Parameters = [:]
     
-    var header: [HTTPFields: String] {
+    var header: [HTTPFields : String] {
         return [
             HTTPFields.authorization: HTTPHeaderType.authorization.header
         ]
     }
+    
 }
