@@ -24,6 +24,9 @@ struct HomeView: View {
                         homeWelcome
                     } else {
                         homeFeedView(viewStore: viewStore)
+                            .refreshable {
+                                viewStore.send(.onAppear)
+                            }
                     }
                 }
                 .onAppear {

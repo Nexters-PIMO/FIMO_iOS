@@ -29,6 +29,9 @@ struct ArchiveView: View {
                         .frame(height: 64)
                     
                     archiveFeedView(viewStore)
+                        .refreshable {
+                            viewStore.send(.refresh)
+                        }
                 }
                 .onAppear {
                     viewStore.send(.onAppear)
@@ -141,7 +144,7 @@ struct ArchiveView: View {
                             .resizable()
                             .frame(height: width/2)
                             .onTapGesture {
-                                viewStore.send(.feedDidTap(feed))
+                                viewStore.send(.feedDidTap(feed.id))
                             }
                     }
                 }
