@@ -20,6 +20,10 @@ protocol NextButtonActionProtocol {
 
 struct ProfileSettingStore: ReducerProtocol {
     struct State: Equatable, NextButtonStateProtocol {
+        @BindingState var isShowToast: Bool = false
+        var toastMessage: ToastModel = ToastModel(title: PIMOStrings.textCopyToastTitle,
+                                                  message: PIMOStrings.textCopyToastMessage)
+
         // MARK: 닉네임 설정
         @BindingState var nickname: String = ""
         var nicknameValidationType: CheckValidationType = .blank
@@ -35,12 +39,15 @@ struct ProfileSettingStore: ReducerProtocol {
 
         // MARK: 프로필 이미지
         @BindingState var isShowImagePicker = false
-        var selectedProfileImage: Image?
-        var isActiveButtonOnImage: Bool  = false
+        var selectedProfileImage: UIImage?
+        var selectedImageURL: String?
+        var isActiveButtonOnImage: Bool = false
     }
 
     enum Action: BindableAction, Equatable, NextButtonActionProtocol {
         case binding(BindingAction<State>)
+        case sendToast(ToastModel)
+        case sendToastDone
         case checkDuplicateOnNickName
         case tappedNextButtonOnNickname
 
@@ -48,7 +55,9 @@ struct ProfileSettingStore: ReducerProtocol {
         case checkDuplicateOnArchive
         case tappedNextButtonOnArchive
 
-        case selectProfileImage(Image)
+        case selectProfileImage(UIImage)
+        case fetchImageURL
+        case fetchImageURLDone(Result<ImgurImageModel, NetworkError>)
         case tappedNextButtonOnProfilePicture
 
         case tappedCompleteButton
@@ -56,10 +65,28 @@ struct ProfileSettingStore: ReducerProtocol {
         case tappedCompleteModifyButton
     }
 
+    @Dependency(\.imgurImageClient) var imgurImageClient
+
     var body: some ReducerProtocol<State, Action> {
         BindingReducer()
         Reduce { state, action in
             switch action {
+            case let .sendToast(toastModel):
+                if state.isShowToast {
+                    return EffectTask<Action>(value: .sendToast(toastModel))
+                        .delay(for: .milliseconds(1000), scheduler: DispatchQueue.main)
+                        .eraseToEffect()
+                } else {
+                    state.isShowToast = true
+                    state.toastMessage = toastModel
+                    return EffectTask<Action>(value: .sendToastDone)
+                        .delay(for: .milliseconds(2000), scheduler: DispatchQueue.main)
+                        .eraseToEffect()
+                }
+                return .none
+            case .sendToastDone:
+                state.isShowToast = false
+                return .none
             case .binding(\.$nickname):
                 state.isBlackNicknameField = state.nickname == ""
                 state.isActiveButtonOnNickname = false
@@ -114,9 +141,26 @@ struct ProfileSettingStore: ReducerProtocol {
                 return .none
             case .selectProfileImage(let image):
                 state.selectedProfileImage = image
-                state.isActiveButtonOnImage = true
 
-                return .none
+                return .init(value: Action.fetchImageURL)
+            case .fetchImageURL:
+                return imgurImageClient
+                    .uploadImage(state.selectedProfileImage?.jpegData(compressionQuality: 0.9) ?? Data())
+                    .map {
+                        Action.fetchImageURLDone($0)
+                    }
+            case .fetchImageURLDone(let result):
+                switch result {
+                case .success(let imageModel):
+                    state.selectedImageURL = imageModel.link
+                    state.isActiveButtonOnImage = true
+                    
+                    return .none
+                case .failure(let error):
+                    state.toastMessage = .init(title: error.errorDescription ?? "")
+                    state.isShowToast = true
+                    return .none
+                }
             case .tappedCompleteModifyButton:
                 #warning("수정 네비게이션 적용")
 
