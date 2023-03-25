@@ -106,11 +106,15 @@ struct ArchiveStore: ReducerProtocol {
                     profileClient.fetchMyProfile().map {
                         Action.fetchArchiveProfile($0)
                     },
-                    .send(.feedsTypeButtonDidTap(.basic))
+                    archiveClient.fetchArchiveFeeds().map {
+                        Action.fetchArchiveFeeds($0)
+                    }
                 )
             case .refresh:
                 guard let feedId = state.feedId else {
-                    return .send(.feedsTypeButtonDidTap(state.feedsType))
+                    return archiveClient.fetchArchiveFeeds().map {
+                        Action.fetchArchiveFeeds($0)
+                    }
                 }
                 return .send(.feedDidTap(feedId))
             case let .fetchArchiveProfile(result):
@@ -196,8 +200,10 @@ struct ArchiveStore: ReducerProtocol {
                 state.feed = nil
                 state.feedId = nil
                 TTSManager.shared.stopPlaying()
-                return archiveClient.fetchArchiveFeeds().map {
-                    Action.fetchArchiveFeeds($0)
+                if type == .basic {
+                    return archiveClient.fetchArchiveFeeds().map {
+                        Action.fetchArchiveFeeds($0)
+                    }
                 }
             case let .bottomSheet(action):
                 switch action {
