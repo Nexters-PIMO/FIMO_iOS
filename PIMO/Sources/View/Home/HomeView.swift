@@ -27,7 +27,7 @@ struct HomeView: View {
                     }
                 }
                 .onAppear {
-                    viewStore.send(.fetchFeeds)
+                    viewStore.send(.onAppear)
                 }
                 .navigationDestination(for: HomeScene.self) { scene in
                     switch scene {

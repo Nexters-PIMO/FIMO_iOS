@@ -31,9 +31,10 @@ struct HomeStore: ReducerProtocol {
     
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
+        case onAppear
         case sendToast(ToastModel)
         case sendToastDone
-        case fetchFeeds
+        case fetchFeeds(Result<[FeedDTO], NetworkError>)
         case feed(id: FeedStore.State.ID, action: FeedStore.Action)
         case settingButtonDidTap
         case receiveProfileInfo(Profile)
@@ -64,22 +65,30 @@ struct HomeStore: ReducerProtocol {
                 }
             case .sendToastDone:
                 state.isShowToast = false
-            case .fetchFeeds:
-                let feeds = homeClient.fetchFeeds()
-                var firstFeed = 0
-                if !feeds.isEmpty { firstFeed = feeds[0].id }
-                state.feeds = IdentifiedArrayOf(
-                    uniqueElements: feeds.map { feed in
-                        FeedStore.State(
-                            textImage: feed.textImages[0],
-                            id: feed.id,
-                            feed: feed,
-                            isFirstFeed: (feed.id == firstFeed) ? true : false,
-                            clapCount: feed.clapCount,
-                            isClapped: feed.isClapped
-                        )
-                    }
-                )
+            case .onAppear:
+                return homeClient.fetchFeeds().map {
+                    Action.fetchFeeds($0)
+                }
+            case let .fetchFeeds(result):
+                switch result {
+                case let .success(feeds):
+                    var firstFeed = 0
+                    if feeds.count != 0 { firstFeed = feeds[0].id }
+                    state.feeds = IdentifiedArrayOf(
+                        uniqueElements: feeds.map { $0.toModel() }.map { feed in
+                            FeedStore.State(
+                                textImage: feed.textImages[0],
+                                id: feed.id,
+                                feed: feed,
+                                isFirstFeed: (feed.id == firstFeed) ? true : false,
+                                clapCount: feed.clapCount,
+                                isClapped: feed.isClapped
+                            )
+                        }
+                    )
+                default:
+                    break
+                }
             case let .feed(id: id, action: action):
                 switch action {
                 case let .copyButtonDidTap(text):

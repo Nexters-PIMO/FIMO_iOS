@@ -24,9 +24,9 @@ extension DependencyValues {
 
 extension ProfileClient: DependencyKey {
     static let liveValue = Self.init {
-        let request = ProfileRequest()
+        let request = ProfileRequest(target: .fetchMyProfile)
 
-        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+        return BaseNetwork.shared.request(api: request, isInterceptive: false)
             .catchToEffect()
     }
 }

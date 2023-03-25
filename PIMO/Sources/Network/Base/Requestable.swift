@@ -15,6 +15,7 @@ protocol Requestable: URLRequestConvertible {
     var path: String { get }
     var method: HTTPMethod { get }
     var parameters: Parameters { get }
+    var header: [HTTPFields: String] { get }
 }
 
 extension Requestable {

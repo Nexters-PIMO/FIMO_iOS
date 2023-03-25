@@ -1,5 +1,5 @@
 //
-//  MyProfile.swift
+//  Profile.swift
 //  PIMO
 //
 //  Created by Ok Hyeon Kim on 2023/03/15.

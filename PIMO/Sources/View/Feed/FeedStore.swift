@@ -32,6 +32,7 @@ struct FeedStore: ReducerProtocol {
         case copyButtonDidTap(String)
         case closeButtonDidTap
         case clapButtonDidTap
+        case postClap(Result<Bool, NetworkError>)
         case clapButtonIsDone
         case shareButtonDidTap
         case audioButtonDidTap(String)
@@ -58,6 +59,16 @@ struct FeedStore: ReducerProtocol {
                 state.clapCount += 1
                 state.clapButtonDidTap = true
                 state.isClapPlusViewShowing = true
+                return feedClient.postClap(state.id).map {
+                    Action.postClap($0)
+                }
+            case let .postClap(result):
+                switch result {
+                case .failure:
+                    let _ = print("error")
+                default:
+                    break
+                }
             case .clapButtonIsDone:
                 state.plusClapCount = 0
                 state.isClapPlusViewShowing = false
