@@ -15,7 +15,7 @@ struct BottomSheetView: View {
     
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
-            VStack(alignment: .center) {
+            VStack {
                 Spacer()
                     .frame(height: 32)
                 
@@ -45,5 +45,7 @@ struct BottomSheetView: View {
     func bottomSheetText(text: String) -> some View {
         Text(text)
             .font(Font(PIMOFontFamily.Pretendard.regular.font(size: 18)))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding([.leading], 20)
     }
 }

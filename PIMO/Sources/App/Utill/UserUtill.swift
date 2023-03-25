@@ -17,6 +17,14 @@ class UserUtill: ObservableObject {
     private let encoder = JSONEncoder()
 
     static let shared = UserUtill()
+    
+    var accessToken: String {
+        return self.getToken()?.accessToken ?? ""
+    }
+    
+    var refreshToken: String {
+        return self.getToken()?.refreshToken ?? ""
+    }
 
     private init() { }
 

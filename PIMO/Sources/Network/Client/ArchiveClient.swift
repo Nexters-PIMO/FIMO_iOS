@@ -33,7 +33,7 @@ extension ArchiveClient: DependencyKey {
                     profile: Temp.profile,
                     feedCount: 2
                 ),
-                feeds: Temp.myFeeds
+                feeds: []
             )
         }
     )

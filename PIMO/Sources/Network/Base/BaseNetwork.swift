@@ -13,6 +13,7 @@ import Alamofire
 
 protocol BaseNetworkInterface {
     func request<API: Requestable>(api: API, isInterceptive: Bool) -> AnyPublisher<API.Response, NetworkError>
+    func requestWithNoResponse<API: Requestable>(api: API, isInterceptive: Bool) -> AnyPublisher<Bool, NetworkError>
 }
 
 struct BaseNetwork: BaseNetworkInterface {
@@ -37,6 +38,9 @@ struct BaseNetwork: BaseNetworkInterface {
             .validate(statusCode: 200..<500)
             .publishData()
             .tryMap({
+                print("----------------------------------- 🌐 Network LOG -----------------------------------\n")
+                print("URL: \(api.baseURL + api.path)\nmethod: \(api.method)\nheader: \(api.header)\nresult: \($0.result)\n")
+                
                 guard let responseData = $0.value,
                       let json = try JSONSerialization.jsonObject(with: responseData) as? [String: Any],
                       let status = json["status"] as? String,
@@ -48,13 +52,49 @@ struct BaseNetwork: BaseNetworkInterface {
                 guard status == "OK" else {
                     throw NetworkError(errorType: .serverError(message))
                 }
-
+                
                 guard JSONSerialization.isValidJSONObject(dataJson),
                       let data = try? JSONSerialization.data(withJSONObject: dataJson),
                       let value = try? BaseNetwork.decoder.decode(API.Response.self, from: data) else {
+                    print("❌ Fail\ndecodingError")
                     throw NetworkError(errorType: .decodingError)
                 }
 
+                print("🚀 Success\ndata: \(value)\n")
+                
+                return value
+            })
+            .mapError({ error in
+                error as? NetworkError ?? .init(errorType: .unknown)
+            })
+            .subscribe(on: DispatchQueue.global())
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+    
+    func requestWithNoResponse<API: Requestable>(api: API, isInterceptive: Bool) -> AnyPublisher<Bool, NetworkError> {
+        session.request(api, interceptor: isInterceptive ? interceptorAuthenticator : nil)
+            .validate(statusCode: 200..<500)
+            .publishData()
+            .tryMap({
+                print("----------------------------------- 🌐 Network LOG -----------------------------------\n")
+                print("URL: \(api.baseURL + api.path)\nmethod: \(api.method)\nheader: \(api.header)\nresult: \($0.result)\n")
+                
+                guard let responseData = $0.value,
+                      let json = try JSONSerialization.jsonObject(with: responseData) as? [String: Any],
+                      let status = json["status"] as? String,
+                      let message = json["message"] as? String,
+                      let value = json["data"] as? Bool else {
+                    print("❌ Fail\ndecodingError")
+                    throw NetworkError(errorType: .unknown)
+                }
+
+                guard status == "OK" else {
+                    throw NetworkError(errorType: .serverError(message))
+                }
+
+                print("🚀 Success\ndata: \(value)\n")
+                
                 return value
             })
             .mapError({ error in
