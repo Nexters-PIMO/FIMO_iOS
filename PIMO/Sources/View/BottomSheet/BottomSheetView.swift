@@ -22,7 +22,7 @@ struct BottomSheetView: View {
                 if viewStore.bottomSheetType == .me {
                     bottomSheetText(text: "수정하기")
                         .onTapGesture {
-                            viewStore.send(.editButtonDidTap(viewStore.feedId))
+                            viewStore.send(.editButtonDidTap(viewStore.feed))
                         }
                     
                     Spacer()

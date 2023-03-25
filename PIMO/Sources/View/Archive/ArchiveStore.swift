@@ -75,6 +75,7 @@ struct ArchiveStore: ReducerProtocol {
         case friends(FriendsListStore.Action)
         case setting(SettingStore.Action)
         case bottomSheet(BottomSheetStore.Action)
+        case dismissBottomSheet(Feed)
         case deleteFeed(Result<Bool, NetworkError>)
     }
     
@@ -153,7 +154,9 @@ struct ArchiveStore: ReducerProtocol {
                     state.isShowToast = true
                 case let .moreButtonDidTap(id):
                     state.isBottomSheetPresented = true
-                    state.bottomSheet = BottomSheetStore.State(feedId: id, bottomSheetType: .me)
+                    state.bottomSheet = BottomSheetStore.State(feedId: id,
+                                                               feed: state.feeds[id: id]?.feed ?? Feed.EMPTY,
+                                                               bottomSheetType: .me)
                 case .audioButtonDidTap:
                     guard let feedId = state.audioPlayingFeedId else {
                         state.audioPlayingFeedId = id
@@ -173,26 +176,27 @@ struct ArchiveStore: ReducerProtocol {
                     state.isShowToast = true
                 case let .moreButtonDidTap(id):
                     state.isBottomSheetPresented = true
-                    state.bottomSheet = BottomSheetStore.State(feedId: id, bottomSheetType: .me)
+                    state.bottomSheet = BottomSheetStore.State(feedId: id,
+                                                               feed: state.feeds[id: id]?.feed ?? Feed.EMPTY,
+                                                               bottomSheetType: .me)
                 default:
                     break
                 }
             case .topBarButtonDidTap:
                 if state.archiveType == .myArchive {
-                    // TODO: 내 피드 공유 (딥링크)
+                    #warning("내 피드 공유 (딥링크)")
                 } else {
-                    // TODO: 친구 서버 (POST)
+                    #warning("친구 서버 (POST)")
                 }
                 break
             case .receiveProfileInfo(let profile):
-                // TODO: API 연결 시 보완 예정
                 state.setting = SettingStore.State(nickname: profile.nickName,
                                                    archiveName: state.archiveProfile.nickName,
                                                    imageURLString: profile.profileImgUrl)
                 state.path.append(.setting)
             case .friendListButtonDidTap:
                 state.pushToFriendView = true
-                // TODO: Friend List 받아오는 매개변수 주입 필요
+                #warning("Friend List 받아오는 매개변수 주입 필요")
                 state.friends = FriendsListStore.State(id: 0)
                 state.path.append(.friends)
             case let .feedsTypeButtonDidTap(type):
@@ -207,8 +211,11 @@ struct ArchiveStore: ReducerProtocol {
                 }
             case let .bottomSheet(action):
                 switch action {
-                case .editButtonDidTap:
+                case let .editButtonDidTap(feed):
                     state.isBottomSheetPresented = false
+                    return EffectTask<Action>(value: .dismissBottomSheet(feed))
+                        .delay(for: .seconds(0.3), scheduler: DispatchQueue.main)
+                        .eraseToEffect()
                 case .deleteButtonDidTap:
                     state.isBottomSheetPresented = false
                 case .declationButtonDidTap:
@@ -217,7 +224,6 @@ struct ArchiveStore: ReducerProtocol {
             case let .deleteFeed(result):
                 switch result {
                 case .success:
-#warning("피드 상세에서 삭제했을 때 로직 구현")
                     return .send(.onAppear)
                 default:
                     print("error")

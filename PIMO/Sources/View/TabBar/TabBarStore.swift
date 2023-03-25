@@ -85,18 +85,34 @@ struct TabBarStore: ReducerProtocol {
                 state.isSheetPresented = true
             case .upload(.didTapCloseButton):
                 state.isSheetPresented = false
-            case .home(.settingButtonDidTap):
-                return .send(.home(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
-            case .home(.bottomSheet(.deleteButtonDidTap(let feedId))):
-                state.isShowRemovePopup = true
-                state.feedId = feedId
-                state.deleteAt = .home
-            case .archive(.settingButtonDidTap):
-                return .send(.archive(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
-            case .archive(.bottomSheet(.deleteButtonDidTap(let feedId))):
-                state.isShowRemovePopup = true
-                state.feedId = feedId
-                state.deleteAt = .archive
+            case let .home(action):
+                switch action {
+                case .settingButtonDidTap:
+                    return .send(.home(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
+                case let .bottomSheet(.deleteButtonDidTap(feedId)):
+                    state.isShowRemovePopup = true
+                    state.feedId = feedId
+                    state.deleteAt = .home
+                case let .dismissBottomSheet(feed):
+                    print(feed)
+                    state.isSheetPresented = true
+                default:
+                    break
+                }
+            case let .archive(action):
+                switch action {
+                case .settingButtonDidTap:
+                    return .send(.archive(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
+                case let .bottomSheet(.deleteButtonDidTap(feedId)):
+                    state.isShowRemovePopup = true
+                    state.feedId = feedId
+                    state.deleteAt = .archive
+                case let .dismissBottomSheet(feed):
+                    print(feed)
+                    state.isSheetPresented = true
+                default:
+                    break
+                }
             case .deleteFeed:
                 guard let feedId = state.feedId else {
                     return .none

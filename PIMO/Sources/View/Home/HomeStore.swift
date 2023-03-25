@@ -41,6 +41,7 @@ struct HomeStore: ReducerProtocol {
         case setting(SettingStore.Action)
         case onboarding(OnboardingStore.Action)
         case bottomSheet(BottomSheetStore.Action)
+        case dismissBottomSheet(Feed)
         case deleteFeed(Result<Bool, NetworkError>)
     }
     
@@ -97,7 +98,9 @@ struct HomeStore: ReducerProtocol {
                     state.isShowToast = true
                 case let .moreButtonDidTap(id):
                     state.isBottomSheetPresented = true
-                    state.bottomSheet = BottomSheetStore.State(feedId: id, bottomSheetType: .me)
+                    state.bottomSheet = BottomSheetStore.State(feedId: id,
+                                                               feed: state.feeds[id: id]?.feed ?? Feed.EMPTY,
+                                                               bottomSheetType: .me)
                 case .audioButtonDidTap:
                     guard let feedId = state.audioPlayingFeedId else {
                         state.audioPlayingFeedId = id
@@ -112,8 +115,11 @@ struct HomeStore: ReducerProtocol {
                 }
             case let .bottomSheet(action):
                 switch action {
-                case .editButtonDidTap:
+                case let  .editButtonDidTap(feed):
                     state.isBottomSheetPresented = false
+                    return EffectTask<Action>(value: .dismissBottomSheet(feed))
+                        .delay(for: .seconds(0.3), scheduler: DispatchQueue.main)
+                        .eraseToEffect()
                 case .deleteButtonDidTap:
                     state.isBottomSheetPresented = false
                 case .declationButtonDidTap:
