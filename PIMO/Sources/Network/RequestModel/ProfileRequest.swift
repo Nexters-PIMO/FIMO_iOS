@@ -13,6 +13,14 @@ import Alamofire
 enum ProfileTarget {
     case fetchMyProfile
     case fetchOtherProfile(String)
+
+#warning("API 미확정")
+    case saveProfile(nickname: String, archiveName: String, profileImgURL: String)
+    case patchNickname(nickname: String)
+
+#warning("API 미확정")
+    case patchArchiveName(archiveName: String)
+    case patchprofileImage(profilImageURL: String)
 }
 
 struct ProfileRequest: Requestable {
@@ -21,15 +29,28 @@ struct ProfileRequest: Requestable {
     
     var path: String {
         switch target {
-        case .fetchMyProfile:
+        case .fetchMyProfile, .saveProfile:
             return "/users"
         case .fetchOtherProfile:
             return "/users/search"
+        case .patchNickname:
+            return "users/nickname"
+        case .patchArchiveName:
+            return "users/archiveName"
+        case .patchprofileImage:
+            return "users/profile"
         }
     }
     
     var method: HTTPMethod {
-        return .get
+        switch target {
+        case .fetchMyProfile, .fetchOtherProfile:
+            return .get
+        case .saveProfile:
+            return .post
+        case .patchprofileImage, .patchNickname, .patchArchiveName:
+            return .patch
+        }
     }
     
     var parameters: Parameters {
@@ -38,6 +59,24 @@ struct ProfileRequest: Requestable {
             return [:]
         case let .fetchOtherProfile(userId):
             return ["userId": userId]
+        case let .saveProfile(nickname, archiveName, profileImgURL):
+            return [
+                "nickName": nickname,
+                "archiveName": archiveName,
+                "profileImgUrl": profileImgURL
+            ]
+        case let .patchNickname(nickname):
+            return [
+                "nickname": nickname
+            ]
+        case let .patchArchiveName(archiveName):
+            return [
+                "archiveName": archiveName
+            ]
+        case let .patchprofileImage(profilImageURL):
+            return [
+                "profile": profilImageURL
+            ]
         }
     }
     
