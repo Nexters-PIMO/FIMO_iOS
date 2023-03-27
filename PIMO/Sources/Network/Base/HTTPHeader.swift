@@ -12,6 +12,7 @@ enum HTTPHeaderType {
     case contentType
     case multiPartFormData
     case authorization
+    case imgurClientID
 
     var header: String {
         switch self {
@@ -21,6 +22,11 @@ enum HTTPHeaderType {
             return "multipart/form-data"
         case .authorization:
             return "Bearer \(UserUtill.shared.accessToken)"
+        case .imgurClientID:
+            guard let clientID = Bundle.main.infoDictionary?["ClientID"] as? String else {
+                return ""
+            }
+            return "Client-ID \(clientID)"
         }
     }
 }

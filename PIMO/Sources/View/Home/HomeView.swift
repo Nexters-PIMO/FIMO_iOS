@@ -37,6 +37,8 @@ struct HomeView: View {
                         ) {
                             SettingView(store: $0)
                         }
+                    case .openSourceLicence:
+                        AcknowView()
                     default:
                         EmptyView()
                     }

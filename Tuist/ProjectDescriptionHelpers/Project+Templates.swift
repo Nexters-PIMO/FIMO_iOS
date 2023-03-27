@@ -15,7 +15,7 @@ extension Project {
             bundleId: "\(Environment.bundleId)",
             infoPlist: .extendingDefault(with: Project.infoPlist),
             sources: ["\(name)/Sources/**"],
-            resources: ["\(name)/Resources/**"],
+            resources: ["\(name)/Resources/**", "Tuist/Dependencies/Lockfiles/Package.resolved"],
             entitlements: "\(name)/\(name).entitlements",
             scripts: [.SwiftLintShell],
             dependencies: dependencies

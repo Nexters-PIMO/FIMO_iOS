@@ -19,6 +19,7 @@ enum NetworkErrorType: Equatable {
     case nilValue
     case decodingError
     case serverError(String)
+    case imgurError(String)
     case unknown
 }
 
@@ -32,6 +33,8 @@ extension NetworkError: LocalizedError {
         case .decodingError:
             return "디코딩 에러"
         case .serverError(let errorDescription):
+            return errorDescription
+        case .imgurError(let errorDescription):
             return errorDescription
         default:
             return "알 수 없는 에러입니다."
