@@ -137,6 +137,10 @@ struct HomeStore: ReducerProtocol {
                     selectedImageURL: state.setting?.imageURLString ?? ""
                 )
                 state.path.append(.modifyProfile)
+            case .profile(.acceptBack):
+                if state.path.last == .modifyProfile {
+                    state.path.removeLast()
+                }
             default:
                 break
             }

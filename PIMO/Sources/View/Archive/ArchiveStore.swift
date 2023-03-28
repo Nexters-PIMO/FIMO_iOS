@@ -32,6 +32,7 @@ enum ArchiveScene: Hashable {
     case friends
     case setting
     case openSourceLicence
+    case modifyProfile
 }
 
 struct ArchiveStore: ReducerProtocol {
@@ -52,6 +53,7 @@ struct ArchiveStore: ReducerProtocol {
         var friends: FriendsListStore.State?
         var setting: SettingStore.State?
         var bottomSheet: BottomSheetStore.State?
+        var profile: ProfileSettingStore.State?
         var audioPlayingFeedId: Int?
     }
     
@@ -71,6 +73,7 @@ struct ArchiveStore: ReducerProtocol {
         case friends(FriendsListStore.Action)
         case setting(SettingStore.Action)
         case bottomSheet(BottomSheetStore.Action)
+        case profile(ProfileSettingStore.Action)
     }
     
     @Dependency(\.archiveClient) var archiveClient
@@ -188,6 +191,18 @@ struct ArchiveStore: ReducerProtocol {
                     clapCount: feed.clapCount,
                     isClapped: feed.isClapped
                 )
+            case .setting(.tappedProfileManagementButton):
+#warning("API연결")
+                state.profile = ProfileSettingStore.State(
+                    nickname: state.setting?.nickname ?? "",
+                    archiveName: "",
+                    selectedImageURL: state.setting?.imageURLString ?? ""
+                )
+                state.path.append(.modifyProfile)
+            case .profile(.acceptBack):
+                if state.path.last == .modifyProfile {
+                    state.path.removeLast()
+                }
             default:
                 break
             }
@@ -204,6 +219,9 @@ struct ArchiveStore: ReducerProtocol {
         }
         .ifLet(\.bottomSheet, action: /Action.bottomSheet) {
             BottomSheetStore()
+        }
+        .ifLet(\.profile, action: /Action.profile) {
+            ProfileSettingStore()
         }
         .forEach(\.feeds, action: /Action.feed(id:action:)) {
             FeedStore()

@@ -17,6 +17,10 @@ struct ModifyProfileView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack(alignment: .leading, spacing: 0) {
+                CustomNavigationBar(title: "프로필 수정") {
+                    viewStore.send(.tappedBackButton)
+                }
+
                 VStack(alignment: .leading, spacing: 0) {
 
                     profileImageButton(viewStore)
@@ -57,7 +61,10 @@ struct ModifyProfileView: View {
             .onAppear {
                 viewStore.send(.onAppear)
             }
+            .toolbar(.hidden, for: .navigationBar)
+            .modifyProfileBackPopup(isShowing: viewStore.binding(\.$isShowExitPopup), store: viewStore)
         }
+
     }
 
     func profileImageButton(_ viewStore: ViewStore<ProfileSettingStore.State, ProfileSettingStore.Action>) -> some View {

@@ -44,6 +44,8 @@ struct ProfileSettingStore: ReducerProtocol {
         var isActiveButtonOnImage: Bool = false
 
         var isChangedInfo: Bool = false
+
+        @BindingState var isShowExitPopup = false
     }
 
     enum Action: BindableAction, Equatable, NextButtonActionProtocol {
@@ -67,6 +69,9 @@ struct ProfileSettingStore: ReducerProtocol {
         case tappedCompleteButton
 
         case tappedCompleteModifyButton
+        case tappedBackButton
+
+        case acceptBack
     }
 
     @Dependency(\.imgurImageClient) var imgurImageClient
@@ -194,6 +199,9 @@ struct ProfileSettingStore: ReducerProtocol {
                     profileImgURL: state.selectedImageURL ?? ""
                 ))
                 .fireAndForget()
+            case .tappedBackButton:
+                state.isShowExitPopup = true
+                return .none
             default:
                 return .none
             }

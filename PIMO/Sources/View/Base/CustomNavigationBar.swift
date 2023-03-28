@@ -14,6 +14,7 @@ struct CustomNavigationBar: View {
     let title: String
     var trailingItemType: TrailingItemType = .none
     var isShadowed: Bool = false
+    var backButtonAction: (() -> Void)?
     var screenWidth: CGFloat {
         sceneDelegate.window?.bounds.width ?? 0
     }
@@ -28,7 +29,12 @@ struct CustomNavigationBar: View {
 
             HStack {
                 Button {
-                    presentation.wrappedValue.dismiss()
+                    if backButtonAction == nil {
+                        presentation.wrappedValue.dismiss()
+                    } else {
+                        backButtonAction?()
+                    }
+
                 } label: {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 18))
