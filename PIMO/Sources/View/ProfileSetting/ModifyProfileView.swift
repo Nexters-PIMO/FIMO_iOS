@@ -70,6 +70,10 @@ struct ModifyProfileView: View {
     func profileImageButton(_ viewStore: ViewStore<ProfileSettingStore.State, ProfileSettingStore.Action>) -> some View {
         ZStack(alignment: .bottomTrailing) {
             KFImage(URL(string: viewStore.selectedImageURL ?? ""))
+                .placeholder {
+                    Image(systemName: "person")
+                        .font(.system(size: 24))
+                }
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 120, height: 120)
