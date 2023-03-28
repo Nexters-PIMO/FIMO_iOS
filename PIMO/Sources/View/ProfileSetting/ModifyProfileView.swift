@@ -54,6 +54,9 @@ struct ModifyProfileView: View {
                     viewStore.send(.selectProfileImage(uiImage))
                 }
             }
+            .onAppear {
+                viewStore.send(.onAppear)
+            }
         }
     }
 
@@ -64,6 +67,7 @@ struct ModifyProfileView: View {
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 120, height: 120)
                 .cornerRadius(4)
+                .zIndex(0)
 
             ZStack {
                 Rectangle()
@@ -75,6 +79,7 @@ struct ModifyProfileView: View {
             .compositingGroup()
             .foregroundColor(.black)
             .opacity(0.6)
+            .zIndex(1)
 
             Button {
                 viewStore.send(.tappedImagePickerButton)
@@ -88,6 +93,7 @@ struct ModifyProfileView: View {
                 }
             }
             .offset(.init(width: 7, height: 12))
+            .zIndex(2)
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 55)
@@ -97,18 +103,18 @@ struct ModifyProfileView: View {
         Button {
             viewStore.send(.tappedCompleteModifyButton)
         } label: {
-            Text("다음")
+            Text("저장하기")
                 .font(.system(size: 16))
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity, minHeight: 56)
                 .background(
-                    viewStore.isActiveButtonOnNickname && viewStore.isActiveButtonOnArchive
+                    viewStore.isChangedInfo
                     ? Color(PIMOAsset.Assets.red2.color)
                     : Color(PIMOAsset.Assets.gray1.color)
                     )
                 .cornerRadius(2)
         }
-        .disabled(!viewStore.isActiveButtonOnNickname && !viewStore.isActiveButtonOnArchive)
+        .disabled(!viewStore.isChangedInfo)
         .padding(.top, 34)
         .padding(.bottom, 60)
     }

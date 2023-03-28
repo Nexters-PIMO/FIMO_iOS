@@ -42,10 +42,13 @@ struct ProfileSettingStore: ReducerProtocol {
         var selectedProfileImage: UIImage?
         var selectedImageURL: String?
         var isActiveButtonOnImage: Bool = false
+
+        var isChangedInfo: Bool = false
     }
 
     enum Action: BindableAction, Equatable, NextButtonActionProtocol {
         case binding(BindingAction<State>)
+        case onAppear
         case sendToast(ToastModel)
         case sendToastDone
         case checkDuplicateOnNickName
@@ -73,6 +76,10 @@ struct ProfileSettingStore: ReducerProtocol {
         BindingReducer()
         Reduce { state, action in
             switch action {
+            case .onAppear:
+                state.isBlackNicknameField = state.nickname == ""
+                state.isBlackArchiveField = state.archiveName == ""
+                return .none
             case let .sendToast(toastModel):
                 if state.isShowToast {
                     return EffectTask<Action>(value: .sendToast(toastModel))
@@ -119,6 +126,8 @@ struct ProfileSettingStore: ReducerProtocol {
                     ? .availableNickName
                     : state.nicknameValidationType
                     state.isActiveButtonOnNickname = state.nicknameValidationType == .availableNickName
+                    state.isChangedInfo = state.nicknameValidationType == .availableNickName
+
                 case .failure(let error):
                     state.toastMessage = .init(title: error.errorDescription ?? "")
                     state.isShowToast = true
@@ -166,6 +175,7 @@ struct ProfileSettingStore: ReducerProtocol {
                 case .success(let imageModel):
                     state.selectedImageURL = imageModel.link
                     state.isActiveButtonOnImage = true
+                    state.isChangedInfo = true
                     
                     return .none
                 case .failure(let error):

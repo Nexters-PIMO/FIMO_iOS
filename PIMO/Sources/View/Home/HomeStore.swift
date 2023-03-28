@@ -151,5 +151,8 @@ struct HomeStore: ReducerProtocol {
         .forEach(\.feeds, action: /Action.feed(id:action:)) {
             FeedStore()
         }
+        .ifLet(\.profile, action: /Action.profile) {
+            ProfileSettingStore()
+        }
     }
 }
