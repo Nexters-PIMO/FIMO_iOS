@@ -62,7 +62,6 @@ struct ModifyProfileView: View {
                 viewStore.send(.onAppear)
             }
             .toolbar(.hidden, for: .navigationBar)
-            .modifyProfileBackPopup(isShowing: viewStore.binding(\.$isShowExitPopup), store: viewStore)
         }
 
     }

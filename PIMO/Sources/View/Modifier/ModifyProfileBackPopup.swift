@@ -11,14 +11,14 @@ import SwiftUI
 import ComposableArchitecture
 
 extension View {
-    func modifyProfileBackPopup(isShowing: Binding<Bool>, store: ViewStore<ProfileSettingStore.State, ProfileSettingStore.Action>) -> some View {
+    func modifyProfileBackPopup(isShowing: Binding<Bool>, store: ViewStore<TabBarStore.State, TabBarStore.Action>) -> some View {
         return self.modifier(ModifyProfileBackPopupViewModifier(isShowing: isShowing, store: store))
     }
 }
 
 struct ModifyProfileBackPopupViewModifier: ViewModifier {
     @Binding var isShowing: Bool
-    let store: ViewStore<ProfileSettingStore.State, ProfileSettingStore.Action>
+    let store: ViewStore<TabBarStore.State, TabBarStore.Action>
 
     func body(content: Content) -> some View {
         ZStack {
@@ -54,7 +54,7 @@ struct ModifyProfileBackPopupViewModifier: ViewModifier {
                         isShowing = false
                     }, type: .cancel),
                     PopupButton(buttonText: "나가기", buttonCompletionHandler: {
-                        store.send(.acceptBack)
+                        store.send(.acceptBackOnProfileSetting)
                         isShowing = false
                     }, type: .destructive)
                 ])

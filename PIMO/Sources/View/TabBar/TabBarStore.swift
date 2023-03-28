@@ -16,6 +16,7 @@ struct TabBarStore: ReducerProtocol {
         @BindingState var isSheetPresented: Bool = false
         @BindingState var isShowToast: Bool = false
         @BindingState var isShowRemovePopup: Bool = false
+        @BindingState var isShowAcceptBackPopup: Bool = false
         var toastMessage: ToastModel = ToastModel(title: PIMOStrings.textCopyToastTitle,
                                                   message: PIMOStrings.textCopyToastMessage)
         var myProfile: Profile?
@@ -35,6 +36,7 @@ struct TabBarStore: ReducerProtocol {
         case upload(UploadStore.Action)
         case archive(ArchiveStore.Action)
         case deleteFeed
+        case acceptBackOnProfileSetting
     }
 
     struct CancelID: Hashable {
@@ -87,6 +89,20 @@ struct TabBarStore: ReducerProtocol {
             case .archive(.bottomSheet(.deleteButtonDidTap(let feedId))):
                 state.isShowRemovePopup = true
                 let _ = print(feedId)
+            case .acceptBackOnProfileSetting:
+                if state.tabBarItem == .home,
+                   state.homeState.path.last == .modifyProfile {
+                    state.homeState.path.removeLast()
+                } else if state.tabBarItem == .myFeed,
+                          state.archiveState.path.last == .modifyProfile {
+                    state.archiveState.path.removeLast()
+                }
+            case .home(.profile(.tappedBackButton)):
+                state.isShowAcceptBackPopup = true
+                return .none
+            case .archive(.profile(.tappedBackButton)):
+                state.isShowAcceptBackPopup = true
+                return .none
             default:
                 return .none
             }
