@@ -49,6 +49,7 @@ struct ProfileSettingStore: ReducerProtocol {
         case sendToast(ToastModel)
         case sendToastDone
         case checkDuplicateOnNickName
+        case checkDuplicateOnNickNameDone(Result<Bool, NetworkError>)
         case tappedNextButtonOnNickname
 
         case tappedImagePickerButton
@@ -66,6 +67,7 @@ struct ProfileSettingStore: ReducerProtocol {
     }
 
     @Dependency(\.imgurImageClient) var imgurImageClient
+    @Dependency(\.profileClient) var profileClient
 
     var body: some ReducerProtocol<State, Action> {
         BindingReducer()
@@ -83,7 +85,6 @@ struct ProfileSettingStore: ReducerProtocol {
                         .delay(for: .milliseconds(2000), scheduler: DispatchQueue.main)
                         .eraseToEffect()
                 }
-                return .none
             case .sendToastDone:
                 state.isShowToast = false
                 return .none
@@ -96,20 +97,26 @@ struct ProfileSettingStore: ReducerProtocol {
                 let nicknameCount = state.nickname.replacingOccurrences(of: "[가-힣]", with: "00", options: .regularExpression)
                     .count
 
-                state.nicknameValidationType = checkValidation(isMatchCharactors: isKoreanEnglishAndNumber,
-                                                              isBlack: isBlack,
-                                                               charactorCount: nicknameCount,
-                                                               type: .nickname)
+                state.nicknameValidationType = checkValidationOnTyping(isMatchCharactors: isKoreanEnglishAndNumber,
+                                                                       isBlack: isBlack,
+                                                                       charactorCount: nicknameCount,
+                                                                       type: .nickname)
 
                 return .none
             case .checkDuplicateOnNickName:
-                #warning("중복 확인 네트워크 연결 필요")
-                state.isActiveButtonOnNickname = state.nicknameValidationType == .availableNickName
-
-                return .none
-            case .tappedNextButtonOnNickname:
-                #warning("네비게이션 적용")
-
+                return profileClient.fetchIsExistsNickname(state.nickname)
+                    .map {
+                        Action.checkDuplicateOnNickNameDone($0)
+                    }
+            case .checkDuplicateOnNickNameDone(let result):
+                switch result {
+                case .success(let isExistsNickname):
+                    state.nicknameValidationType = isExistsNickname ? .alreadyUsedNickname : .availableNickName
+                    state.isActiveButtonOnNickname = !isExistsNickname
+                case .failure(let error):
+                    state.toastMessage = .init(title: error.errorDescription ?? "")
+                    state.isShowToast = true
+                }
                 return .none
             case .binding(\.$archiveName):
                 state.isBlackArchiveField = state.archiveName == ""
@@ -120,24 +127,19 @@ struct ProfileSettingStore: ReducerProtocol {
                 let archiveCharactorCount = state.archiveName.replacingOccurrences(of: "[가-힣]", with: "00", options: .regularExpression)
                     .count
 
-                state.archiveValidationType = checkValidation(isMatchCharactors: isKoreanEnglishAndNumber,
-                                                              isBlack: isBlack,
-                                                              charactorCount: archiveCharactorCount,
-                                                              type: .archiveName)
+                state.archiveValidationType = checkValidationOnTyping(isMatchCharactors: isKoreanEnglishAndNumber,
+                                                                      isBlack: isBlack,
+                                                                      charactorCount: archiveCharactorCount,
+                                                                      type: .archiveName)
 
                 return .none
             case .checkDuplicateOnArchive:
-                #warning("중복 확인 네트워크 연결 필요")
-                state.isActiveButtonOnArchive = state.archiveValidationType == .availableArchiveName
-
-                return .none
-            case .tappedNextButtonOnArchive:
-                #warning("네비게이션 적용")
+#warning("중복 확인 네트워크 연결 필요")
+                state.isActiveButtonOnArchive = true
 
                 return .none
             case .tappedImagePickerButton:
                 state.isShowImagePicker = true
-
                 return .none
             case .selectProfileImage(let image):
                 state.selectedProfileImage = image
@@ -162,29 +164,34 @@ struct ProfileSettingStore: ReducerProtocol {
                     return .none
                 }
             case .tappedCompleteModifyButton:
-                #warning("수정 네비게이션 적용")
+#warning("수정 네비게이션 적용")
 
                 return .none
+            case .tappedNextButtonOnProfilePicture:
+                return profileClient.saveProfile((
+                    nickname: state.nickname,
+                    archiveName: state.archiveName,
+                    profileImgURL: state.selectedImageURL ?? ""
+                ))
+                .fireAndForget()
             default:
                 return .none
             }
         }
     }
 
-    private func checkValidation(isMatchCharactors: Bool,
-                                 isBlack: Bool,
-                                 charactorCount: Int,
-                                 type: ProfileSettingFieldType) -> CheckValidationType {
+    private func checkValidationOnTyping(isMatchCharactors: Bool,
+                                         isBlack: Bool,
+                                         charactorCount: Int,
+                                         type: ProfileSettingFieldType) -> CheckValidationType {
         if isBlack {
             return .blank
         } else if isMatchCharactors {
             return .onlyKoreanEnglishAndNumber
         } else if charactorCount > 16 {
             return .exceededCharacters
-        } else if type == .nickname {
-            return .availableNickName
         } else {
-            return .availableArchiveName
+            return .blank
         }
     }
 }

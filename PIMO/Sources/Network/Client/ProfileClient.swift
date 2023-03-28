@@ -43,17 +43,17 @@ extension ProfileClient: DependencyKey {
     } deleteProfile: {
         let request = ProfileCheckRequest(target: .deleteProfile)
 
-        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+        return BaseNetwork.shared.requestWithNoResponse(api: request, isInterceptive: true)
             .catchToEffect()
     } fetchIsExistsNickname: { nickname in
         let request = ProfileCheckRequest(target: .fetchIsExistsNickname(nickname))
 
-        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+        return BaseNetwork.shared.requestWithNoResponse(api: request, isInterceptive: true)
             .catchToEffect()
     } fetchIsExistsArchiveName: { archiveName in
         let request = ProfileCheckRequest(target: .fetchIsExistsArchiveName(archiveName))
 
-        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+        return BaseNetwork.shared.requestWithNoResponse(api: request, isInterceptive: true)
             .catchToEffect()
     } patchNickname: { nickname in
         let request = ProfileRequest(target: .patchNickname(nickname: nickname))
