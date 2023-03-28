@@ -31,6 +31,7 @@ enum ArchiveScene: Hashable {
     case archive
     case friends
     case setting
+    case openSourceLicence
 }
 
 struct ArchiveStore: ReducerProtocol {
@@ -200,6 +201,8 @@ struct ArchiveStore: ReducerProtocol {
                                                    archiveName: state.archiveProfile.nickName,
                                                    imageURLString: profile.profileImgUrl)
                 state.path.append(.setting)
+            case .setting(.tappedLicenceButton):
+                state.path.append(.openSourceLicence)
             case .friendListButtonDidTap:
                 state.pushToFriendView = true
                 #warning("Friend List 받아오는 매개변수 주입 필요")

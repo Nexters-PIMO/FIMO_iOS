@@ -50,8 +50,7 @@ struct ModifyProfileView: View {
             }
             .sheet(isPresented: viewStore.binding(\.$isShowImagePicker)) {
                 ImagePicker { uiImage in
-                    let image = Image(uiImage: uiImage)
-                    viewStore.send(.selectProfileImage(image))
+                    viewStore.send(.selectProfileImage(uiImage))
                 }
             }
         }
@@ -59,7 +58,7 @@ struct ModifyProfileView: View {
 
     func profileImageButton(_ viewStore: ViewStore<ProfileSettingStore.State, ProfileSettingStore.Action>) -> some View {
         ZStack(alignment: .bottomTrailing) {
-            viewStore.selectedProfileImage?
+            Image(uiImage: viewStore.selectedProfileImage ?? UIImage())
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 120, height: 120)

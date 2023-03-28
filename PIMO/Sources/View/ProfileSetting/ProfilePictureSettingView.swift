@@ -43,10 +43,12 @@ struct ProfilePictureSettingView: View {
             .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: viewStore.binding(\.$isShowImagePicker)) {
                 ImagePicker { uiImage in
-                    let image = Image(uiImage: uiImage)
-                    viewStore.send(.selectProfileImage(image))
+                    viewStore.send(.selectProfileImage(uiImage))
                 }
             }
+            .toast(isShowing: viewStore.binding(\.$isShowToast),
+                   title: viewStore.toastMessage.title,
+                   message: viewStore.toastMessage.message)
         }
     }
 
@@ -66,7 +68,7 @@ struct ProfilePictureSettingView: View {
                     }
                 } else {
                     ZStack {
-                        viewStore.selectedProfileImage?
+                        Image(uiImage: viewStore.selectedProfileImage ?? UIImage())
                             .resizable()
                             .aspectRatio(1.0, contentMode: .fit)
                             .cornerRadius(4)
