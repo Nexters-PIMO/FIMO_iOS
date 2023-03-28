@@ -8,9 +8,9 @@
 
 import Foundation
 
-struct Feed: Decodable, Equatable, Hashable {
+struct Feed: Equatable, Hashable {
     let id: Int
-    let userId: String
+    let user: User
     let uploadTime: String
     let textImages: [TextImage]
     let clapCount: Int
@@ -18,7 +18,7 @@ struct Feed: Decodable, Equatable, Hashable {
         
     static var EMPTY: Feed = .init(
         id: 0,
-        userId: "userId",
+        user: User.EMPTY,
         uploadTime: "",
         textImages: [],
         clapCount: 0,
