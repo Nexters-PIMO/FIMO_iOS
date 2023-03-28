@@ -14,6 +14,7 @@ enum HomeScene: Hashable {
     case home
     case setting
     case openSourceLicence
+    case modifyProfile
 }
 
 struct HomeStore: ReducerProtocol {
@@ -26,6 +27,7 @@ struct HomeStore: ReducerProtocol {
         var feeds: IdentifiedArrayOf<FeedStore.State> = []
         var setting: SettingStore.State?
         var bottomSheet: BottomSheetStore.State?
+        var profile: ProfileSettingStore.State?
         var audioPlayingFeedId: Int?
     }
     
@@ -41,6 +43,7 @@ struct HomeStore: ReducerProtocol {
         case setting(SettingStore.Action)
         case onboarding(OnboardingStore.Action)
         case bottomSheet(BottomSheetStore.Action)
+        case profile(ProfileSettingStore.Action)
     }
     
     @Dependency(\.homeClient) var homeClient
@@ -119,13 +122,21 @@ struct HomeStore: ReducerProtocol {
                     state.isBottomSheetPresented = false
                 }
             case .receiveProfileInfo(let profile):
-                #warning("API연결")
+#warning("API연결")
                 state.setting = SettingStore.State(nickname: profile.nickName,
                                                    archiveName: "",
                                                    imageURLString: profile.profileImgUrl)
                 state.path.append(.setting)
             case .setting(.tappedLicenceButton):
                 state.path.append(.openSourceLicence)
+            case .setting(.tappedProfileManagementButton):
+#warning("API연결")
+                state.profile = ProfileSettingStore.State(
+                    nickname: state.setting?.nickname ?? "",
+                    archiveName: "",
+                    selectedImageURL: state.setting?.imageURLString ?? ""
+                )
+                state.path.append(.modifyProfile)
             default:
                 break
             }

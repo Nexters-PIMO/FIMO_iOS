@@ -9,6 +9,7 @@
 import SwiftUI
 
 import ComposableArchitecture
+import Kingfisher
 
 struct ModifyProfileView: View {
     let store: StoreOf<ProfileSettingStore>
@@ -58,7 +59,7 @@ struct ModifyProfileView: View {
 
     func profileImageButton(_ viewStore: ViewStore<ProfileSettingStore.State, ProfileSettingStore.Action>) -> some View {
         ZStack(alignment: .bottomTrailing) {
-            Image(uiImage: viewStore.selectedProfileImage ?? UIImage())
+            KFImage(URL(string: viewStore.selectedImageURL ?? ""))
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 120, height: 120)

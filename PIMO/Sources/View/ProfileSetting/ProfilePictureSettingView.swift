@@ -9,6 +9,7 @@
 import SwiftUI
 
 import ComposableArchitecture
+import Kingfisher
 
 struct ProfilePictureSettingView: View {
     let store: StoreOf<ProfileSettingStore>
@@ -57,7 +58,7 @@ struct ProfilePictureSettingView: View {
             Button(action: {
                 viewStore.send(.tappedImagePickerButton)
             }, label: {
-                if viewStore.selectedProfileImage == nil {
+                if viewStore.selectedImageURL == nil {
                     ZStack(alignment: .center) {
                         RoundedRectangle(cornerRadius: 4)
                             .stroke(Color(PIMOAsset.Assets.gray1.color), style: StrokeStyle(lineWidth: 1))
@@ -68,7 +69,7 @@ struct ProfilePictureSettingView: View {
                     }
                 } else {
                     ZStack {
-                        Image(uiImage: viewStore.selectedProfileImage ?? UIImage())
+                        KFImage(URL(string: viewStore.selectedImageURL ?? ""))
                             .resizable()
                             .aspectRatio(1.0, contentMode: .fit)
                             .cornerRadius(4)
