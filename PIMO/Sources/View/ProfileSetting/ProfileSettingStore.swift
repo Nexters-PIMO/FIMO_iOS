@@ -104,6 +104,10 @@ struct ProfileSettingStore: ReducerProtocol {
 
                 return .none
             case .checkDuplicateOnNickName:
+                guard state.nicknameValidationType == .blank else {
+                    return .none
+                }
+
                 return profileClient.fetchIsExistsNickname(state.nickname)
                     .map {
                         Action.checkDuplicateOnNickNameDone($0)
@@ -111,8 +115,10 @@ struct ProfileSettingStore: ReducerProtocol {
             case .checkDuplicateOnNickNameDone(let result):
                 switch result {
                 case .success(let isExistsNickname):
-                    state.nicknameValidationType = isExistsNickname ? .alreadyUsedNickname : .availableNickName
-                    state.isActiveButtonOnNickname = !isExistsNickname
+                    state.nicknameValidationType = !isExistsNickname && state.nicknameValidationType == .blank
+                    ? .availableNickName
+                    : state.nicknameValidationType
+                    state.isActiveButtonOnNickname = state.nicknameValidationType == .availableNickName
                 case .failure(let error):
                     state.toastMessage = .init(title: error.errorDescription ?? "")
                     state.isShowToast = true
@@ -135,6 +141,10 @@ struct ProfileSettingStore: ReducerProtocol {
                 return .none
             case .checkDuplicateOnArchive:
 #warning("중복 확인 네트워크 연결 필요")
+                guard state.archiveValidationType == .blank else {
+                    return .none
+                }
+
                 state.isActiveButtonOnArchive = true
 
                 return .none
