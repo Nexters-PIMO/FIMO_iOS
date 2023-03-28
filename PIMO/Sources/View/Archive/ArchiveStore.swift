@@ -38,6 +38,7 @@ struct ArchiveStore: ReducerProtocol {
         @BindingState var path: [ArchiveScene] = []
         @BindingState var isShowToast: Bool = false
         @BindingState var isBottomSheetPresented = false
+        var isLoading: Bool = false
         var toastMessage: ToastModel = ToastModel(title: PIMOStrings.textCopyToastTitle,
                                                   message: PIMOStrings.textCopyToastMessage)
         var archiveType: ArchiveType = .myArchive
@@ -59,8 +60,8 @@ struct ArchiveStore: ReducerProtocol {
         case binding(BindingAction<State>)
         case sendToast(ToastModel)
         case sendToastDone
-        case refresh
         case onAppear
+        case refresh
         case fetchArchiveProfile(Result<Profile, NetworkError>)
         case fetchArchiveFeeds(Result<[FeedDTO], NetworkError>)
         case fetchFeed(Result<FeedDTO, NetworkError>)
@@ -103,6 +104,7 @@ struct ArchiveStore: ReducerProtocol {
             case .sendToastDone:
                 state.isShowToast = false
             case .onAppear:
+                state.isLoading = true
                 return .merge(
                     profileClient.fetchMyProfile().map {
                         Action.fetchArchiveProfile($0)
@@ -117,7 +119,9 @@ struct ArchiveStore: ReducerProtocol {
                         Action.fetchArchiveFeeds($0)
                     }
                 }
-                return .send(.feedDidTap(feedId))
+                return archiveClient.fetchFeed(feedId).map {
+                    Action.fetchFeed($0)
+                }
             case let .fetchArchiveProfile(result):
                 switch result {
                 case let .success(profile):
@@ -125,6 +129,7 @@ struct ArchiveStore: ReducerProtocol {
                 default:
                     print("error")
                 }
+                state.isLoading = false
             case let .fetchArchiveFeeds(result):
                 switch result {
                 case let .success(feeds):
@@ -147,6 +152,7 @@ struct ArchiveStore: ReducerProtocol {
                 default:
                     print("error")
                 }
+                state.isLoading = false
             case let .feed(id: id, action: action):
                 switch action {
                 case let .copyButtonDidTap(text):
@@ -229,6 +235,7 @@ struct ArchiveStore: ReducerProtocol {
                     print("error")
                 }
             case let .feedDidTap(feedId):
+                state.isLoading = true
                 state.feedId = feedId
                 return archiveClient.fetchFeed(feedId).map {
                     Action.fetchFeed($0)
@@ -248,6 +255,7 @@ struct ArchiveStore: ReducerProtocol {
                 default:
                     print("error")
                 }
+                state.isLoading = false
             default:
                 break
             }

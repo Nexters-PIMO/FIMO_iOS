@@ -28,10 +28,14 @@ struct ArchiveView: View {
                     archiveTopBar
                         .frame(height: 64)
                     
-                    archiveFeedView(viewStore)
-                        .refreshable {
-                            viewStore.send(.refresh)
-                        }
+                    if viewStore.isLoading {
+                        LoadingView()
+                    } else {
+                        archiveFeedView(viewStore)
+                            .refreshable {
+                                viewStore.send(.refresh)
+                            }
+                    }
                 }
                 .onAppear {
                     viewStore.send(.onAppear)

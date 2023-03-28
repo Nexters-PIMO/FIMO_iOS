@@ -20,6 +20,7 @@ struct HomeStore: ReducerProtocol {
         @BindingState var path: [HomeScene] = []
         @BindingState var isShowToast: Bool = false
         @BindingState var isBottomSheetPresented: Bool = false
+        var isLoading: Bool = false
         var toastMessage: ToastModel = ToastModel(title: PIMOStrings.textCopyToastTitle,
                                                   message: PIMOStrings.textCopyToastMessage)
         var feeds: IdentifiedArrayOf<FeedStore.State> = []
@@ -31,6 +32,7 @@ struct HomeStore: ReducerProtocol {
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
         case onAppear
+        case refresh
         case sendToast(ToastModel)
         case sendToastDone
         case fetchFeeds(Result<[FeedDTO], NetworkError>)
@@ -68,6 +70,11 @@ struct HomeStore: ReducerProtocol {
             case .sendToastDone:
                 state.isShowToast = false
             case .onAppear:
+                state.isLoading = true
+                return homeClient.fetchFeeds().map {
+                    Action.fetchFeeds($0)
+                }
+            case .refresh:
                 return homeClient.fetchFeeds().map {
                     Action.fetchFeeds($0)
                 }
@@ -91,6 +98,7 @@ struct HomeStore: ReducerProtocol {
                 default:
                     break
                 }
+                state.isLoading = false
             case let .feed(id: id, action: action):
                 switch action {
                 case let .copyButtonDidTap(text):

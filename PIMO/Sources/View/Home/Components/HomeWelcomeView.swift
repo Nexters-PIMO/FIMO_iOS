@@ -37,5 +37,8 @@ extension HomeView {
         }
         
         Spacer()
+        
+        Spacer()
+            .frame(height: 72)
     }
 }
