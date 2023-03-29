@@ -28,10 +28,17 @@ struct ArchiveView: View {
                     archiveTopBar
                         .frame(height: 64)
                     
-                    archiveFeedView(viewStore)
+                    if viewStore.isLoading {
+                        LoadingView()
+                    } else {
+                        archiveFeedView(viewStore)
+                            .refreshable {
+                                viewStore.send(.refresh)
+                            }
+                    }
                 }
                 .onAppear {
-                    viewStore.send(.fetchArchive)
+                    viewStore.send(.onAppear)
                 }
                 .navigationDestination(for: ArchiveScene.self) { scene in
                     switch scene {
@@ -144,7 +151,7 @@ struct ArchiveView: View {
                             .resizable()
                             .frame(height: width/2)
                             .onTapGesture {
-                                viewStore.send(.feedDidTap(feed))
+                                viewStore.send(.feedDidTap(feed.id))
                             }
                     }
                 }
@@ -202,7 +209,7 @@ struct ArchiveView: View {
     // 아카이브 상단 프로필 뷰
     func profileView(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>) -> some View {
         HStack {
-            KFImage(URL(string: viewStore.archiveInfo.profile.profileImgUrl))
+            KFImage(URL(string: viewStore.archiveProfile.profileImgUrl))
                 .placeholder { Image(systemName: "person") }
                 .resizable()
                 .frame(width: 52, height: 52)
@@ -214,10 +221,10 @@ struct ArchiveView: View {
                 .frame(width: 16)
             
             VStack(alignment: .leading) {
-                Text(viewStore.archiveInfo.profile.nickName)
+                Text(viewStore.archiveProfile.nickName)
                     .font(Font(PIMOFontFamily.Pretendard.medium.font(size: 16)))
                 
-                Text(PIMOStrings.archivingTextImage(viewStore.archiveInfo.feedCount))
+                Text(PIMOStrings.archivingTextImage(viewStore.feeds.count))
                     .font(Font(PIMOFontFamily.Pretendard.regular.font(size: 14)))
                     .foregroundColor(Color(PIMOAsset.Assets.grayText.color))
             }
@@ -244,7 +251,7 @@ struct ArchiveView: View {
         HStack {
             Image(uiImage: PIMOAsset.Assets.archiveLogo.image)
             
-            Text(PIMOStrings.textImageTitle(viewStore.archiveInfo.feedCount))
+            Text(PIMOStrings.textImageTitle(viewStore.feeds.count))
                 .font(Font(PIMOFontFamily.Pretendard.medium.font(size: 16)))
                 .foregroundColor(.black)
             
@@ -282,19 +289,20 @@ struct ArchiveView: View {
     // 아카이브 상단 이름 옆 버튼
     func archiveTopBarButton(_ viewStore: ViewStore<ArchiveView.ArchiveViewState, ArchiveStore.Action>) -> some View {
         switch viewStore.archiveType {
-        case .myArchive:
+        default:
             return Image(uiImage: PIMOAsset.Assets.share.image)
-        case .otherArchive:
-            switch viewStore.archiveInfo.friendType {
-            case .both:
-                return Image(uiImage: PIMOAsset.Assets.bothFriend.image)
-            case .me:
-                return Image(uiImage: PIMOAsset.Assets.meFriend.image)
-            case .other:
-                return Image(uiImage: PIMOAsset.Assets.otherFriend.image)
-            case .neither:
-                return Image(uiImage: PIMOAsset.Assets.neitherFriend.image)
-            }
+            #warning("서버 값 없음")
+            //        case .otherArchive:
+            //            switch viewStore.archiveInfo.friendType {
+            //            case .both:
+            //                return Image(uiImage: PIMOAsset.Assets.bothFriend.image)
+            //            case .me:
+            //                return Image(uiImage: PIMOAsset.Assets.meFriend.image)
+            //            case .other:
+            //                return Image(uiImage: PIMOAsset.Assets.otherFriend.image)
+            //            case .neither:
+            //                return Image(uiImage: PIMOAsset.Assets.neitherFriend.image)
+            //            }
         }
     }
 }

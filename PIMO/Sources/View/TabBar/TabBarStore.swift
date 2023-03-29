@@ -10,6 +10,11 @@ import SwiftUI
 
 import ComposableArchitecture
 
+enum DeleteAt {
+    case home
+    case archive
+}
+
 struct TabBarStore: ReducerProtocol {
     struct State: Equatable {
         @BindingState var tabBarItem: TabBarItem = .home
@@ -22,6 +27,8 @@ struct TabBarStore: ReducerProtocol {
         var homeState = HomeStore.State()
         var uploadState = UploadStore.State()
         var archiveState = ArchiveStore.State()
+        var feedId: Int?
+        var deleteAt: DeleteAt?
     }
     
     enum Action: BindableAction, Equatable {
@@ -42,6 +49,7 @@ struct TabBarStore: ReducerProtocol {
     }
     
     @Dependency(\.profileClient) var profileClient
+    @Dependency(\.feedClient) var feedClient
     
     var body: some ReducerProtocol<State, Action> {
         BindingReducer()
@@ -77,16 +85,48 @@ struct TabBarStore: ReducerProtocol {
                 state.isSheetPresented = true
             case .upload(.didTapCloseButton):
                 state.isSheetPresented = false
-            case .home(.settingButtonDidTap):
-                return .send(.home(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
-            case .home(.bottomSheet(.deleteButtonDidTap(let feedId))):
-                state.isShowRemovePopup = true
-                let _ = print(feedId)
-            case .archive(.settingButtonDidTap):
-                return .send(.archive(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
-            case .archive(.bottomSheet(.deleteButtonDidTap(let feedId))):
-                state.isShowRemovePopup = true
-                let _ = print(feedId)
+            case let .home(action):
+                switch action {
+                case .settingButtonDidTap:
+                    return .send(.home(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
+                case let .bottomSheet(.deleteButtonDidTap(feedId)):
+                    state.isShowRemovePopup = true
+                    state.feedId = feedId
+                    state.deleteAt = .home
+                case let .dismissBottomSheet(feed):
+                    print(feed)
+                    state.isSheetPresented = true
+                default:
+                    break
+                }
+            case let .archive(action):
+                switch action {
+                case .settingButtonDidTap:
+                    return .send(.archive(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
+                case let .bottomSheet(.deleteButtonDidTap(feedId)):
+                    state.isShowRemovePopup = true
+                    state.feedId = feedId
+                    state.deleteAt = .archive
+                case let .dismissBottomSheet(feed):
+                    print(feed)
+                    state.isSheetPresented = true
+                default:
+                    break
+                }
+            case .deleteFeed:
+                guard let feedId = state.feedId else {
+                    return .none
+                }
+                
+                if state.deleteAt == .home {
+                    return feedClient.deleteFeed(feedId).map {
+                        Action.home(.deleteFeed($0))
+                    }
+                } else {
+                    return feedClient.deleteFeed(feedId).map {
+                        Action.archive(.deleteFeed($0))
+                    }
+                }
             default:
                 return .none
             }

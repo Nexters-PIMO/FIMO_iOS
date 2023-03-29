@@ -12,7 +12,7 @@ import Alamofire
 
 enum FeedsTarget {
     case fetchHomeFeeds
-    case fetchOtherFeeds
+    case fetchArchiveFeeds
 }
 
 struct FeedsRequest: Requestable {

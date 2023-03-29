@@ -19,11 +19,19 @@ struct HomeView: View {
                 VStack {
                     homeTopBar
                         .frame(height: 116)
-
-                    if viewStore.feeds.isEmpty {
+                    
+                    if viewStore.isLoading {
+                        LoadingView()
+                    } else if viewStore.feeds.isEmpty {
                         homeWelcome
+                            .refreshable {
+                                viewStore.send(.refresh)
+                            }
                     } else {
                         homeFeedView(viewStore: viewStore)
+                            .refreshable {
+                                viewStore.send(.refresh)
+                            }
                     }
                 }
                 .onAppear {
