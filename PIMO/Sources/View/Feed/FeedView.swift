@@ -24,8 +24,7 @@ struct FeedView: View {
                 VStack {
                     // 피드 상단
                     HStack {
-#warning("서버")
-                        KFImage(URL(string: PIMOStrings.profileImage))
+                        KFImage(URL(string: viewStore.feed.user.profileImage))
                             .placeholder { Image(systemName: "person") }
                             .resizable()
                             .aspectRatio(contentMode: .fill)
@@ -37,8 +36,7 @@ struct FeedView: View {
                         Spacer()
                             .frame(width: 12)
                         
-#warning("서버")
-                        Text("0inn")
+                        Text(viewStore.feed.user.nickName)
                             .font(.system(size: 14, weight: .medium))
                         
                         Spacer()

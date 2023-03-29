@@ -65,7 +65,7 @@ struct FeedStore: ReducerProtocol {
             case let .postClap(result):
                 switch result {
                 case .failure:
-                    let _ = print("error")
+                    print("error")
                 default:
                     break
                 }

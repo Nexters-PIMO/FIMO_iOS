@@ -22,6 +22,7 @@ struct HomeStore: ReducerProtocol {
         @BindingState var path: [HomeScene] = []
         @BindingState var isShowToast: Bool = false
         @BindingState var isBottomSheetPresented: Bool = false
+        var isLoading: Bool = false
         var toastMessage: ToastModel = ToastModel(title: PIMOStrings.textCopyToastTitle,
                                                   message: PIMOStrings.textCopyToastMessage)
         var feeds: IdentifiedArrayOf<FeedStore.State> = []
@@ -34,9 +35,11 @@ struct HomeStore: ReducerProtocol {
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
         case onAppear
+        case refresh
         case sendToast(ToastModel)
         case sendToastDone
         case fetchFeeds(Result<[FeedDTO], NetworkError>)
+        case fetchFeedProfile(Result<Profile, NetworkError>)
         case feed(id: FeedStore.State.ID, action: FeedStore.Action)
         case settingButtonDidTap
         case receiveProfileInfo(Profile)
@@ -44,6 +47,8 @@ struct HomeStore: ReducerProtocol {
         case onboarding(OnboardingStore.Action)
         case bottomSheet(BottomSheetStore.Action)
         case profile(ProfileSettingStore.Action)
+        case dismissBottomSheet(Feed)
+        case deleteFeed(Result<Bool, NetworkError>)
     }
     
     @Dependency(\.homeClient) var homeClient
@@ -69,6 +74,11 @@ struct HomeStore: ReducerProtocol {
             case .sendToastDone:
                 state.isShowToast = false
             case .onAppear:
+                state.isLoading = true
+                return homeClient.fetchFeeds().map {
+                    Action.fetchFeeds($0)
+                }
+            case .refresh:
                 return homeClient.fetchFeeds().map {
                     Action.fetchFeeds($0)
                 }
@@ -76,7 +86,7 @@ struct HomeStore: ReducerProtocol {
                 switch result {
                 case let .success(feeds):
                     var firstFeed = 0
-                    if feeds.count != 0 { firstFeed = feeds[0].id }
+                    if !feeds.isEmpty { firstFeed = feeds[0].id }
                     state.feeds = IdentifiedArrayOf(
                         uniqueElements: feeds.map { $0.toModel() }.map { feed in
                             FeedStore.State(
@@ -92,6 +102,7 @@ struct HomeStore: ReducerProtocol {
                 default:
                     break
                 }
+                state.isLoading = false
             case let .feed(id: id, action: action):
                 switch action {
                 case let .copyButtonDidTap(text):
@@ -99,7 +110,9 @@ struct HomeStore: ReducerProtocol {
                     state.isShowToast = true
                 case let .moreButtonDidTap(id):
                     state.isBottomSheetPresented = true
-                    state.bottomSheet = BottomSheetStore.State(feedId: id, bottomSheetType: .me)
+                    state.bottomSheet = BottomSheetStore.State(feedId: id,
+                                                               feed: state.feeds[id: id]?.feed ?? Feed.EMPTY,
+                                                               bottomSheetType: .me)
                 case .audioButtonDidTap:
                     guard let feedId = state.audioPlayingFeedId else {
                         state.audioPlayingFeedId = id
@@ -114,12 +127,22 @@ struct HomeStore: ReducerProtocol {
                 }
             case let .bottomSheet(action):
                 switch action {
-                case .editButtonDidTap:
+                case let  .editButtonDidTap(feed):
                     state.isBottomSheetPresented = false
+                    return EffectTask<Action>(value: .dismissBottomSheet(feed))
+                        .delay(for: .seconds(0.3), scheduler: DispatchQueue.main)
+                        .eraseToEffect()
                 case .deleteButtonDidTap:
                     state.isBottomSheetPresented = false
                 case .declationButtonDidTap:
                     state.isBottomSheetPresented = false
+                }
+            case let .deleteFeed(result):
+                switch result {
+                case .success:
+                    return .send(.onAppear)
+                default:
+                    print("error")
                 }
             case .receiveProfileInfo(let profile):
 #warning("API연결")

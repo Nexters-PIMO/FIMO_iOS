@@ -12,7 +12,9 @@ import Foundation
 import ComposableArchitecture
 
 struct ArchiveClient {
-    let fetchArchive: () -> Archive
+    let fetchProfile: () -> EffectPublisher<Result<Profile, NetworkError>, Never>
+    let fetchArchiveFeeds: () -> EffectPublisher<Result<[FeedDTO], NetworkError>, Never>
+    let fetchFeed: (Int) -> EffectPublisher<Result<FeedDTO, NetworkError>, Never>
 }
 
 extension DependencyValues {
@@ -23,18 +25,22 @@ extension DependencyValues {
 }
 
 extension ArchiveClient: DependencyKey {
-    static let liveValue = Self.init (
-        fetchArchive: {
-            // TODO: 서버 통신
-            return Archive(
-                archiveInfo: ArchiveInfo(
-                    friendType: .both,
-                    archiveName: "밤에 쓰는 편지",
-                    profile: Temp.profile,
-                    feedCount: 2
-                ),
-                feeds: []
-            )
+    static let liveValue = Self.init(
+        fetchProfile: {
+            let request = ProfileRequest(target: .fetchMyProfile)
+            
+            return BaseNetwork.shared.request(api: request, isInterceptive: false)
+                .catchToEffect()
+        }, fetchArchiveFeeds: {
+            let request = FeedsRequest(target: .fetchArchiveFeeds)
+            
+            return BaseNetwork.shared.request(api: request, isInterceptive: false)
+                .catchToEffect()
+        }, fetchFeed: { feedId in
+            let request = FeedRequest(feedId: feedId)
+            
+            return BaseNetwork.shared.request(api: request, isInterceptive: false)
+                .catchToEffect()
         }
     )
 }
