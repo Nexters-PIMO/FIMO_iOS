@@ -21,6 +21,7 @@ struct TabBarStore: ReducerProtocol {
         @BindingState var isSheetPresented: Bool = false
         @BindingState var isShowToast: Bool = false
         @BindingState var isShowRemovePopup: Bool = false
+        @BindingState var isShowAcceptBackPopup: Bool = false
         var toastMessage: ToastModel = ToastModel(title: PIMOStrings.textCopyToastTitle,
                                                   message: PIMOStrings.textCopyToastMessage)
         var myProfile: Profile?
@@ -42,6 +43,7 @@ struct TabBarStore: ReducerProtocol {
         case upload(UploadStore.Action)
         case archive(ArchiveStore.Action)
         case deleteFeed
+        case acceptBackOnProfileSetting
     }
 
     struct CancelID: Hashable {
@@ -85,6 +87,30 @@ struct TabBarStore: ReducerProtocol {
                 state.isSheetPresented = true
             case .upload(.didTapCloseButton):
                 state.isSheetPresented = false
+            case .home(.settingButtonDidTap):
+                return .send(.home(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
+            case .home(.bottomSheet(.deleteButtonDidTap(let feedId))):
+                state.isShowRemovePopup = true
+                let _ = print(feedId)
+            case .archive(.settingButtonDidTap):
+                return .send(.archive(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
+            case .archive(.bottomSheet(.deleteButtonDidTap(let feedId))):
+                state.isShowRemovePopup = true
+                let _ = print(feedId)
+            case .acceptBackOnProfileSetting:
+                if state.tabBarItem == .home,
+                   state.homeState.path.last == .modifyProfile {
+                    state.homeState.path.removeLast()
+                } else if state.tabBarItem == .myFeed,
+                          state.archiveState.path.last == .modifyProfile {
+                    state.archiveState.path.removeLast()
+                }
+            case .home(.profile(.tappedBackButton)):
+                state.isShowAcceptBackPopup = true
+                return .none
+            case .archive(.profile(.tappedBackButton)):
+                state.isShowAcceptBackPopup = true
+                return .none
             case let .home(action):
                 switch action {
                 case .settingButtonDidTap:

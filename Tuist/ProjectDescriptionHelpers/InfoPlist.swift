@@ -10,6 +10,8 @@ extension Project {
         "LSApplicationQueriesSchemes": ["kakaokompassauth"],
         "KAKAO_NATIVE_APP_KEY": "${KAKAO_NATIVE_APP_KEY}",
         "BaseURL": "${BASE_URL}",
+        "ClientID": "${CLIENT_ID}",
+        "ImgurURL": "${IMGUR_URL}",
         "CFBundleURLTypes": [
             [
                 "CFBundleTypeRole": "Editor",

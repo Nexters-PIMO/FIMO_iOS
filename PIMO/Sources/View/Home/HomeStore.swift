@@ -14,6 +14,7 @@ enum HomeScene: Hashable {
     case home
     case setting
     case openSourceLicence
+    case modifyProfile
 }
 
 struct HomeStore: ReducerProtocol {
@@ -27,6 +28,7 @@ struct HomeStore: ReducerProtocol {
         var feeds: IdentifiedArrayOf<FeedStore.State> = []
         var setting: SettingStore.State?
         var bottomSheet: BottomSheetStore.State?
+        var profile: ProfileSettingStore.State?
         var audioPlayingFeedId: Int?
     }
     
@@ -44,6 +46,7 @@ struct HomeStore: ReducerProtocol {
         case setting(SettingStore.Action)
         case onboarding(OnboardingStore.Action)
         case bottomSheet(BottomSheetStore.Action)
+        case profile(ProfileSettingStore.Action)
         case dismissBottomSheet(Feed)
         case deleteFeed(Result<Bool, NetworkError>)
     }
@@ -142,13 +145,21 @@ struct HomeStore: ReducerProtocol {
                     print("error")
                 }
             case .receiveProfileInfo(let profile):
-                #warning("API연결")
+#warning("API연결")
                 state.setting = SettingStore.State(nickname: profile.nickName,
                                                    archiveName: "",
                                                    imageURLString: profile.profileImgUrl)
                 state.path.append(.setting)
             case .setting(.tappedLicenceButton):
                 state.path.append(.openSourceLicence)
+            case .setting(.tappedProfileManagementButton):
+#warning("API연결")
+                state.profile = ProfileSettingStore.State(
+                    nickname: state.setting?.nickname ?? "",
+                    archiveName: "",
+                    selectedImageURL: state.setting?.imageURLString ?? ""
+                )
+                state.path.append(.modifyProfile)
             default:
                 break
             }
@@ -162,6 +173,9 @@ struct HomeStore: ReducerProtocol {
         }
         .forEach(\.feeds, action: /Action.feed(id:action:)) {
             FeedStore()
+        }
+        .ifLet(\.profile, action: /Action.profile) {
+            ProfileSettingStore()
         }
     }
 }

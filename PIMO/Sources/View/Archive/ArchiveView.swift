@@ -57,6 +57,12 @@ struct ArchiveView: View {
 
                     case .openSourceLicence:
                         AcknowView()
+                    case .modifyProfile:
+                        IfLetStore(
+                            self.store.scope(state: \.profile, action: { .profile($0) })
+                        ) {
+                            ModifyProfileView(store: $0)
+                        }
                     default:
                         EmptyView()
                     }

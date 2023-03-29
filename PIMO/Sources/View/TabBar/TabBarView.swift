@@ -48,6 +48,7 @@ struct TabBarView: View {
             .ignoresSafeArea(.all)
             .toast(isShowing: viewStore.binding(\.$isShowToast), title: viewStore.toastMessage.title)
             .removePopup(isShowing: viewStore.binding(\.$isShowRemovePopup), store: viewStore)
+            .modifyProfileBackPopup(isShowing: viewStore.binding(\.$isShowAcceptBackPopup), store: viewStore)
         }
     }
     
