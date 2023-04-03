@@ -79,6 +79,9 @@ extension TabBarView {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 28, height: 28)
+                    .mask {
+                        Circle()
+                    }
                     .overlay(
                         Circle()
                             .stroke(Color.black, lineWidth: 1.5)
