@@ -9,6 +9,7 @@
 import SwiftUI
 
 import ComposableArchitecture
+import FirebaseCore
 import KakaoSDKAuth
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -24,6 +25,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
 
         viewStore.send(.appDelegate(.onLaunchFinish))
+            
+            FirebaseApp.configure()
 
         return true
     }

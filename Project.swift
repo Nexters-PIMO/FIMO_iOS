@@ -13,5 +13,7 @@ let project = Project.app(
         .external(name: "Kingfisher"),
         .external(name: "AcknowList"),
         .external(name: "KakaoSDK"),
-        .external(name: "FLAnimatedImage")
+        .external(name: "FLAnimatedImage"),
+        .external(name: "FirebaseDynamicLinks"),
+        .external(name: "FirebaseAnalytics")
     ])

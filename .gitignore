@@ -4,6 +4,7 @@
 .AppleDouble
 .LSOverride
 *.xcconfig
+InfoPlist/
 
 # Icon must end with two
 Icon
