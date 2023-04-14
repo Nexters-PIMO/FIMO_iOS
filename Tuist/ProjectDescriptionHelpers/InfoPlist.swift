@@ -16,6 +16,10 @@ extension Project {
             [
                 "CFBundleTypeRole": "Editor",
                 "CFBundleURLSchemes": ["kakao$(KAKAO_NATIVE_APP_KEY)"]
+            ],
+            [
+                "CFBundleTypeRole": "Editor",
+                "CFBundleURLSchemes": ["$(DYNAMIC_LINK)"]
             ]
         ]
     ]
