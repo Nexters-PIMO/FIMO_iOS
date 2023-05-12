@@ -12,6 +12,7 @@ extension Project {
         "BaseURL": "${BASE_URL}",
         "ClientID": "${CLIENT_ID}",
         "ImgurURL": "${IMGUR_URL}",
+        "DynamicLinkURL": "${DYNAMIC_LINK}",
         "CFBundleURLTypes": [
             [
                 "CFBundleTypeRole": "Editor",
