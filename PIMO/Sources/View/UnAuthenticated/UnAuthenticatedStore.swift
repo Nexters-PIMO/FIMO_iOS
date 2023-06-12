@@ -35,6 +35,7 @@ struct UnAuthenticatedStore: ReducerProtocol {
         case profileSetting(ProfileSettingStore.Action)
         case onboarding(OnboardingStore.Action)
         case transitionSceneOnOnboarding
+        case resetPageIndex
     }
 
     var body: some ReducerProtocol<State, Action> {
@@ -47,8 +48,9 @@ struct UnAuthenticatedStore: ReducerProtocol {
                 return .send(.transitionSceneOnOnboarding)
             case .transitionSceneOnOnboarding:
                 state.path.append(.login)
-                state.onboardingState.pageType = .one
-                return .none
+                return .init(value: .resetPageIndex)
+                    .delay(for: .milliseconds(1000), scheduler: DispatchQueue.main)
+                    .eraseToEffect()
             case .login(.onSuccessLogin(let onSuccess)):
                 if onSuccess {
                     state.path.append(.nickName)
@@ -62,6 +64,9 @@ struct UnAuthenticatedStore: ReducerProtocol {
                 return .none
             case .profileSetting(.tappedNextButtonOnProfilePicture):
                 state.path.append(.complete)
+                return .none
+            case .resetPageIndex:
+                state.onboardingState.pageType = .one
                 return .none
             default:
                 return .none
