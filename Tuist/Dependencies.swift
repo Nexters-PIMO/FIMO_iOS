@@ -6,7 +6,8 @@ let spm = SwiftPackageManagerDependencies([
     .remote(url: "https://github.com/onevcat/Kingfisher", requirement: .upToNextMajor(from: "7.6.1")),
     .remote(url: "https://github.com/vtourraine/AcknowList", requirement: .upToNextMajor(from: "3.0.0")),
     .remote(url: "https://github.com/kakao/kakao-ios-sdk", requirement: .upToNextMajor(from: "2.13.1")),
-    .remote(url: "https://github.com/Flipboard/FLAnimatedImage", requirement: .upToNextMajor(from: "1.0.17"))
+    .remote(url: "https://github.com/Flipboard/FLAnimatedImage", requirement: .upToNextMajor(from: "1.0.17")),
+    .remote(url: "https://github.com/firebase/firebase-ios-sdk", requirement: .upToNextMajor(from:"10.7.0")),
 ])
 
 let dependencies = Dependencies(
