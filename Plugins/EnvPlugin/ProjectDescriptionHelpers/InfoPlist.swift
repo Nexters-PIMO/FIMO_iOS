@@ -1,6 +1,6 @@
 import ProjectDescription
 
-extension Project {
+public extension Project {
     static let infoPlist: [String: InfoPlist.Value] = [
         "CFBundleShortVersionString": "1.0",
         "CFBundleVersion": "1",

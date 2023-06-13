@@ -2,6 +2,7 @@ import ProjectDescription
 
 let config = Config(
     plugins: [
-        .local(path: .relativeToManifest("../../Plugins/PIMO")),
-    ]
+        .local(path: .relativeToRoot("Plugins/EnvPlugin"))
+    ],
+    generationOptions: .options()
 )

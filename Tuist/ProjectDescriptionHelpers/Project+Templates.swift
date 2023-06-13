@@ -1,4 +1,5 @@
 import ProjectDescription
+import EnvPlugin
 
 extension Project {
     public static func app(
