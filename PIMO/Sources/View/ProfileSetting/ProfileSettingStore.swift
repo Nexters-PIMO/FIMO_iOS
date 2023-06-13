@@ -44,8 +44,6 @@ struct ProfileSettingStore: ReducerProtocol {
         var isActiveButtonOnImage: Bool = false
 
         var isChangedInfo: Bool = false
-
-        @BindingState var isShowExitPopup = false
     }
 
     enum Action: BindableAction, Equatable, NextButtonActionProtocol {
@@ -200,7 +198,6 @@ struct ProfileSettingStore: ReducerProtocol {
                 ))
                 .fireAndForget()
             case .tappedBackButton:
-                state.isShowExitPopup = true
                 return .none
             default:
                 return .none
