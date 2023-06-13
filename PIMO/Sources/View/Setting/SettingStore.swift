@@ -12,8 +12,6 @@ import ComposableArchitecture
 
 struct SettingStore: ReducerProtocol {
     struct State: Equatable {
-        @BindingState var isShowLogoutPopup: Bool = false
-        @BindingState var isShowWithdrawalPopup: Bool = false
         @BindingState var isShowBackPopup: Bool = false
         @BindingState var isSheetPresented: Bool = false
         var onboarding: OnboardingStore.State?
@@ -41,8 +39,6 @@ struct SettingStore: ReducerProtocol {
         case tappedTermsOfUseButton
         case tappedLogoutButton
         case tappedWithdrawalButton
-        case acceptLogout
-        case acceptWithdrawal
         case acceptBack
     }
 

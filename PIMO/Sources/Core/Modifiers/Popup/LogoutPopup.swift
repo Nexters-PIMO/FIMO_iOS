@@ -11,14 +11,14 @@ import SwiftUI
 import ComposableArchitecture
 
 extension View {
-    func logoutPopup(isShowing: Binding<Bool>, store: ViewStore<SettingStore.State, SettingStore.Action>) -> some View {
+    func logoutPopup(isShowing: Binding<Bool>, store: ViewStore<TabBarStore.State, TabBarStore.Action>) -> some View {
         return self.modifier(LogoutPopupViewModifier(isShowing: isShowing, store: store))
     }
 }
 
 struct LogoutPopupViewModifier: ViewModifier {
     @Binding var isShowing: Bool
-    let store: ViewStore<SettingStore.State, SettingStore.Action>
+    let store: ViewStore<TabBarStore.State, TabBarStore.Action>
 
     func body(content: Content) -> some View {
         ZStack {

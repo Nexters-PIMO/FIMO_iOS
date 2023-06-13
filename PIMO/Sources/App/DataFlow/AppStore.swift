@@ -43,6 +43,19 @@ struct AppStore: ReducerProtocol {
             case .unAuthenticated(.profileSetting(.tappedCompleteButton)):
                 state.userState.status = .authenticated
                 return .none
+            case .tabBar(.acceptLogout):
+                let effects: [EffectTask<AppStore.Action>] = [
+                    .init(value: .user(.expiredToken)),
+                    .init(value: .user(.changeUnAuthenticated))
+                ]
+                return .merge(effects)
+            case .tabBar(.acceptWithdrawal):
+                #warning("회원탈퇴 네트워크 추가 필요")
+                let effects: [EffectTask<AppStore.Action>] = [
+                    .init(value: .user(.expiredToken)),
+                    .init(value: .user(.changeUnAuthenticated))
+                ]
+                return .merge(effects)
             default:
                 return .none
             }

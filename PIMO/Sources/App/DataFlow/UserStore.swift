@@ -23,6 +23,8 @@ struct UserStore: ReducerProtocol {
 
     enum Action: Equatable {
         case checkAccessToken
+        case expiredToken
+        case changeUnAuthenticated
     }
 
     @Dependency(\.userClient) var userClient
@@ -37,8 +39,12 @@ struct UserStore: ReducerProtocol {
                 }
                 state.status = .authenticated
                 state.token = token
-                return .none
+            case .expiredToken:
+                userClient.removeToken()
+            case .changeUnAuthenticated:
+                state.status = .unAuthenticated
             }
+            return .none
         }
     }
 }

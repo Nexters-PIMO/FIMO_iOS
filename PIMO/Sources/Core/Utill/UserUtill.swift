@@ -36,6 +36,10 @@ class UserUtill: ObservableObject {
         userDefaults.set(data, forKey: key.description)
     }
 
+    func removeValue(of key: UserDefaultsKeys) {
+        userDefaults.removeObject(forKey: key.description)
+    }
+
     private func getUserDefaults<T: Decodable>(key: UserDefaultsKeys) -> T? {
         guard let data = userDefaults.object(forKey: key.description) as? Data,
               let object = try? decoder.decode(T.self, from: data) else {
