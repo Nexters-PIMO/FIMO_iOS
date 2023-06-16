@@ -25,75 +25,26 @@ struct OnboardingView: View {
                     .ignoresSafeArea()
 
                 TabView(selection: viewStore.binding(\.$pageType)) {
-                    ForEach(OnboardingPageType.allCases, id: \.self) { type in
-                        ZStack {
-                            VStack(spacing: 0) {
-                                VStack {
-                                    Spacer()
+                    firstOnboardingView(viewStore: viewStore, type: .one)
+                        .tag(OnboardingPageType.one)
 
-                                    if viewStore.pageType != .one {
-                                        viewStore.pageType.backgroundImage
-                                            .resizable()
-                                            .frame(maxHeight: .infinity)
-                                            .padding(.top, 40)
-                                            .aspectRatio(contentMode: .fit)
-                                    }
-                                }
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .background(
-                                    viewStore.pageType == .one
-                                    ? Color.clear
-                                    : Color(FIMOAsset.Assets.gray1.color)
-                                )
-
-                                VStack(alignment: .leading, spacing: 0) {
-                                    if viewStore.pageType == .one {
-                                        Image(uiImage: FIMOAsset.Assets.logo.image)
-                                            .padding(.leading, 40)
-                                            .padding(.bottom, -20)
-                                    }
-
-                                    VStack(spacing: 0) {
-                                        OnboardingDescriptionView(type: type)
-
-                                        Spacer()
-
-                                        if viewStore.pageType == .four {
-                                            startButton(viewStore: viewStore)
-                                        } else {
-                                            Rectangle()
-                                                .foregroundColor(.clear)
-                                                .frame(width: 313, height: 56)
-                                                .padding(.bottom, 60)
-                                        }
-                                    }
-                                    .if(isOverflowBottomText) { view in
-                                        view.frame(height: 281)
-                                    }
-
-                                    Spacer()
-                                }
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .ignoresSafeArea()
-                                .background(
-                                    viewStore.pageType == .one
-                                    ? Color.clear
-                                    : Color.white
-                                )
-                            }
-                        }
-                        .ignoresSafeArea()
-                        .tag(type)
+                    ForEach([OnboardingPageType.two, .three, .four], id: \.self) { type in
+                        otherOnboardingView(viewStore: viewStore, type: type)
+                            .tag(type)
                     }
                 }
                 .ignoresSafeArea()
+                .if(viewStore.pageType == .one) {
+                    $0.background(
+                        viewStore.pageType.backgroundImage
+                            .resizable()
+                            .ignoresSafeArea()
+                            .scaledToFill()
+                    )
+                }
                 .tabViewStyle(.page(indexDisplayMode: .never))
-                .background(
-                    viewStore.pageType.backgroundImage
-                        .resizable()
-                        .ignoresSafeArea()
-                        .scaledToFill()
-                )
+                .animation(.easeInOut, value: viewStore.pageType)
+                .transition(.opacity)
 
                 if viewStore.pageType != .four {
                     ZStack {
@@ -109,6 +60,85 @@ struct OnboardingView: View {
             .ignoresSafeArea()
             .zIndex(0)
         }
+    }
+
+    @ViewBuilder func firstOnboardingView(viewStore: ViewStore<OnboardingStore.State, OnboardingStore.Action>, type: OnboardingPageType) -> some View {
+        VStack(spacing: 0) {
+            VStack {
+                Text("")
+                Spacer()
+            }
+            VStack(alignment: .leading, spacing: 0) {
+                Image(uiImage: FIMOAsset.Assets.logo.image)
+                    .padding(.leading, 40)
+                    .padding(.bottom, -20)
+
+                VStack(spacing: 0) {
+                    OnboardingDescriptionView(type: type)
+
+                    Spacer()
+
+                    Rectangle()
+                        .foregroundColor(.clear)
+                        .frame(width: 313, height: 56)
+                        .padding(.bottom, 60)
+                }
+                .if(isOverflowBottomText) { view in
+                    view.frame(height: 281)
+                }
+
+                Spacer()
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea()
+        .background(
+            OnboardingPageType.one.backgroundImage
+                .resizable()
+                .ignoresSafeArea()
+                .scaledToFill()
+        )
+    }
+
+    @ViewBuilder func otherOnboardingView(viewStore: ViewStore<OnboardingStore.State, OnboardingStore.Action>, type: OnboardingPageType) -> some View {
+        VStack(spacing: 0) {
+            VStack {
+                Spacer()
+                viewStore.pageType.backgroundImage
+                    .resizable()
+                    .frame(maxHeight: .infinity)
+                    .padding(.top, 40)
+                    .aspectRatio(contentMode: .fit)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(FIMOAsset.Assets.gray1.color))
+
+            VStack(alignment: .leading, spacing: 0) {
+                VStack(spacing: 0) {
+                    OnboardingDescriptionView(type: type)
+
+                    Spacer()
+
+                    if viewStore.pageType == .four {
+                        startButton(viewStore: viewStore)
+                    } else {
+                        Rectangle()
+                            .foregroundColor(.clear)
+                            .frame(width: 313, height: 56)
+                            .padding(.bottom, 60)
+                    }
+                }
+                .if(isOverflowBottomText) { view in
+                    view.frame(height: 281)
+                }
+
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .ignoresSafeArea()
+            .background(Color.white)
+        }
+        .ignoresSafeArea()
     }
 
     func startButton(viewStore: ViewStore<OnboardingStore.State, OnboardingStore.Action>) -> some View {
