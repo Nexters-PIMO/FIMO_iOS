@@ -17,18 +17,14 @@ struct FriendsListView: View {
 
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
-            ScrollView {
-                LazyVStack(pinnedViews: .sectionHeaders) {
-                    Section {
-                        friendsList(viewStore)
-                    } header: {
-                        if viewStore.friendsList.count > 0 {
-                            VStack {
-                                CustomNavigationBar(title: viewStore.selectedFriendsList.nickName)
-                                header(viewStore)
-                            }
+            VStack(spacing: 0) {
+                CustomNavigationBar(title: viewStore.selectedFriendsList.nickName)
 
-                        }
+                header(viewStore)
+
+                ScrollView {
+                    LazyVStack(pinnedViews: .sectionHeaders) {
+                        friendsList(viewStore)
                     }
                 }
             }
@@ -96,7 +92,7 @@ struct FriendsListView: View {
     }
 
     func header(_ store: ViewStore<FriendsListStore.State, FriendsListStore.Action>) -> some View {
-        VStack {
+        VStack(spacing: 0) {
             HStack {
                 Spacer(minLength: 30)
 
@@ -155,6 +151,7 @@ struct FriendsListView: View {
             CustomDivider()
         }
         .padding(.horizontal, 20)
+        .frame(height: 164)
     }
 
     func tabBarItem(_ store: ViewStore<FriendsListStore.State, FriendsListStore.Action>, title: String, count: Int, index: Int) -> some View {
@@ -175,8 +172,6 @@ struct FriendsListView: View {
                         .font(.system(size: 12, weight: .medium))
                 }
                 .padding(.top, 17)
-
-                Spacer()
 
                 if store.currentTab.index == index {
                     Color.black
