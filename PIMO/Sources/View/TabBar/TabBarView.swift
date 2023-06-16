@@ -35,13 +35,14 @@ struct TabBarView: View {
                     )
                     .tag(tabBarItems[1])
                 }
+                .safeAreaInset(edge: .bottom, content: {
+                    TabBar(selected: viewStore.binding(\.$tabBarItem),
+                           profileImage: viewStore.state.myProfile?.profileImgUrl)
+                })
                 .onAppear {
                     viewStore.send(.fetchProfile)
                     UITabBar.appearance().isHidden = true
                 }
-                
-                TabBar(selected: viewStore.binding(\.$tabBarItem),
-                       profileImage: viewStore.state.myProfile?.profileImgUrl)
                 
                 uploadButton(viewStore: viewStore)
             }
