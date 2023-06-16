@@ -27,6 +27,9 @@ struct FriendsListView: View {
                         friendsList(viewStore)
                     }
                 }
+                .refreshable {
+                    viewStore.send(.refreshFriendList)
+                }
             }
             .onAppear {
                 viewStore.send(.onAppear)
@@ -45,7 +48,7 @@ struct FriendsListView: View {
     }
 
     func friendCell(_ store: ViewStore<FriendsListStore.State, FriendsListStore.Action>, friend: Friend) -> some View {
-        HStack(alignment: .center) {
+        HStack {
             KFImage(URL(string: friend.profileImageURL))
                 .retry(maxCount: 3, interval: .seconds(5))
                 .cacheOriginalImage()
@@ -77,17 +80,23 @@ struct FriendsListView: View {
 
             if friend.isMyRelationship {
                 Button {
-                    store.send(.tappedRequestFriendButton(friend.friendType))
+                    store.send(.tappedRequestFriendButton)
                 } label: {
                     friend.friendType.image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 28)
                         .padding(.leading, 19)
                 }
             } else {
                 friend.friendType.noRelationshipImage
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 28)
                     .padding(.leading, 19)
             }
         }
-        .frame(maxWidth: .infinity, minHeight: 40)
+        .frame(minHeight: 40)
         .padding(.top, 25)
     }
 
