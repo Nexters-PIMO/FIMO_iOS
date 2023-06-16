@@ -50,7 +50,7 @@ struct AppStore: ReducerProtocol {
                 ]
                 return .merge(effects)
             case .tabBar(.acceptWithdrawal):
-                #warning("회원탈퇴 네트워크 추가 필요")
+                #warning("회원탈퇴 네트워크 추가 필요, 네트워크 후 화면전환")
                 let effects: [EffectTask<AppStore.Action>] = [
                     .init(value: .user(.expiredToken)),
                     .init(value: .user(.changeUnAuthenticated))
