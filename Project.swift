@@ -1,11 +1,8 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
-import MyPlugin
-
-let localHelper = LocalHelper(name: "MyPlugin")
 
 let project = Project.app(
-    name: "PIMO",
+    name: "FIMO",
     platform: .iOS,
     dependencies: [
         .external(name: "Alamofire"),
