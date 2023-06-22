@@ -18,19 +18,20 @@ struct LoginStore: ReducerProtocol {
         @BindingState var isAlertShowing = false
         var isSignIn = false
         var errorMessage = ""
-        var appleIdentityToken = ""
         var kakaoRefreshToken = ""
+        var userIdentity = ""
     }
     
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
         case tappedKakaoLoginButton(String, String)
         case tappedAppleLoginButton(String)
-        case onSuccessLogin(Bool)
+        case enterProfileSetting
         case showAlert
         case tappedAlertOKButton
-        case tappedAppleLoginButtonDone(Result<AppleToken, NetworkError>)
-        case encodeTokenDone(Result<EncodedToken, NetworkError>)
+        case failureLogin(NetworkError)
+        case signup
+        case tappedAppleLoginButtonDone(Result<MemberToken, NetworkError>)
     }
     
     @Dependency(\.loginClient) var loginClient
@@ -39,42 +40,20 @@ struct LoginStore: ReducerProtocol {
         BindingReducer()
         Reduce { state, action in
             switch action {
-            case .tappedAppleLoginButton(let token):
-                guard token != "" else {
-                    return .none
+            case .tappedAppleLoginButton(let userIdentity):
+                guard userIdentity != "" else {
+                    return .init(value: Action.showAlert)
                 }
+                state.userIdentity = userIdentity
                 
-                state.appleIdentityToken = token
-                
-                let tokenResult = loginClient.getAppleLoginToken(token)
+                let tokenResult = loginClient.login(userIdentity)
 
                 return tokenResult.map {
                     Action.tappedAppleLoginButtonDone($0)
                 }
-            case .tappedAppleLoginButtonDone(let result):
-                switch result {
-                case .success(let appleLogin):
-                    let accessToken = appleLogin.accessToken
-                    
-                    return loginClient.encodeAppleLoginToken(accessToken).map { Action.encodeTokenDone($0) }
-                case .failure:
-                    return .init(value: Action.showAlert)
-                }
             case let .tappedKakaoLoginButton(accessToken, refreshToken):
                 state.kakaoRefreshToken = refreshToken
-                return loginClient.encodeKakaoLoginToken(accessToken).map { Action.encodeTokenDone($0) }
-            case .encodeTokenDone(let result):
-                switch result {
-                case .success(let encodedToken):
-                    let encodedAccessToken = encodedToken.accessToken
-
-                    let memberToken = MemberToken(accessToken: encodedAccessToken, refreshToken: state.kakaoRefreshToken)
-                    UserUtill.shared.setUserDefaults(key: .token, value: memberToken)
-
-                    return .init(value: Action.onSuccessLogin(true))
-                case .failure:
-                    return .init(value: Action.showAlert)
-                }
+                return .none
             case .showAlert:
                 state.isAlertShowing = true
                 
@@ -82,6 +61,15 @@ struct LoginStore: ReducerProtocol {
             case .tappedAlertOKButton:
                 state.isAlertShowing = false
                 
+                return .none
+            case .failureLogin(let error):
+                switch error.errorType {
+                case .serverError(.userNotFound):
+                    print("➡️ 유저 정보가 없으므로 프로필 기입 화면으로 이동합니다!!!")
+                    return .init(value: .enterProfileSetting)
+                default:
+                    return .init(value: .showAlert)
+                }
                 return .none
             default:
                 return .none

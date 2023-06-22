@@ -18,7 +18,7 @@ struct FMLoginRequest: Requestable {
     let provider: String = "iOS"
 
     var path: String {
-        return "/post/auth/login"
+        return "/auth/login"
     }
 
     var method: HTTPMethod {

@@ -93,11 +93,8 @@ extension AppleLoginButton.Coordinator: ASAuthorizationControllerDelegate {
                   print("Apple Login Authorized")
                   #endif
                   
-                  guard let identityTokenData = appleIDCredential.identityToken,
-                        let identityToken = String(data: identityTokenData, encoding: .utf8) else {
-                      return
-                  }
-                  self.appleLoginButton.action(identityToken)
+                  let userIdentity = appleIDCredential.user
+                  self.appleLoginButton.action(userIdentity)
               case .notFound, .revoked, .transferred:
                   #if DEBUG
                   print("Apple Login Fail")

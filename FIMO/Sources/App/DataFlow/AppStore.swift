@@ -40,9 +40,22 @@ struct AppStore: ReducerProtocol {
             case .hiddenLaunchScreen:
                 state.isLoading = false
                 return .none
-            case .unAuthenticated(.profileSetting(.tappedCompleteButton)):
-                state.userState.status = .authenticated
-                return .none
+            case .unAuthenticated(let action):
+                switch action {
+                case .profileSetting(.tappedCompleteButton):
+                    state.userState.status = .authenticated
+                    return .none
+                case .login(.tappedAppleLoginButtonDone(let result)):
+                    switch result {
+                    case .success(let memberToken):
+                        state.userState.token = memberToken
+                        return .none
+                    case .failure(let error):
+                        return .init(value: Action.unAuthenticated(.login(.failureLogin(error))))
+                    }
+                default:
+                    return .none
+                }
             case .tabBar(.acceptLogout):
                 let effects: [EffectTask<AppStore.Action>] = [
                     .init(value: .user(.expiredToken)),
