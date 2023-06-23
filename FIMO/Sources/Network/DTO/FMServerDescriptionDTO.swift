@@ -12,4 +12,12 @@ struct FMServerDescriptionDTO: Decodable, Equatable {
     let code: String
     let message: String
     let status: Int
+
+    func toModel() -> FMServerDescription {
+        return .init(
+            code: code,
+            message: message,
+            status: status
+        )
+    }
 }

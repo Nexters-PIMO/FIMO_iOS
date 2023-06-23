@@ -59,7 +59,7 @@ struct LoginStore: ReducerProtocol {
                 return loginResult.map {
                     Action.loginResult($0)
                 }
-            case let .loginAgain:
+            case .loginAgain:
                 let loginResult = loginClient.login(state.userIdentity)
 
                 return loginResult.map {

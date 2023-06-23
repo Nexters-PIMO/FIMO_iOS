@@ -26,7 +26,11 @@ struct AppStore: ReducerProtocol {
         case user(UserStore.Action)
         case onAppear
         case hiddenLaunchScreen
+        case withdrawal
+        case withdrawalDone(Result<FMServerDescriptionDTO, NetworkError>)
     }
+
+    @Dependency(\.loginClient) var loginClient
 
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
@@ -69,7 +73,19 @@ struct AppStore: ReducerProtocol {
                 ]
                 return .merge(effects)
             case .tabBar(.acceptWithdrawal):
-                #warning("회원탈퇴 네트워크 추가 필요, 네트워크 후 화면전환")
+                let withdrawalResult = loginClient.withdrawal()
+
+                return withdrawalResult.map({
+                    Action.withdrawalDone($0)
+                })
+            case .withdrawalDone(let result):
+                switch result {
+                case .success:
+                    return .init(value: .withdrawal)
+                case .failure:
+                    return .none
+                }
+            case .withdrawal:
                 let effects: [EffectTask<AppStore.Action>] = [
                     .init(value: .user(.expiredToken)),
                     .init(value: .user(.changeUnAuthenticated))

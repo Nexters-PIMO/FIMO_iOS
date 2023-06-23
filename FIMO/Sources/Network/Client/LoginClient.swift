@@ -17,6 +17,7 @@ struct LoginClient {
     let encodeKakaoLoginToken: (String) -> EffectPublisher<Result<EncodedToken, NetworkError>, Never>
 
     let login: (String) -> EffectPublisher<Result<MemberToken, NetworkError>, Never>
+    let withdrawal: () -> EffectPublisher<Result<FMServerDescriptionDTO, NetworkError>, Never>
 }
 
 extension DependencyValues {
@@ -56,9 +57,13 @@ extension LoginClient: DependencyKey {
         return effect
     } login: { userIdentity in
         let request = FMLoginRequest(identifier: userIdentity)
-        let effect = BaseNetwork.shared.request(api: request, isInterceptive: false)
-            .catchToEffect()
 
-        return effect
+        return BaseNetwork.shared.request(api: request, isInterceptive: false)
+            .catchToEffect()
+    } withdrawal: {
+        let request = FMWithdrawalRequest()
+
+        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            .catchToEffect()
     }
 }

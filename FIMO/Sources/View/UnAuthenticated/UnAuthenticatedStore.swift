@@ -66,7 +66,8 @@ struct UnAuthenticatedStore: ReducerProtocol {
                 return .none
             case .profileSetting(.signUpDone(let result)):
                 switch result {
-                case .success(let serverDescription):
+                case .success(let serverDescriptionDTO):
+                    let serverDescription = serverDescriptionDTO.toModel()
                     switch serverDescription.status {
                     case 200:
                         return .init(value: .login(.loginAgain))
