@@ -24,6 +24,7 @@ struct ProfileClient {
     // 새로운 API 적용
     let isExistsNickname: (String) -> EffectTask<Result<Bool, NetworkError>>
     let isExistsArchiveName: (String) -> EffectTask<Result<Bool, NetworkError>>
+    let signUp: (FMSignUp) -> EffectTask<Result<FMServerDescriptionDTO, NetworkError>>
 }
 
 extension DependencyValues {
@@ -81,6 +82,11 @@ extension ProfileClient: DependencyKey {
             .catchToEffect()
     } isExistsArchiveName: { archiveName in
         let request = FMUserValidateRequest(target: .archive(name: archiveName))
+
+        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            .catchToEffect()
+    } signUp: { signUpModel in
+        let request = FMSignUpRequest(signUpModel: signUpModel)
 
         return BaseNetwork.shared.request(api: request, isInterceptive: true)
             .catchToEffect()

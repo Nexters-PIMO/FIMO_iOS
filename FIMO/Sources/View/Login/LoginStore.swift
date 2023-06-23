@@ -18,7 +18,6 @@ struct LoginStore: ReducerProtocol {
         @BindingState var isAlertShowing = false
         var isSignIn = false
         var errorMessage = ""
-        var kakaoRefreshToken = ""
         var userIdentity = ""
     }
     
@@ -26,12 +25,13 @@ struct LoginStore: ReducerProtocol {
         case binding(BindingAction<State>)
         case tappedKakaoLoginButton(String)
         case tappedAppleLoginButton(String)
-        case enterProfileSetting
+        case enterProfileSetting(String)
         case showAlert
         case tappedAlertOKButton
         case failureLogin(NetworkError)
         case signup
-        case tappedLoginButtonDone(Result<MemberToken, NetworkError>)
+        case loginAgain
+        case loginResult(Result<MemberToken, NetworkError>)
     }
     
     @Dependency(\.loginClient) var loginClient
@@ -49,7 +49,7 @@ struct LoginStore: ReducerProtocol {
                 let loginResult = loginClient.login(userIdentity)
 
                 return loginResult.map {
-                    Action.tappedLoginButtonDone($0)
+                    Action.loginResult($0)
                 }
             case let .tappedKakaoLoginButton(id):
                 state.userIdentity = id
@@ -57,7 +57,13 @@ struct LoginStore: ReducerProtocol {
                 let loginResult = loginClient.login(id)
 
                 return loginResult.map {
-                    Action.tappedLoginButtonDone($0)
+                    Action.loginResult($0)
+                }
+            case let .loginAgain:
+                let loginResult = loginClient.login(state.userIdentity)
+
+                return loginResult.map {
+                    Action.loginResult($0)
                 }
             case .showAlert:
                 state.isAlertShowing = true
@@ -71,11 +77,10 @@ struct LoginStore: ReducerProtocol {
                 switch error.errorType {
                 case .serverError(.userNotFound):
                     Log.warning("유저 정보가 없으므로 프로필 기입 화면으로 이동합니다!!!")
-                    return .init(value: .enterProfileSetting)
+                    return .init(value: .enterProfileSetting(state.userIdentity))
                 default:
                     return .init(value: .showAlert)
                 }
-                return .none
             default:
                 return .none
             }

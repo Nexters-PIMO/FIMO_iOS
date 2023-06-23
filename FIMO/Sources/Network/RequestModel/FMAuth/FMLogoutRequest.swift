@@ -14,7 +14,7 @@ struct FMLogoutRequest: Requestable {
     typealias Response = FMServerDescriptionDTO
 
     var path: String {
-        return "/post/auth/logout"
+        return "/auth/logout"
     }
 
     var method: HTTPMethod {

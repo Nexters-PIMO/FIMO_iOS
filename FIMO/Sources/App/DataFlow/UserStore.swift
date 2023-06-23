@@ -25,6 +25,7 @@ struct UserStore: ReducerProtocol {
         case checkAccessToken
         case expiredToken
         case changeUnAuthenticated
+        case setToken
     }
 
     @Dependency(\.userClient) var userClient
@@ -43,6 +44,12 @@ struct UserStore: ReducerProtocol {
                 userClient.removeToken()
             case .changeUnAuthenticated:
                 state.status = .unAuthenticated
+            case .setToken:
+                guard let token = state.token else {
+                    userClient.removeToken()
+                    return .none
+                }
+                userClient.setToken(token)
             }
             return .none
         }
