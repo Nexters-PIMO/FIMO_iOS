@@ -45,7 +45,7 @@ struct AppStore: ReducerProtocol {
                 case .profileSetting(.tappedCompleteButton):
                     state.userState.status = .authenticated
                     return .none
-                case .login(.tappedAppleLoginButtonDone(let result)):
+                case .login(.tappedLoginButtonDone(let result)):
                     switch result {
                     case .success(let memberToken):
                         state.userState.token = memberToken

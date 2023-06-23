@@ -41,9 +41,5 @@ struct FMUserValidateRequest: Requestable {
         }
     }
 
-    var header: [HTTPFields: String] {
-        return [
-            HTTPFields.authorization: HTTPHeaderType.authorization.header
-        ]
-    }
+    var header: [HTTPFields: String] = [:]
 }

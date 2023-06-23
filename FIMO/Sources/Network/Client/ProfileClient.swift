@@ -20,6 +20,10 @@ struct ProfileClient {
     let patchNickname: (String) -> EffectTask<Result<Profile, NetworkError>>
     let patchArchiveName: (String) -> EffectTask<Result<Profile, NetworkError>>
     let patchProfileImage: (String) -> EffectTask<Result<Profile, NetworkError>>
+
+    // 새로운 API 적용
+    let isExistsNickname: (String) -> EffectTask<Result<Bool, NetworkError>>
+    let isExistsArchiveName: (String) -> EffectTask<Result<Bool, NetworkError>>
 }
 
 extension DependencyValues {
@@ -67,6 +71,16 @@ extension ProfileClient: DependencyKey {
             .catchToEffect()
     } patchProfileImage: { profileImageURL in
         let request = ProfileRequest(target: .patchprofileImage(profilImageURL: profileImageURL))
+
+        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            .catchToEffect()
+    } isExistsNickname: { nickname in
+        let request = FMUserValidateRequest(target: .nickname(name: nickname))
+
+        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            .catchToEffect()
+    } isExistsArchiveName: { archiveName in
+        let request = FMUserValidateRequest(target: .archive(name: archiveName))
 
         return BaseNetwork.shared.request(api: request, isInterceptive: true)
             .catchToEffect()

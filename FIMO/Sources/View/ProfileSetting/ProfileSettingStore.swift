@@ -57,6 +57,7 @@ struct ProfileSettingStore: ReducerProtocol {
 
         case tappedImagePickerButton
         case checkDuplicateOnArchive
+        case checkDuplicateOnArchiveNameDone(Result<Bool, NetworkError>)
         case tappedNextButtonOnArchive
 
         case selectProfileImage(UIImage)
@@ -118,7 +119,7 @@ struct ProfileSettingStore: ReducerProtocol {
                     return .none
                 }
 
-                return profileClient.fetchIsExistsNickname(state.nickname)
+                return profileClient.isExistsNickname(state.nickname)
                     .map {
                         Action.checkDuplicateOnNickNameDone($0)
                     }
@@ -152,13 +153,27 @@ struct ProfileSettingStore: ReducerProtocol {
 
                 return .none
             case .checkDuplicateOnArchive:
-#warning("중복 확인 네트워크 연결 필요")
                 guard state.archiveValidationType == .blank else {
                     return .none
                 }
 
-                state.isActiveButtonOnArchive = true
+                return profileClient.isExistsArchiveName(state.archiveName)
+                    .map {
+                        Action.checkDuplicateOnArchiveNameDone($0)
+                    }
+            case .checkDuplicateOnArchiveNameDone(let result):
+                switch result {
+                case .success(let isExistsArchiveName):
+                    state.archiveValidationType = !isExistsArchiveName && state.archiveValidationType == .blank
+                    ? .availableArchiveName
+                    : state.archiveValidationType
+                    state.isActiveButtonOnArchive = state.archiveValidationType == .availableArchiveName
+                    state.isChangedInfo = state.archiveValidationType == .availableArchiveName
 
+                case .failure(let error):
+                    state.toastMessage = .init(title: error.errorDescription ?? "")
+                    state.isShowToast = true
+                }
                 return .none
             case .tappedImagePickerButton:
                 state.isShowImagePicker = true
