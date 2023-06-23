@@ -14,7 +14,7 @@ import KakaoSDKUser
 
 struct KakaoLoginButton: UIViewRepresentable {
     let viewStore: ViewStore<LoginStore.State, LoginStore.Action>
-    let action: ((String, String)) -> Void
+    let action: (String) -> Void
 
     var kakaoLoginButton = UIButton()
 
@@ -37,24 +37,43 @@ struct KakaoLoginButton: UIViewRepresentable {
 
         private func requestKakaoLogin() {
             if UserApi.isKakaoTalkLoginAvailable() {
-                UserApi.shared.loginWithKakaoTalk { [weak self] (oauthToken, error) in
-                    guard let self else { return }
+                UserApi.shared.loginWithKakaoTalk { [weak self] (_, error) in
+                    guard let self else {
+                        return
+                    }
 
                     if error != nil {
                         self.kakaoLoginButton.viewStore.send(.showAlert)
                     } else {
-                        self.kakaoLoginButton.action((oauthToken?.accessToken ?? "", oauthToken?.refreshToken ?? ""))
+                        self.requestUserInfo()
                     }
                 }
             } else {
-                UserApi.shared.loginWithKakaoAccount { [weak self] (oauthToken, error) in
-                    guard let self else { return }
+                UserApi.shared.loginWithKakaoAccount { [weak self] (_, error) in
+                    guard let self else {
+                        return
+                    }
 
                     if error != nil {
                         self.kakaoLoginButton.viewStore.send(.showAlert)
                     } else {
-                        self.kakaoLoginButton.action((oauthToken?.accessToken ?? "", oauthToken?.refreshToken ?? ""))
+                        self.requestUserInfo()
                     }
+                }
+            }
+        }
+
+        private func requestUserInfo() {
+            UserApi.shared.me { [weak self] (user, error) in
+                guard let self else {
+                    return
+                }
+
+                if let error = error {
+                    self.kakaoLoginButton.viewStore.send(.showAlert)
+                } else {
+                    let id = String(Int(user?.id ?? 0))
+                    self.kakaoLoginButton.action(id)
                 }
             }
         }
