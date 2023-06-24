@@ -12,7 +12,7 @@ import Foundation
 import ComposableArchitecture
 
 struct FriendsClient {
-    let fetchFriendsList: (FriendType, FriendListSortType) -> FriendList
+    let fetchFriendsList: (FriendListSortType) -> EffectPublisher<Result<[FMFriendDTO], NetworkError>, Never>
 }
 
 extension DependencyValues {
@@ -23,11 +23,10 @@ extension DependencyValues {
 }
 
 extension FriendsClient: DependencyKey {
-    static let liveValue = Self.init { (friendType, sortType) in
-        // TODO: 서버 통신
-        return FriendList(count: 2, nickName: "EOEUNNOO", friendType: friendType, friends: [
-            .init(friendType: friendType, profileImageURL: FIMOStrings.otherProfileImage, name: "CHERISHER_Y", archiveName: "하루", count: 2,  isMyRelationship: true),
-            .init(friendType: friendType, profileImageURL: FIMOStrings.profileImage, name: "0inn", archiveName: "파도의 거품", count: 1, isMyRelationship: true)
-        ])
+    static let liveValue = Self.init { (sortType) in
+        let request = FMFollowMeRequest()
+
+        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            .catchToEffect()
     }
 }

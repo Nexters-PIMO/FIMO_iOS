@@ -13,19 +13,21 @@ import ComposableArchitecture
 struct FriendsListStore: ReducerProtocol {
     struct State: Equatable {
         var id: Int?
+        var userName: String = ""
         var currentTab: FriendType = .mutualFriends
         var selectedSort: FriendListSortType = .newest
-        var friendsList: [FriendList] = Array(repeating: .EMPTY, count: FriendType.allCases.count)
+        var friendsList: [[FMFriend]] = Array(repeating: [FMFriend](), count: FriendType.allCases.count)
 
-        var selectedFriendsList: FriendList {
+        var selectedFriendsList: [FMFriend] {
             return friendsList[currentTab.index]
         }
     }
 
     enum Action: Equatable {
         case onAppear
-        case tappedTab(Int)
+        case tappedTab(String)
         case fetchFriendsList
+        case fetchFriendsListDone(Result<[FMFriendDTO], NetworkError>)
         case tappedNewestButton
         case tappedCharactorOrderButton
         case tappedRequestFriendButton
@@ -38,13 +40,31 @@ struct FriendsListStore: ReducerProtocol {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                return .send(.tappedTab(FriendType.mutualFriends.index))
-            case .tappedTab(let index):
-                state.currentTab = FriendType(rawValue: index) ?? .mutualFriends
-                return .send(.fetchFriendsList)
+                let effects: [EffectTask<FriendsListStore.Action>] = [
+                    .send(.tappedTab(FriendType.mutualFriends.description)),
+                    .send(.fetchFriendsList)
+                ]
+                return .merge(effects)
+            case .tappedTab(let statusName):
+                state.currentTab = FriendType(rawValue: statusName) ?? .mutualFriends
+                return .none
             case .fetchFriendsList:
-                // TODO: Fetch Friends List
-                state.friendsList[state.currentTab.index] = friendsClient.fetchFriendsList(state.currentTab, state.selectedSort)
+                let fetchResult = friendsClient.fetchFriendsList(.newest)
+                return fetchResult.map {
+                    Action.fetchFriendsListDone($0)
+                }
+            case .fetchFriendsListDone(let result):
+                switch result {
+                case .success(let friends):
+                    var array = Array(repeating: [FMFriend](), count: FriendType.allCases.count)
+                    state.friendsList = friends
+                        .reduce(into: array, { result, friendDTO in
+                            let friend = friendDTO.toModel()
+                            result[friend.friendType.index].append(friend)
+                        })
+                case .failure(_):
+                    return .none
+                }
                 return .none
             case .tappedNewestButton:
                 state.selectedSort = .newest
