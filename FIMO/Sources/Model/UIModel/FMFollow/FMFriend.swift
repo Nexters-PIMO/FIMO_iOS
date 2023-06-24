@@ -8,11 +8,11 @@
 
 import Foundation
 
-struct FMFollowMe: Equatable {
+struct FMFriend: Equatable {
     let id: String
     let nickname: String
     let archiveName: String
     let profileImageUrl: String
     let postCount: Int
-    let status: String // FOLLOWING FOLLOWER MUTUAL
+    let status: String // FOLLOWING FOLLOWED MUTUAL
 }
