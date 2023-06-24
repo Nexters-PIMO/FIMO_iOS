@@ -44,22 +44,36 @@ struct AppStore: ReducerProtocol {
             case .hiddenLaunchScreen:
                 state.isLoading = false
                 return .none
+            case .user(let action):
+                switch action {
+                case .changeUnAuthenticated:
+                    state.userState.status = .unAuthenticated
+                    state.tabBarState = TabBarStore.State()
+                case .changeAuthenticated:
+                    state.userState.status = .authenticated
+                    state.unAuthenticatedStore = UnAuthenticatedStore.State()
+                default:
+                    break
+                }
             case .unAuthenticated(let action):
                 switch action {
                 case .profileSetting(.tappedCompleteButton):
-                    state.userState.status = .authenticated
-                    return .none
+                    return .init(value: .user(.changeAuthenticated))
                 case .login(.loginResult(let result)):
                     switch result {
                     case .success(let memberToken):
-                        if state.userState.token == nil {
+                        var effects: [EffectTask<AppStore.Action>] = [
+                            .init(value: .user(.setToken))
+                        ]
+                        if state.unAuthenticatedStore.profileSettingState.userId != "" {
                             state.userState.token = memberToken
                             state.unAuthenticatedStore.path.append(.complete)
                         } else {
                             state.userState.token = memberToken
                             state.userState.status = .authenticated
+                            effects.append(.init(value: .user(.changeAuthenticated)))
                         }
-                        return .init(value: .user(.setToken))
+                        return .merge(effects)
                     case .failure(let error):
                         return .init(value: Action.unAuthenticated(.login(.failureLogin(error))))
                     }
@@ -92,8 +106,9 @@ struct AppStore: ReducerProtocol {
                 ]
                 return .merge(effects)
             default:
-                return .none
+                break
             }
+            return .none
         }
 
         Scope(state: \.appDelegateState, action: /Action.appDelegate) {
