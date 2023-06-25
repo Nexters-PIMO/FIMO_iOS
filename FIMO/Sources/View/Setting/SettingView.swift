@@ -131,8 +131,6 @@ struct SettingView: View {
                 }
                 .padding(.horizontal, 20)
             }
-            .logoutPopup(isShowing: viewStore.binding(\.$isShowLogoutPopup), store: viewStore)
-            .withdrawalPopup(isShowing: viewStore.binding(\.$isShowWithdrawalPopup), store: viewStore)
             .backPopup(isShowing: viewStore.binding(\.$isShowBackPopup), store: viewStore)
             .fullScreenCover(isPresented: viewStore.binding(\.$isSheetPresented)) {
                 IfLetStore(

@@ -12,7 +12,7 @@ import Foundation
 import ComposableArchitecture
 
 struct FriendsClient {
-    let fetchFriendsList: (FriendType) -> FriendList
+    let fetchFriendsList: (FriendType, FriendListSortType) -> FriendList
 }
 
 extension DependencyValues {
@@ -23,7 +23,7 @@ extension DependencyValues {
 }
 
 extension FriendsClient: DependencyKey {
-    static let liveValue = Self.init { friendType in
+    static let liveValue = Self.init { (friendType, sortType) in
         // TODO: 서버 통신
         return FriendList(count: 2, nickName: "EOEUNNOO", friendType: friendType, friends: [
             .init(friendType: friendType, profileImageURL: FIMOStrings.otherProfileImage, name: "CHERISHER_Y", archiveName: "하루", count: 2,  isMyRelationship: true),

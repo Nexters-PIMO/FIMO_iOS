@@ -22,6 +22,8 @@ struct TabBarStore: ReducerProtocol {
         @BindingState var isShowToast: Bool = false
         @BindingState var isShowRemovePopup: Bool = false
         @BindingState var isShowAcceptBackPopup: Bool = false
+        @BindingState var isShowLogoutPopup: Bool = false
+        @BindingState var isShowWithdrawalPopup: Bool = false
         var toastMessage: ToastModel = ToastModel(title: FIMOStrings.textCopyToastTitle,
                                                   message: FIMOStrings.textCopyToastMessage)
         var myProfile: Profile?
@@ -44,6 +46,8 @@ struct TabBarStore: ReducerProtocol {
         case archive(ArchiveStore.Action)
         case deleteFeed
         case acceptBackOnProfileSetting
+        case acceptLogout
+        case acceptWithdrawal
     }
 
     struct CancelID: Hashable {
@@ -122,6 +126,10 @@ struct TabBarStore: ReducerProtocol {
                 case let .dismissBottomSheet(feed):
                     print(feed)
                     state.isSheetPresented = true
+                case .setting(.tappedLogoutButton):
+                    state.isShowLogoutPopup = true
+                case .setting(.tappedWithdrawalButton):
+                    state.isShowWithdrawalPopup = true
                 default:
                     break
                 }
@@ -136,6 +144,10 @@ struct TabBarStore: ReducerProtocol {
                 case let .dismissBottomSheet(feed):
                     print(feed)
                     state.isSheetPresented = true
+                case .setting(.tappedLogoutButton):
+                    state.isShowLogoutPopup = true
+                case .setting(.tappedWithdrawalButton):
+                    state.isShowWithdrawalPopup = true
                 default:
                     break
                 }

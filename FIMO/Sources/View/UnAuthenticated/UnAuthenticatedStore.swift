@@ -51,10 +51,8 @@ struct UnAuthenticatedStore: ReducerProtocol {
                 return .init(value: .resetPageIndex)
                     .delay(for: .milliseconds(1000), scheduler: DispatchQueue.main)
                     .eraseToEffect()
-            case .login(.onSuccessLogin(let onSuccess)):
-                if onSuccess {
-                    state.path.append(.nickName)
-                }
+            case .login(.enterProfileSetting):
+                state.path.append(.nickName)
                 return .none
             case .profileSetting(.tappedNextButtonOnNickname):
                 state.path.append(.archiveName)

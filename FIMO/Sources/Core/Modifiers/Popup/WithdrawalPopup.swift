@@ -11,14 +11,14 @@ import SwiftUI
 import ComposableArchitecture
 
 extension View {
-    func withdrawalPopup(isShowing: Binding<Bool>, store: ViewStore<SettingStore.State, SettingStore.Action>) -> some View {
+    func withdrawalPopup(isShowing: Binding<Bool>, store: ViewStore<TabBarStore.State, TabBarStore.Action>) -> some View {
         return self.modifier(WithdrawalViewModifier(isShowing: isShowing, store: store))
     }
 }
 
 struct WithdrawalViewModifier: ViewModifier {
     @Binding var isShowing: Bool
-    let store: ViewStore<SettingStore.State, SettingStore.Action>
+    let store: ViewStore<TabBarStore.State, TabBarStore.Action>
 
     func body(content: Content) -> some View {
         ZStack {

@@ -18,8 +18,9 @@ enum NetworkErrorType: Equatable {
     case tokenExpired
     case nilValue
     case decodingError
-    case serverError(String)
+    case serverError(ServerErrorType)
     case imgurError(String)
+    case unknownType
     case unknown
 }
 
@@ -32,12 +33,26 @@ extension NetworkError: LocalizedError {
             return "값이 존재하지 않습니다."
         case .decodingError:
             return "디코딩 에러"
-        case .serverError(let errorDescription):
-            return errorDescription
+        case .serverError(let serverErrorType):
+            return serverErrorType.rawValue
         case .imgurError(let errorDescription):
             return errorDescription
+        case .unknownType:
+            return "알 수 없는 타입입니다"
         default:
             return "알 수 없는 에러입니다."
         }
+    }
+}
+
+enum ServerErrorType: String {
+    case userNotFound = "USER_NOT_FOUND"
+    case userAlreadyExist = "USER_ALREADY_EXIST"
+    case unknown
+}
+
+extension ServerErrorType: CustomStringConvertible {
+    var description: String {
+        return self.rawValue
     }
 }

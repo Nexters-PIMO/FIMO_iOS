@@ -14,6 +14,7 @@ import ComposableArchitecture
 struct UserClient {
     let getToken: () -> MemberToken?
     let setToken: (_ token: MemberToken) -> Void
+    let removeToken: () -> Void
 }
 
 extension DependencyValues {
@@ -28,5 +29,7 @@ extension UserClient: DependencyKey {
         UserUtill.shared.getToken()
     } setToken: { token in
         UserUtill.shared.setUserDefaults(key: .token, value: token)
+    } removeToken: {
+        UserUtill.shared.removeValue(of: .token)
     }
 }

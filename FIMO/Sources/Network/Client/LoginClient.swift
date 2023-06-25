@@ -15,6 +15,8 @@ struct LoginClient {
     let getAppleLoginToken: (String) -> EffectPublisher<Result<AppleToken, NetworkError>, Never>
     let encodeAppleLoginToken: (String) -> EffectPublisher<Result<EncodedToken, NetworkError>, Never>
     let encodeKakaoLoginToken: (String) -> EffectPublisher<Result<EncodedToken, NetworkError>, Never>
+
+    let login: (String) -> EffectPublisher<Result<MemberToken, NetworkError>, Never>
 }
 
 extension DependencyValues {
@@ -48,6 +50,12 @@ extension LoginClient: DependencyKey {
             "state": "kakao",
             "token": accessToken
         ])
+        let effect = BaseNetwork.shared.request(api: request, isInterceptive: false)
+            .catchToEffect()
+
+        return effect
+    } login: { userIdentity in
+        let request = FMLoginRequest(identifier: userIdentity)
         let effect = BaseNetwork.shared.request(api: request, isInterceptive: false)
             .catchToEffect()
 

@@ -41,29 +41,24 @@ struct BaseNetwork: BaseNetworkInterface {
             .tryMap({
                 print("----------------------------------- 🌐 Network LOG -----------------------------------\n")
                 print("URL: \(api.baseURL + api.path)\nmethod: \(api.method)\nheader: \(api.header)\nresult: \($0.result)\n")
-                
+
                 guard let responseData = $0.value,
-                      let json = try JSONSerialization.jsonObject(with: responseData) as? [String: Any],
-                      let status = json["status"] as? String,
-                      let message = json["message"] as? String,
-                      let dataJson = json["data"] else {
+                      let data = $0.value else {
+                    throw NetworkError(errorType: .nilValue)
+                }
+
+                if let value = try? BaseNetwork.decoder.decode(API.Response.self, from: data) {
+                    print("🚀 Success\ndata: \(value)\n")
+                    return value
+                } else if let serverDescription = try? decoder.decode(FMServerDescriptionDTO.self, from: responseData),
+                          serverDescription.status != 200 {
+                    print("❌ Fail\nServer Error\nmessage: \(serverDescription.message) code: \(serverDescription.code)")
+                    let serverErrorType = ServerErrorType(rawValue: serverDescription.code) ?? .unknown
+                    throw NetworkError(errorType: .serverError(serverErrorType))
+                } else {
+                    print("❌ Fail\nUnknown Error")
                     throw NetworkError(errorType: .unknown)
                 }
-
-                guard status == "OK" else {
-                    throw NetworkError(errorType: .serverError(message))
-                }
-                
-                guard JSONSerialization.isValidJSONObject(dataJson),
-                      let data = try? JSONSerialization.data(withJSONObject: dataJson),
-                      let value = try? BaseNetwork.decoder.decode(API.Response.self, from: data) else {
-                    print("❌ Fail\ndecodingError")
-                    throw NetworkError(errorType: .decodingError)
-                }
-
-                print("🚀 Success\ndata: \(value)\n")
-                
-                return value
             })
             .mapError({ error in
                 error as? NetworkError ?? .init(errorType: .unknown)
@@ -72,7 +67,8 @@ struct BaseNetwork: BaseNetworkInterface {
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
-    
+
+    @available(*, deprecated)
     func requestWithNoResponse<API: Requestable>(api: API, isInterceptive: Bool) -> AnyPublisher<Bool, NetworkError> {
         session.request(api, interceptor: isInterceptive ? interceptorAuthenticator : nil)
             .validate(statusCode: 200..<500)
@@ -88,10 +84,6 @@ struct BaseNetwork: BaseNetworkInterface {
                       let value = json["data"] as? Bool else {
                     print("❌ Fail\ndecodingError")
                     throw NetworkError(errorType: .unknown)
-                }
-
-                guard status == "OK" else {
-                    throw NetworkError(errorType: .serverError(message))
                 }
 
                 print("🚀 Success\ndata: \(value)\n")

@@ -35,19 +35,22 @@ struct TabBarView: View {
                     )
                     .tag(tabBarItems[1])
                 }
+                .safeAreaInset(edge: .bottom, content: {
+                    TabBar(selected: viewStore.binding(\.$tabBarItem),
+                           profileImage: viewStore.state.myProfile?.profileImgUrl)
+                })
                 .onAppear {
                     viewStore.send(.fetchProfile)
                     UITabBar.appearance().isHidden = true
                 }
-                
-                TabBar(selected: viewStore.binding(\.$tabBarItem),
-                       profileImage: viewStore.state.myProfile?.profileImgUrl)
                 
                 uploadButton(viewStore: viewStore)
             }
             .ignoresSafeArea(.all)
             .toast(isShowing: viewStore.binding(\.$isShowToast), title: viewStore.toastMessage.title)
             .removePopup(isShowing: viewStore.binding(\.$isShowRemovePopup), store: viewStore)
+            .logoutPopup(isShowing: viewStore.binding(\.$isShowLogoutPopup), store: viewStore)
+            .withdrawalPopup(isShowing: viewStore.binding(\.$isShowWithdrawalPopup), store: viewStore)
             .modifyProfileBackPopup(isShowing: viewStore.binding(\.$isShowAcceptBackPopup), store: viewStore)
         }
     }
