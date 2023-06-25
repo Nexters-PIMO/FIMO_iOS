@@ -10,11 +10,22 @@ import Foundation
 
 import Alamofire
 
+enum FMAllPostTarget {
+    case me
+    case another(String)
+}
+
 struct FMAllPostRequest: Requestable {
     typealias Response = [FMPostDTO]
+    let target: FMAllPostTarget
 
     var path: String {
-        return "/post"
+        switch target {
+        case .me:
+            return "/post/"
+        case .another(let userId):
+            return "/post/user/\(userId)"
+        }
     }
 
     var method: HTTPMethod {
