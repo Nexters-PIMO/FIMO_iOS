@@ -15,7 +15,7 @@ struct FMSignUpRequest: Requestable {
     let signUpModel: FMSignUp
 
     var path: String {
-        return "/post/auth/signup"
+        return "/auth/signup"
     }
 
     var method: HTTPMethod {

@@ -15,7 +15,7 @@ struct FMReissueRequest: Requestable {
     let memberToekn: MemberToken
 
     var path: String {
-        return "/post/auth/reissue"
+        return "/auth/reissue"
     }
 
     var method: HTTPMethod {

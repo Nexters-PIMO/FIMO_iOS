@@ -14,7 +14,7 @@ struct FMWithdrawalRequest: Requestable {
     typealias Response = FMServerDescriptionDTO
 
     var path: String {
-        return "/post/auth/withdrawal"
+        return "/auth/withdrawal"
     }
 
     var method: HTTPMethod {
