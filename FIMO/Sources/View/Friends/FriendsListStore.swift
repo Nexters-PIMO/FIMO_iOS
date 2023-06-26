@@ -16,6 +16,14 @@ struct FriendsListStore: ReducerProtocol {
         var userName: String = ""
         var currentTab: FriendType = .mutualFriends
         var selectedSort: FriendListSortType = .newest
+        var rowFriendsList: [FMFriend] = [FMFriend]() {
+            didSet {
+                let array = Array(repeating: [FMFriend](), count: FriendType.allCases.count)
+                friendsList = rowFriendsList.reduce(into: array, { result, friend in
+                    result[friend.friendType.index].append(friend)
+                })
+            }
+        }
         var friendsList: [[FMFriend]] = Array(repeating: [FMFriend](), count: FriendType.allCases.count)
 
         var selectedFriendsList: [FMFriend] {
@@ -30,7 +38,8 @@ struct FriendsListStore: ReducerProtocol {
         case fetchFriendsListDone(Result<[FMFriendDTO], NetworkError>)
         case tappedNewestButton
         case tappedCharactorOrderButton
-        case tappedRequestFriendButton
+        case tappedRequestFriendButton(FMFriend)
+        case tappedRequestFriendDone(FMFriend, Result<FMServerDescriptionDTO, NetworkError>)
         case refreshFriendList
     }
 
@@ -56,28 +65,43 @@ struct FriendsListStore: ReducerProtocol {
             case .fetchFriendsListDone(let result):
                 switch result {
                 case .success(let friends):
-                    var array = Array(repeating: [FMFriend](), count: FriendType.allCases.count)
-                    state.friendsList = friends
-                        .reduce(into: array, { result, friendDTO in
-                            let friend = friendDTO.toModel()
-                            result[friend.friendType.index].append(friend)
-                        })
-                case .failure(_):
+                    state.rowFriendsList = friends.map({ $0.toModel() })
+                case .failure:
                     return .none
                 }
                 return .none
+            case .tappedRequestFriendDone(let friend, let result):
+                switch result {
+                case .success:
+                    var resultFriend = friend
+                    resultFriend.toggleFriendStatus()
+
+                    state.friendsList = state.friendsList.map { innerArray in
+                        innerArray.filter({
+                            $0 != friend
+                        })
+                    }
+
+                    if !resultFriend.willDelete {
+                        state.friendsList[resultFriend.friendType.index].append(resultFriend)
+                    }
+
+                    return .none
+                case .failure:
+                    return .none
+                }
             case .tappedNewestButton:
                 state.selectedSort = .newest
                 return .none
             case .tappedCharactorOrderButton:
                 state.selectedSort = .characterOrder
                 return .none
-            case .tappedRequestFriendButton:
-                #warning("친구 추가 버튼 네트워크")
-                return .none
             case .refreshFriendList:
                 return .send(.fetchFriendsList)
+            default:
+                break
             }
+            return .none
         }
     }
 }

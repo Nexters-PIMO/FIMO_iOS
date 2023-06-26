@@ -24,6 +24,7 @@ struct TabBarStore: ReducerProtocol {
         @BindingState var isShowAcceptBackPopup: Bool = false
         @BindingState var isShowLogoutPopup: Bool = false
         @BindingState var isShowWithdrawalPopup: Bool = false
+        @BindingState var isShowFriendshipPopup: Bool = false
         var toastMessage: ToastModel = ToastModel(title: FIMOStrings.textCopyToastTitle,
                                                   message: FIMOStrings.textCopyToastMessage)
         var myProfile: Profile?
@@ -32,6 +33,7 @@ struct TabBarStore: ReducerProtocol {
         var archiveState = ArchiveStore.State()
         var feedId: Int?
         var deleteAt: DeleteAt?
+        var selectedFriend: FMFriend?
     }
     
     enum Action: BindableAction, Equatable {
@@ -48,6 +50,7 @@ struct TabBarStore: ReducerProtocol {
         case acceptBackOnProfileSetting
         case acceptLogout
         case acceptWithdrawal
+        case acceptFriendship(FMFriend)
     }
 
     struct CancelID: Hashable {
@@ -56,6 +59,7 @@ struct TabBarStore: ReducerProtocol {
     
     @Dependency(\.profileClient) var profileClient
     @Dependency(\.feedClient) var feedClient
+    @Dependency(\.friendsClient) var friendsClient
     
     var body: some ReducerProtocol<State, Action> {
         BindingReducer()
@@ -148,8 +152,23 @@ struct TabBarStore: ReducerProtocol {
                     state.isShowLogoutPopup = true
                 case .setting(.tappedWithdrawalButton):
                     state.isShowWithdrawalPopup = true
+                case .friends(.tappedRequestFriendButton(let friend)):
+                    state.selectedFriend = friend
+                    state.isShowFriendshipPopup = true
+                    return .none
                 default:
                     break
+                }
+            case .acceptFriendship(let friend):
+                switch friend.friendType.friendshipInteraction {
+                case .follow:
+                    return friendsClient.followFriend(friend.id).map{
+                        Action.archive(.friends(.tappedRequestFriendDone(friend, $0)))
+                    }
+                case .unfollow:
+                    return friendsClient.unfollowFriend(friend.id).map{
+                        Action.archive(.friends(.tappedRequestFriendDone(friend, $0)))
+                    }
                 }
             case .deleteFeed:
                 guard let feedId = state.feedId else {

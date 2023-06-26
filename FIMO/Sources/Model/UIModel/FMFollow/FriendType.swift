@@ -59,6 +59,15 @@ enum FriendType: String {
             return Image(uiImage: FIMOAsset.Assets.theirFriendsNoActive.image)
         }
     }
+
+    var friendshipInteraction: FriendshipDescriptionType {
+        switch self {
+        case .mutualFriends, .myFriends:
+            return .unfollow
+        case .theirFriends:
+            return .follow
+        }
+    }
 }
 
 extension FriendType: CaseIterable, CustomStringConvertible {

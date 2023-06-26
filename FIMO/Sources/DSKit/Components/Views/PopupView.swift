@@ -8,13 +8,15 @@
 
 import SwiftUI
 
+import Kingfisher
+
 struct PopupView: View {
-    private var image: Image?
+    private var image: KFImage?
     private var title: String
     private var message: String
     private var popupButtons: [PopupButton]
 
-    init(image: Image? = nil, title: String, message: String, popupButtons: [PopupButton]) {
+    init(image: KFImage? = nil, title: String, message: String, popupButtons: [PopupButton]) {
         self.image = image
         self.title = title
         self.message = message
@@ -30,6 +32,7 @@ struct PopupView: View {
                     VStack(spacing: image == nil ? 10 : 12) {
                         image?
                             .resizable()
+                            .aspectRatio(0.7, contentMode: .fill)
                             .frame(width: 56, height: 56)
                             .mask({
                                 Circle()

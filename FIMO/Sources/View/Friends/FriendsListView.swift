@@ -79,7 +79,7 @@ struct FriendsListView: View {
                 .font(.system(size: 12))
 
             Button {
-                store.send(.tappedRequestFriendButton)
+                store.send(.tappedRequestFriendButton(friend))
             } label: {
                 friend.friendType.image
                     .resizable()

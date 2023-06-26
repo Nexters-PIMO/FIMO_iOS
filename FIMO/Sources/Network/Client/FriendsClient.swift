@@ -13,6 +13,8 @@ import ComposableArchitecture
 
 struct FriendsClient {
     let fetchFriendsList: (FriendListSortType) -> EffectPublisher<Result<[FMFriendDTO], NetworkError>, Never>
+    let followFriend: (String) -> EffectPublisher<Result<FMServerDescriptionDTO, NetworkError>, Never>
+    let unfollowFriend: (String) -> EffectPublisher<Result<FMServerDescriptionDTO, NetworkError>, Never>
 }
 
 extension DependencyValues {
@@ -25,6 +27,16 @@ extension DependencyValues {
 extension FriendsClient: DependencyKey {
     static let liveValue = Self.init { (sortType) in
         let request = FMFollowMeRequest()
+
+        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            .catchToEffect()
+    } followFriend: { id in
+        let request = FMFollowingRequest(followerID: id)
+
+        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            .catchToEffect()
+    } unfollowFriend: { id in
+        let request = FMUnfollowingRequest(unfollowerID: id)
 
         return BaseNetwork.shared.request(api: request, isInterceptive: true)
             .catchToEffect()
