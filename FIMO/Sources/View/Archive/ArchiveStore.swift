@@ -44,7 +44,7 @@ struct ArchiveStore: ReducerProtocol {
         var toastMessage: ToastModel = ToastModel(title: FIMOStrings.textCopyToastTitle,
                                                   message: FIMOStrings.textCopyToastMessage)
         var archiveType: ArchiveType = .myArchive
-        var archiveProfile: Profile = .EMPTY
+        var archiveProfile: FMProfile = .EMPTY
         var gridFeeds: [Feed] = []
         var feeds: IdentifiedArrayOf<FeedStore.State> = []
         var pushToSettingView: Bool = false
@@ -65,7 +65,7 @@ struct ArchiveStore: ReducerProtocol {
         case sendToastDone
         case onAppear
         case refresh
-        case fetchArchiveProfile(Result<Profile, NetworkError>)
+        case fetchArchiveProfile(Result<FMProfileDTO, NetworkError>)
         case fetchArchiveFeeds(Result<[FeedDTO], NetworkError>)
         case fetchFeed(Result<FeedDTO, NetworkError>)
         case feed(id: FeedStore.State.ID, action: FeedStore.Action)
@@ -74,7 +74,7 @@ struct ArchiveStore: ReducerProtocol {
         case friendListButtonDidTap
         case feedsTypeButtonDidTap(FeedsType)
         case feedDidTap(Int)
-        case receiveProfileInfo(Profile)
+        case receiveProfileInfo(FMProfile)
         case feedDetail(FeedStore.Action)
         case friends(FriendsListStore.Action)
         case setting(SettingStore.Action)
@@ -110,7 +110,7 @@ struct ArchiveStore: ReducerProtocol {
             case .onAppear:
                 state.isLoading = true
                 return .merge(
-                    profileClient.fetchMyProfile().map {
+                    profileClient.myProfile().map {
                         Action.fetchArchiveProfile($0)
                     },
                     archiveClient.fetchArchiveFeeds().map {
@@ -129,7 +129,7 @@ struct ArchiveStore: ReducerProtocol {
             case let .fetchArchiveProfile(result):
                 switch result {
                 case let .success(profile):
-                    state.archiveProfile = profile
+                    state.archiveProfile = profile.toModel()
                 default:
                     print("error")
                 }
@@ -200,16 +200,16 @@ struct ArchiveStore: ReducerProtocol {
                 }
                 break
             case .receiveProfileInfo(let profile):
-                state.setting = SettingStore.State(nickname: profile.nickName,
-                                                   archiveName: state.archiveProfile.nickName,
-                                                   imageURLString: profile.profileImgUrl)
+                state.setting = SettingStore.State(nickname: profile.nickname,
+                                                   archiveName: profile.archiveName,
+                                                   imageURLString: profile.profileImageUrl)
                 state.path.append(.setting)
             case .setting(.tappedLicenceButton):
                 state.path.append(.openSourceLicence)
             case .friendListButtonDidTap:
                 state.pushToFriendView = true
                 #warning("Friend List 받아오는 매개변수 주입 필요")
-                state.friends = FriendsListStore.State(id: 0)
+                state.friends = FriendsListStore.State(id: 0, userName: state.archiveProfile.nickname)
                 state.path.append(.friends)
             case let .feedsTypeButtonDidTap(type):
                 state.feedsType = type

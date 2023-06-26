@@ -27,7 +27,7 @@ struct TabBarStore: ReducerProtocol {
         @BindingState var isShowFriendshipPopup: Bool = false
         var toastMessage: ToastModel = ToastModel(title: FIMOStrings.textCopyToastTitle,
                                                   message: FIMOStrings.textCopyToastMessage)
-        var myProfile: Profile?
+        var myProfile: FMProfile?
         var homeState = HomeStore.State()
         var uploadState = UploadStore.State()
         var archiveState = ArchiveStore.State()
@@ -41,7 +41,7 @@ struct TabBarStore: ReducerProtocol {
         case sendToast(ToastModel)
         case sendToastDone
         case fetchProfile
-        case fetchProfileDone(Result<Profile, NetworkError>)
+        case fetchProfileDone(Result<FMProfileDTO, NetworkError>)
         case setSheetState
         case home(HomeStore.Action)
         case upload(UploadStore.Action)
@@ -80,13 +80,13 @@ struct TabBarStore: ReducerProtocol {
             case .sendToastDone:
                 state.isShowToast = false
             case .fetchProfile:
-                return profileClient.fetchMyProfile()
+                return profileClient.myProfile()
                     .map(Action.fetchProfileDone)
                     .cancellable(id: TabBarStore.CancelID())
             case .fetchProfileDone(let result):
                 switch result {
                 case .success(let myProfile):
-                    state.myProfile = myProfile
+                    state.myProfile = myProfile.toModel()
                 case .failure(let error):
                     state.toastMessage = .init(title: error.errorDescription ?? "")
                     state.isShowToast = true
@@ -96,12 +96,12 @@ struct TabBarStore: ReducerProtocol {
             case .upload(.didTapCloseButton):
                 state.isSheetPresented = false
             case .home(.settingButtonDidTap):
-                return .send(.home(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
+                return .send(.home(.receiveProfileInfo(state.myProfile ?? FMProfile.EMPTY)))
             case .home(.bottomSheet(.deleteButtonDidTap(let feedId))):
                 state.isShowRemovePopup = true
                 let _ = print(feedId)
             case .archive(.settingButtonDidTap):
-                return .send(.archive(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
+                return .send(.archive(.receiveProfileInfo(state.myProfile ?? FMProfile.EMPTY)))
             case .archive(.bottomSheet(.deleteButtonDidTap(let feedId))):
                 state.isShowRemovePopup = true
                 let _ = print(feedId)
@@ -122,7 +122,7 @@ struct TabBarStore: ReducerProtocol {
             case let .home(action):
                 switch action {
                 case .settingButtonDidTap:
-                    return .send(.home(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
+                    return .send(.home(.receiveProfileInfo(state.myProfile ?? FMProfile.EMPTY)))
                 case let .bottomSheet(.deleteButtonDidTap(feedId)):
                     state.isShowRemovePopup = true
                     state.feedId = feedId
@@ -140,7 +140,7 @@ struct TabBarStore: ReducerProtocol {
             case let .archive(action):
                 switch action {
                 case .settingButtonDidTap:
-                    return .send(.archive(.receiveProfileInfo(state.myProfile ?? Profile.EMPTY)))
+                    return .send(.archive(.receiveProfileInfo(state.myProfile ?? FMProfile.EMPTY)))
                 case let .bottomSheet(.deleteButtonDidTap(feedId)):
                     state.isShowRemovePopup = true
                     state.feedId = feedId

@@ -13,7 +13,7 @@ import ComposableArchitecture
 struct FriendsListStore: ReducerProtocol {
     struct State: Equatable {
         var id: Int?
-        var userName: String = ""
+        var userName: String?
         var currentTab: FriendType = .mutualFriends
         var selectedSort: FriendListSortType = .newest
         var rowFriendsList: [FMFriend] = [FMFriend]() {

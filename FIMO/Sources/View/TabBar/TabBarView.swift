@@ -37,7 +37,7 @@ struct TabBarView: View {
                 }
                 .safeAreaInset(edge: .bottom, content: {
                     TabBar(selected: viewStore.binding(\.$tabBarItem),
-                           profileImage: viewStore.state.myProfile?.profileImgUrl)
+                           profileImage: viewStore.state.myProfile?.profileImageUrl)
                 })
                 .onAppear {
                     viewStore.send(.fetchProfile)

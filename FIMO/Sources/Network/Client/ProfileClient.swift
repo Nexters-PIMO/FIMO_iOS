@@ -25,6 +25,7 @@ struct ProfileClient {
     let isExistsNickname: (String) -> EffectTask<Result<Bool, NetworkError>>
     let isExistsArchiveName: (String) -> EffectTask<Result<Bool, NetworkError>>
     let signUp: (FMSignUp) -> EffectTask<Result<FMServerDescriptionDTO, NetworkError>>
+    let myProfile: () -> EffectTask<Result<FMProfileDTO, NetworkError>>
 }
 
 extension DependencyValues {
@@ -87,6 +88,11 @@ extension ProfileClient: DependencyKey {
             .catchToEffect()
     } signUp: { signUpModel in
         let request = FMSignUpRequest(signUpModel: signUpModel)
+
+        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            .catchToEffect()
+    } myProfile: {
+        let request = FMMyProfileRequest()
 
         return BaseNetwork.shared.request(api: request, isInterceptive: true)
             .catchToEffect()

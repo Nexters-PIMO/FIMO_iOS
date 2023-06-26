@@ -15,3 +15,13 @@ struct FMProfile: Equatable {
     let profileImageUrl: String
     let postCount: Int
 }
+
+extension FMProfile {
+    static let EMPTY: FMProfile = FMProfile(
+        id: "",
+        nickname: "",
+        archiveName: "",
+        profileImageUrl: "",
+        postCount: 0
+    )
+}
