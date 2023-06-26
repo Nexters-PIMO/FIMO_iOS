@@ -145,18 +145,15 @@ struct HomeStore: ReducerProtocol {
                     print("error")
                 }
             case .receiveProfileInfo(let profile):
-                state.setting = SettingStore.State(nickname: profile.nickname,
-                                                   archiveName: profile.archiveName,
-                                                   imageURLString: profile.profileImageUrl)
+                state.setting = SettingStore.State(profile: profile)
                 state.path.append(.setting)
             case .setting(.tappedLicenceButton):
                 state.path.append(.openSourceLicence)
             case .setting(.tappedProfileManagementButton):
-#warning("API연결")
                 state.profile = ProfileSettingStore.State(
-                    nickname: state.setting?.nickname ?? "",
-                    archiveName: "",
-                    selectedImageURL: state.setting?.imageURLString ?? ""
+                    nickname: state.setting?.profile.nickname ?? "",
+                    archiveName: state.setting?.profile.archiveName ?? "",
+                    selectedImageURL: state.setting?.profile.profileImageUrl ?? ""
                 )
                 state.path.append(.modifyProfile)
             default:

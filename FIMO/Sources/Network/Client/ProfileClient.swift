@@ -26,6 +26,7 @@ struct ProfileClient {
     let isExistsArchiveName: (String) -> EffectTask<Result<Bool, NetworkError>>
     let signUp: (FMSignUp) -> EffectTask<Result<FMServerDescriptionDTO, NetworkError>>
     let myProfile: () -> EffectTask<Result<FMProfileDTO, NetworkError>>
+    let updateProfile: (_ nickname: String, _ archiveName: String, _ profileImageUrl: String) -> EffectTask<Result<FMProfileDTO, NetworkError>>
 }
 
 extension DependencyValues {
@@ -96,6 +97,14 @@ extension ProfileClient: DependencyKey {
 
         return BaseNetwork.shared.request(api: request, isInterceptive: true)
             .catchToEffect()
-    }
+    } updateProfile: { (nickname, archiveName, profileImageUrl) in
+        let request = FMUserProfileUpdateRequest(
+            nickname: nickname,
+            archiveName: archiveName,
+            profileImageUrl: profileImageUrl
+        )
 
+        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            .catchToEffect()
+    }
 }

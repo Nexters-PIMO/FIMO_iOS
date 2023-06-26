@@ -20,7 +20,7 @@ struct SettingView: View {
                 CustomNavigationBar(title: "설정")
 
                 HStack(alignment: .center) {
-                    KFImage(URL(string: viewStore.imageURLString))
+                    KFImage(URL(string: viewStore.profile.profileImageUrl))
                         .retry(maxCount: 3, interval: .seconds(5))
                         .cacheOriginalImage()
                         .resizable()
@@ -35,10 +35,10 @@ struct SettingView: View {
                         }
 
                     VStack(alignment: .leading, spacing: 7) {
-                        Text(viewStore.nickname)
+                        Text(viewStore.profile.nickname)
                             .font(.system(size: 16, weight: .medium))
 
-                        Text(viewStore.archiveName)
+                        Text(viewStore.profile.archiveName)
                             .font(.system(size: 16))
                             .foregroundColor(Color(FIMOAsset.Assets.grayText.color))
                     }

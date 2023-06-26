@@ -119,6 +119,9 @@ struct TabBarStore: ReducerProtocol {
             case .archive(.profile(.tappedBackButton)):
                 state.isShowAcceptBackPopup = true
                 return .none
+
+                // MARK: Home
+
             case let .home(action):
                 switch action {
                 case .settingButtonDidTap:
@@ -134,9 +137,24 @@ struct TabBarStore: ReducerProtocol {
                     state.isShowLogoutPopup = true
                 case .setting(.tappedWithdrawalButton):
                     state.isShowWithdrawalPopup = true
+                case .profile(.modifyProfileDone(let result)):
+                    switch result {
+                    case .success(let profileDTO):
+                        let profile = profileDTO.toModel()
+                        state.myProfile = profile
+                        state.archiveState.archiveProfile = profile
+                        state.homeState.setting?.profile = profile
+                        state.homeState.path.removeLast()
+                        return .none
+                    case .failure(let error):
+                        return .init(value: .sendToast(ToastModel(title: error.errorDescription ?? "")))
+                    }
                 default:
                     break
                 }
+
+                // MARK: Archive
+
             case let .archive(action):
                 switch action {
                 case .settingButtonDidTap:
@@ -156,6 +174,18 @@ struct TabBarStore: ReducerProtocol {
                     state.selectedFriend = friend
                     state.isShowFriendshipPopup = true
                     return .none
+                case .profile(.modifyProfileDone(let result)):
+                    switch result {
+                    case .success(let profileDTO):
+                        let profile = profileDTO.toModel()
+                        state.myProfile = profile
+                        state.archiveState.archiveProfile = profile
+                        state.archiveState.setting?.profile = profile
+                        state.archiveState.path.removeLast()
+                        return .none
+                    case .failure(let error):
+                        return .init(value: .sendToast(ToastModel(title: error.errorDescription ?? "")))
+                    }
                 default:
                     break
                 }

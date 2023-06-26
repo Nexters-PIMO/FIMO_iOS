@@ -72,6 +72,7 @@ struct ProfileSettingStore: ReducerProtocol {
         case tappedCompleteButton
 
         case tappedCompleteModifyButton
+        case modifyProfileDone(Result<FMProfileDTO, NetworkError>)
         case tappedBackButton
 
         case acceptBack
@@ -206,9 +207,15 @@ struct ProfileSettingStore: ReducerProtocol {
                     return .none
                 }
             case .tappedCompleteModifyButton:
-#warning("수정 네비게이션 적용")
+                let result = profileClient.updateProfile(
+                    state.nickname,
+                    state.archiveName,
+                    state.selectedImageURL ?? ""
+                )
 
-                return .none
+                return result.map {
+                    Action.modifyProfileDone($0)
+                }
             case .signUpOnProfilePicture:
                 guard let imageURL = state.selectedImageURL else {
                     Log.error("이미지 URL이 없습니다.")
@@ -227,8 +234,6 @@ struct ProfileSettingStore: ReducerProtocol {
                 return signupResult.map {
                     Action.signUpDone($0)
                 }
-            case .tappedBackButton:
-                return .none
             default:
                 return .none
             }
