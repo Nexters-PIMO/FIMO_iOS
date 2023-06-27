@@ -42,7 +42,7 @@ struct HomeStore: ReducerProtocol {
         case fetchFeedProfile(Result<Profile, NetworkError>)
         case feed(id: FeedStore.State.ID, action: FeedStore.Action)
         case settingButtonDidTap
-        case receiveProfileInfo(Profile)
+        case receiveProfileInfo(FMProfile)
         case setting(SettingStore.Action)
         case onboarding(OnboardingStore.Action)
         case bottomSheet(BottomSheetStore.Action)
@@ -145,19 +145,15 @@ struct HomeStore: ReducerProtocol {
                     print("error")
                 }
             case .receiveProfileInfo(let profile):
-#warning("API연결")
-                state.setting = SettingStore.State(nickname: profile.nickName,
-                                                   archiveName: "",
-                                                   imageURLString: profile.profileImgUrl)
+                state.setting = SettingStore.State(profile: profile)
                 state.path.append(.setting)
             case .setting(.tappedLicenceButton):
                 state.path.append(.openSourceLicence)
             case .setting(.tappedProfileManagementButton):
-#warning("API연결")
                 state.profile = ProfileSettingStore.State(
-                    nickname: state.setting?.nickname ?? "",
-                    archiveName: "",
-                    selectedImageURL: state.setting?.imageURLString ?? ""
+                    nickname: state.setting?.profile.nickname ?? "",
+                    archiveName: state.setting?.profile.archiveName ?? "",
+                    selectedImageURL: state.setting?.profile.profileImageUrl ?? ""
                 )
                 state.path.append(.modifyProfile)
             default:

@@ -12,7 +12,7 @@ import ComposableArchitecture
 
 extension ArchiveView {
     struct ArchiveViewState: Equatable {
-        let archiveProfile: Profile
+        let archiveProfile: FMProfile
         let archiveType: ArchiveType
         
         init(_ state: ArchiveStore.State) {
@@ -25,7 +25,7 @@ extension ArchiveView {
     var archiveTopBar: some View {
         WithViewStore(self.store, observe: ArchiveViewState.init) { viewStore in
             HStack {
-                Text(viewStore.archiveProfile.nickName)
+                Text(viewStore.archiveProfile.nickname)
                     .font(Font(FIMOFontFamily.Pretendard.semiBold.font(size: 24)))
                     .foregroundColor(.black)
                 

@@ -51,7 +51,8 @@ struct UnAuthenticatedStore: ReducerProtocol {
                 return .init(value: .resetPageIndex)
                     .delay(for: .milliseconds(1000), scheduler: DispatchQueue.main)
                     .eraseToEffect()
-            case .login(.enterProfileSetting):
+            case .login(.enterProfileSetting(let userId)):
+                state.profileSettingState.userId = userId
                 state.path.append(.nickName)
                 return .none
             case .profileSetting(.tappedNextButtonOnNickname):
@@ -60,12 +61,26 @@ struct UnAuthenticatedStore: ReducerProtocol {
             case .profileSetting(.tappedNextButtonOnArchive):
                 state.path.append(.profilePicture)
                 return .none
-            case .profileSetting(.tappedNextButtonOnProfilePicture):
-                state.path.append(.complete)
-                return .none
             case .resetPageIndex:
                 state.onboardingState.pageType = .one
                 return .none
+            case .profileSetting(.signUpDone(let result)):
+                switch result {
+                case .success(let serverDescriptionDTO):
+                    let serverDescription = serverDescriptionDTO.toModel()
+                    switch serverDescription.status {
+                    case 200:
+                        return .init(value: .login(.loginAgain))
+                    case 409:
+                        state.path.removeAll(where: { $0 == .profilePicture || $0 == .archiveName  })
+                    default:
+                        break
+                    }
+                    return .none
+                case .failure:
+                    state.path.removeAll(where: { $0 == .profilePicture || $0 == .archiveName  })
+                    return .none
+                }
             default:
                 return .none
             }

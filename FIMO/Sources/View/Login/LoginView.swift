@@ -45,12 +45,12 @@ struct LoginView: View {
                         .foregroundColor(.white)
                         .padding(.top, 0)
                         .padding(.bottom, 18)
-                    KakaoLoginButton(viewStore: viewStore) { (accessToken, refreshToken) in
+                    KakaoLoginButton(viewStore: viewStore) { id in
                         DispatchQueue.main.async {
-                            viewStore.send(.tappedKakaoLoginButton(accessToken, refreshToken))
+                            viewStore.send(.tappedKakaoLoginButton(id))
                         }
                     }
-                    .alert("로그인이 실패했습니다", isPresented: viewStore.$isAlertShowing) {
+                    .alert("로그인이 실패했습니다", isPresented: viewStore.binding(\.$isAlertShowing)) {
                         Button("확인", role: .cancel) {
                             viewStore.send(.tappedAlertOKButton)
                         }

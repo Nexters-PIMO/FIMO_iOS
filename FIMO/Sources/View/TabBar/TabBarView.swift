@@ -37,7 +37,7 @@ struct TabBarView: View {
                 }
                 .safeAreaInset(edge: .bottom, content: {
                     TabBar(selected: viewStore.binding(\.$tabBarItem),
-                           profileImage: viewStore.state.myProfile?.profileImgUrl)
+                           profileImage: viewStore.state.myProfile?.profileImageUrl)
                 })
                 .onAppear {
                     viewStore.send(.fetchProfile)
@@ -52,6 +52,7 @@ struct TabBarView: View {
             .logoutPopup(isShowing: viewStore.binding(\.$isShowLogoutPopup), store: viewStore)
             .withdrawalPopup(isShowing: viewStore.binding(\.$isShowWithdrawalPopup), store: viewStore)
             .modifyProfileBackPopup(isShowing: viewStore.binding(\.$isShowAcceptBackPopup), store: viewStore)
+            .friendshipPopup(isShowing: viewStore.binding(\.$isShowFriendshipPopup), store: viewStore, selectedFriend: viewStore.selectedFriend ?? .EMPTY)
         }
     }
     

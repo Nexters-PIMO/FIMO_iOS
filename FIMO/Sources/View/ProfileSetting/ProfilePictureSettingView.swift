@@ -95,7 +95,7 @@ struct ProfilePictureSettingView: View {
 
     func nextButton(_ viewStore: ViewStore<ProfileSettingStore.State, ProfileSettingStore.Action>) -> some View {
         Button {
-            viewStore.send(.tappedNextButtonOnProfilePicture)
+            viewStore.send(.signUpOnProfilePicture)
         } label: {
             Text("완료")
                 .font(.system(size: 16))

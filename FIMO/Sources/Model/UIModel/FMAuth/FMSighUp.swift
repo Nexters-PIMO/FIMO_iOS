@@ -14,4 +14,12 @@ struct FMSignUp: Equatable {
     let nickname: String
     let archiveName: String
     let profileImageUrl: String
+
+    init(provider: String = "iOS", identifier: String, nickname: String, archiveName: String, profileImageUrl: String) {
+        self.provider = provider
+        self.identifier = identifier
+        self.nickname = nickname
+        self.archiveName = archiveName
+        self.profileImageUrl = profileImageUrl
+    }
 }

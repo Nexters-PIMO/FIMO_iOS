@@ -20,6 +20,13 @@ struct ProfileClient {
     let patchNickname: (String) -> EffectTask<Result<Profile, NetworkError>>
     let patchArchiveName: (String) -> EffectTask<Result<Profile, NetworkError>>
     let patchProfileImage: (String) -> EffectTask<Result<Profile, NetworkError>>
+
+    // 새로운 API 적용
+    let isExistsNickname: (String) -> EffectTask<Result<Bool, NetworkError>>
+    let isExistsArchiveName: (String) -> EffectTask<Result<Bool, NetworkError>>
+    let signUp: (FMSignUp) -> EffectTask<Result<FMServerDescriptionDTO, NetworkError>>
+    let myProfile: () -> EffectTask<Result<FMProfileDTO, NetworkError>>
+    let updateProfile: (_ nickname: String, _ archiveName: String, _ profileImageUrl: String) -> EffectTask<Result<FMProfileDTO, NetworkError>>
 }
 
 extension DependencyValues {
@@ -70,6 +77,34 @@ extension ProfileClient: DependencyKey {
 
         return BaseNetwork.shared.request(api: request, isInterceptive: true)
             .catchToEffect()
-    }
+    } isExistsNickname: { nickname in
+        let request = FMUserValidateRequest(target: .nickname(name: nickname))
 
+        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            .catchToEffect()
+    } isExistsArchiveName: { archiveName in
+        let request = FMUserValidateRequest(target: .archive(name: archiveName))
+
+        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            .catchToEffect()
+    } signUp: { signUpModel in
+        let request = FMSignUpRequest(signUpModel: signUpModel)
+
+        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            .catchToEffect()
+    } myProfile: {
+        let request = FMMyProfileRequest()
+
+        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            .catchToEffect()
+    } updateProfile: { (nickname, archiveName, profileImageUrl) in
+        let request = FMUserProfileUpdateRequest(
+            nickname: nickname,
+            archiveName: archiveName,
+            profileImageUrl: profileImageUrl
+        )
+
+        return BaseNetwork.shared.request(api: request, isInterceptive: true)
+            .catchToEffect()
+    }
 }

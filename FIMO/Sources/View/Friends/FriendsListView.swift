@@ -18,7 +18,7 @@ struct FriendsListView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack(spacing: 0) {
-                CustomNavigationBar(title: viewStore.selectedFriendsList.nickName)
+                CustomNavigationBar(title: viewStore.userName ?? "")
 
                 header(viewStore)
 
@@ -40,16 +40,16 @@ struct FriendsListView: View {
 
     func friendsList(_ store: ViewStore<FriendsListStore.State, FriendsListStore.Action>) -> some View {
         LazyVStack {
-            ForEach(store.selectedFriendsList.friends, id: \.self) { friend in
+            ForEach(store.selectedFriendsList, id: \.self) { friend in
                 friendCell(store, friend: friend)
             }
         }
         .padding(.horizontal, 20)
     }
 
-    func friendCell(_ store: ViewStore<FriendsListStore.State, FriendsListStore.Action>, friend: Friend) -> some View {
+    func friendCell(_ store: ViewStore<FriendsListStore.State, FriendsListStore.Action>, friend: FMFriend) -> some View {
         HStack {
-            KFImage(URL(string: friend.profileImageURL))
+            KFImage(URL(string: friend.profileImageUrl))
                 .retry(maxCount: 3, interval: .seconds(5))
                 .cacheOriginalImage()
                 .resizable()
@@ -64,7 +64,7 @@ struct FriendsListView: View {
                 }
 
             VStack(alignment: .leading, spacing: 5) {
-                Text(friend.name)
+                Text(friend.nickname)
                     .font(.system(size: 16, weight: .semibold))
                 Text(friend.archiveName)
                     .font(.system(size: 14))
@@ -74,22 +74,14 @@ struct FriendsListView: View {
 
             Spacer()
 
-            Text("글사진 \(friend.count)개")
+            Text("글사진 \(friend.postCount)개")
                 .foregroundColor(Color(FIMOAsset.Assets.grayText.color))
                 .font(.system(size: 12))
 
-            if friend.isMyRelationship {
-                Button {
-                    store.send(.tappedRequestFriendButton)
-                } label: {
-                    friend.friendType.image
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 28)
-                        .padding(.leading, 19)
-                }
-            } else {
-                friend.friendType.noRelationshipImage
+            Button {
+                store.send(.tappedRequestFriendButton(friend))
+            } label: {
+                friend.friendType.image
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 28)
@@ -106,7 +98,7 @@ struct FriendsListView: View {
                 Spacer(minLength: 30)
 
                 ForEach(FriendType.allCases, id: \.self) { type in
-                    tabBarItem(store, title: type.title, count: store.selectedFriendsList.count, index: type.index)
+                    tabBarItem(store, title: type.title, count: store.friendsList[type.index].count, type: type)
                 }
 
                 Spacer(minLength: 30)
@@ -163,9 +155,9 @@ struct FriendsListView: View {
         .frame(height: 164)
     }
 
-    func tabBarItem(_ store: ViewStore<FriendsListStore.State, FriendsListStore.Action>, title: String, count: Int, index: Int) -> some View {
+    func tabBarItem(_ store: ViewStore<FriendsListStore.State, FriendsListStore.Action>, title: String, count: Int, type: FriendType) -> some View {
         Button {
-            store.send(.tappedTab(index))
+            store.send(.tappedTab(type.description))
         } label: {
             VStack {
                 VStack(spacing: 6) {
@@ -174,7 +166,7 @@ struct FriendsListView: View {
                         .font(.system(size: 18, weight: .medium))
                     Text(title)
                         .foregroundColor(
-                            store.currentTab.index == index
+                            store.currentTab.index == type.index
                             ? .black
                             : Color(FIMOAsset.Assets.grayText.color)
                         )
@@ -182,7 +174,7 @@ struct FriendsListView: View {
                 }
                 .padding(.top, 17)
 
-                if store.currentTab.index == index {
+                if store.currentTab.index == type.index {
                     Color.black
                         .frame(width: 77, height: 1)
                         .matchedGeometryEffect(id: "underLine", in: underLine)

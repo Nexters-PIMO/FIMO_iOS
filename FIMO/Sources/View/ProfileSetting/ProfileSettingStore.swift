@@ -24,6 +24,9 @@ struct ProfileSettingStore: ReducerProtocol {
         var toastMessage: ToastModel = ToastModel(title: FIMOStrings.textCopyToastTitle,
                                                   message: FIMOStrings.textCopyToastMessage)
 
+        // 회원가입 제출용 유저 식별자
+        var userId: String = ""
+
         // MARK: 닉네임 설정
         @BindingState var nickname: String = ""
         var nicknameValidationType: CheckValidationType = .blank
@@ -57,16 +60,19 @@ struct ProfileSettingStore: ReducerProtocol {
 
         case tappedImagePickerButton
         case checkDuplicateOnArchive
+        case checkDuplicateOnArchiveNameDone(Result<Bool, NetworkError>)
         case tappedNextButtonOnArchive
 
         case selectProfileImage(UIImage)
         case fetchImageURL
         case fetchImageURLDone(Result<ImgurImageModel, NetworkError>)
-        case tappedNextButtonOnProfilePicture
+        case signUpOnProfilePicture
+        case signUpDone(Result<FMServerDescriptionDTO, NetworkError>)
 
         case tappedCompleteButton
 
         case tappedCompleteModifyButton
+        case modifyProfileDone(Result<FMProfileDTO, NetworkError>)
         case tappedBackButton
 
         case acceptBack
@@ -114,23 +120,23 @@ struct ProfileSettingStore: ReducerProtocol {
 
                 return .none
             case .checkDuplicateOnNickName:
-                guard state.nicknameValidationType == .blank else {
+                guard state.nicknameValidationType == .beforeDuplicateCheck else {
                     return .none
                 }
 
-                return profileClient.fetchIsExistsNickname(state.nickname)
+                return profileClient.isExistsNickname(state.nickname)
                     .map {
                         Action.checkDuplicateOnNickNameDone($0)
                     }
             case .checkDuplicateOnNickNameDone(let result):
                 switch result {
-                case .success(let isExistsNickname):
-                    state.nicknameValidationType = !isExistsNickname && state.nicknameValidationType == .blank
+                case .success(let isValidNickname):
+                    state.nicknameValidationType = isValidNickname
                     ? .availableNickName
-                    : state.nicknameValidationType
+                    : .alreadyUsedNickname
+
                     state.isActiveButtonOnNickname = state.nicknameValidationType == .availableNickName
                     state.isChangedInfo = state.nicknameValidationType == .availableNickName
-
                 case .failure(let error):
                     state.toastMessage = .init(title: error.errorDescription ?? "")
                     state.isShowToast = true
@@ -152,13 +158,27 @@ struct ProfileSettingStore: ReducerProtocol {
 
                 return .none
             case .checkDuplicateOnArchive:
-#warning("중복 확인 네트워크 연결 필요")
-                guard state.archiveValidationType == .blank else {
+                guard state.archiveValidationType == .beforeDuplicateCheck else {
                     return .none
                 }
 
-                state.isActiveButtonOnArchive = true
+                return profileClient.isExistsArchiveName(state.archiveName)
+                    .map {
+                        Action.checkDuplicateOnArchiveNameDone($0)
+                    }
+            case .checkDuplicateOnArchiveNameDone(let result):
+                switch result {
+                case .success(let isValidArchiveName):
+                    state.archiveValidationType = isValidArchiveName
+                    ? .availableArchiveName
+                    : .alreadyUsedArchiveName
 
+                    state.isActiveButtonOnArchive = state.archiveValidationType == .availableArchiveName
+                    state.isChangedInfo = state.archiveValidationType == .availableArchiveName
+                case .failure(let error):
+                    state.toastMessage = .init(title: error.errorDescription ?? "")
+                    state.isShowToast = true
+                }
                 return .none
             case .tappedImagePickerButton:
                 state.isShowImagePicker = true
@@ -187,18 +207,33 @@ struct ProfileSettingStore: ReducerProtocol {
                     return .none
                 }
             case .tappedCompleteModifyButton:
-#warning("수정 네비게이션 적용")
+                let result = profileClient.updateProfile(
+                    state.nickname,
+                    state.archiveName,
+                    state.selectedImageURL ?? ""
+                )
 
-                return .none
-            case .tappedNextButtonOnProfilePicture:
-                return profileClient.saveProfile((
+                return result.map {
+                    Action.modifyProfileDone($0)
+                }
+            case .signUpOnProfilePicture:
+                guard let imageURL = state.selectedImageURL else {
+                    Log.error("이미지 URL이 없습니다.")
+                    return .none
+                }
+
+                let signUpModel = FMSignUp(
+                    identifier: state.userId,
                     nickname: state.nickname,
                     archiveName: state.archiveName,
-                    profileImgURL: state.selectedImageURL ?? ""
-                ))
-                .fireAndForget()
-            case .tappedBackButton:
-                return .none
+                    profileImageUrl: imageURL
+                )
+
+                let signupResult = profileClient.signUp(signUpModel)
+
+                return signupResult.map {
+                    Action.signUpDone($0)
+                }
             default:
                 return .none
             }
@@ -216,7 +251,7 @@ struct ProfileSettingStore: ReducerProtocol {
         } else if charactorCount > 16 {
             return .exceededCharacters
         } else {
-            return .blank
+            return .beforeDuplicateCheck
         }
     }
 }

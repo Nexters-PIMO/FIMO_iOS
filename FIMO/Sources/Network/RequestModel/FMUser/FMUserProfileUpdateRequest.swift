@@ -12,7 +12,9 @@ import Alamofire
 
 struct FMUserProfileUpdateRequest: Requestable {
     typealias Response = FMProfileDTO
-    let updateProfile: FMProfile
+    let nickname: String
+    let archiveName: String
+    let profileImageUrl: String
 
     var path: String {
         return "/user/profile/update"
@@ -24,9 +26,9 @@ struct FMUserProfileUpdateRequest: Requestable {
 
     var parameters: Parameters {
         return [
-            "nickname": updateProfile.nickname,
-            "archiveName": updateProfile.archiveName,
-            "profileImageUrl": updateProfile.profileImageUrl
+            "nickname": nickname,
+            "archiveName": archiveName,
+            "profileImageUrl": profileImageUrl
         ]
     }
 

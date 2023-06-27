@@ -15,9 +15,7 @@ struct SettingStore: ReducerProtocol {
         @BindingState var isShowBackPopup: Bool = false
         @BindingState var isSheetPresented: Bool = false
         var onboarding: OnboardingStore.State?
-        var nickname: String = "닉네임"
-        var archiveName: String = "아카이브 이름"
-        var imageURLString: String = ""
+        var profile: FMProfile = .EMPTY
         var termsOfUseURL: URL? = URL(string: FIMOStrings.termsOfUseURL)
 
         var version: String {

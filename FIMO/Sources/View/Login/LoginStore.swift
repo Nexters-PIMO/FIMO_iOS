@@ -18,20 +18,20 @@ struct LoginStore: ReducerProtocol {
         @BindingState var isAlertShowing = false
         var isSignIn = false
         var errorMessage = ""
-        var kakaoRefreshToken = ""
         var userIdentity = ""
     }
     
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
-        case tappedKakaoLoginButton(String, String)
+        case tappedKakaoLoginButton(String)
         case tappedAppleLoginButton(String)
-        case enterProfileSetting
+        case enterProfileSetting(String)
         case showAlert
         case tappedAlertOKButton
         case failureLogin(NetworkError)
         case signup
-        case tappedAppleLoginButtonDone(Result<MemberToken, NetworkError>)
+        case loginAgain
+        case loginResult(Result<MemberToken, NetworkError>)
     }
     
     @Dependency(\.loginClient) var loginClient
@@ -46,14 +46,25 @@ struct LoginStore: ReducerProtocol {
                 }
                 state.userIdentity = userIdentity
                 
-                let tokenResult = loginClient.login(userIdentity)
+                let loginResult = loginClient.login(userIdentity)
 
-                return tokenResult.map {
-                    Action.tappedAppleLoginButtonDone($0)
+                return loginResult.map {
+                    Action.loginResult($0)
                 }
-            case let .tappedKakaoLoginButton(accessToken, refreshToken):
-                state.kakaoRefreshToken = refreshToken
-                return .none
+            case let .tappedKakaoLoginButton(id):
+                state.userIdentity = id
+
+                let loginResult = loginClient.login(id)
+
+                return loginResult.map {
+                    Action.loginResult($0)
+                }
+            case .loginAgain:
+                let loginResult = loginClient.login(state.userIdentity)
+
+                return loginResult.map {
+                    Action.loginResult($0)
+                }
             case .showAlert:
                 state.isAlertShowing = true
                 
@@ -65,12 +76,11 @@ struct LoginStore: ReducerProtocol {
             case .failureLogin(let error):
                 switch error.errorType {
                 case .serverError(.userNotFound):
-                    print("➡️ 유저 정보가 없으므로 프로필 기입 화면으로 이동합니다!!!")
-                    return .init(value: .enterProfileSetting)
+                    Log.warning("유저 정보가 없으므로 프로필 기입 화면으로 이동합니다!!!")
+                    return .init(value: .enterProfileSetting(state.userIdentity))
                 default:
                     return .init(value: .showAlert)
                 }
-                return .none
             default:
                 return .none
             }

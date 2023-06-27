@@ -215,7 +215,7 @@ struct ArchiveView: View {
     // 아카이브 상단 프로필 뷰
     func profileView(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>) -> some View {
         HStack {
-            KFImage(URL(string: viewStore.archiveProfile.profileImgUrl))
+            KFImage(URL(string: viewStore.archiveProfile.profileImageUrl))
                 .placeholder { Image(systemName: "person") }
                 .resizable()
                 .frame(width: 52, height: 52)
@@ -227,7 +227,7 @@ struct ArchiveView: View {
                 .frame(width: 16)
             
             VStack(alignment: .leading) {
-                Text(viewStore.archiveProfile.nickName)
+                Text(viewStore.archiveProfile.nickname)
                     .font(Font(FIMOFontFamily.Pretendard.medium.font(size: 16)))
                 
                 Text(FIMOStrings.archivingTextImage(viewStore.feeds.count))

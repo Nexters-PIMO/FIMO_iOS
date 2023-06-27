@@ -8,16 +8,23 @@
 
 import SwiftUI
 
-enum FriendType: Int {
-    // 서로 친구
-    case mutualFriends = 0
-    // 나만 친구
-    case myFriends = 1
-    // 상대만 친구
-    case theirFriends = 2
+enum FriendType: String {
+    // 서로 친구, MUTUAL
+    case mutualFriends = "MUTUAL"
+    // 나만 친구, FOLLOWING
+    case myFriends = "FOLLOWING"
+    // 상대만 친구, FOLLOWED
+    case theirFriends = "FOLLOWED"
 
     var index: Int {
-        return self.rawValue
+        switch self {
+        case .mutualFriends:
+            return 0
+        case .myFriends:
+            return 1
+        case .theirFriends:
+            return 2
+        }
     }
 
     var title: String {
@@ -52,6 +59,19 @@ enum FriendType: Int {
             return Image(uiImage: FIMOAsset.Assets.theirFriendsNoActive.image)
         }
     }
+
+    var friendshipInteraction: FriendshipDescriptionType {
+        switch self {
+        case .mutualFriends, .myFriends:
+            return .unfollow
+        case .theirFriends:
+            return .follow
+        }
+    }
 }
 
-extension FriendType: CaseIterable { }
+extension FriendType: CaseIterable, CustomStringConvertible {
+    var description: String {
+        return self.rawValue
+    }
+}

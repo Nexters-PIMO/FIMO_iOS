@@ -14,6 +14,7 @@ enum CheckValidationType {
     case onlyKoreanEnglishAndNumber
     case exceededCharacters
     case blank
+    case beforeDuplicateCheck
     case alreadyUsedNickname
     case alreadyUsedArchiveName
 }
@@ -31,6 +32,8 @@ extension CheckValidationType: CustomStringConvertible {
             return "글자 수를 초과했어요"
         case .blank:
             return ""
+        case .beforeDuplicateCheck:
+            return  ""
         case .alreadyUsedNickname:
             return "이미 사용 중인 닉네임이에요"
         case .alreadyUsedArchiveName:

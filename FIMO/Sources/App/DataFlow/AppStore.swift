@@ -26,7 +26,11 @@ struct AppStore: ReducerProtocol {
         case user(UserStore.Action)
         case onAppear
         case hiddenLaunchScreen
+        case withdrawal
+        case withdrawalDone(Result<FMServerDescriptionDTO, NetworkError>)
     }
+
+    @Dependency(\.loginClient) var loginClient
 
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
@@ -40,16 +44,36 @@ struct AppStore: ReducerProtocol {
             case .hiddenLaunchScreen:
                 state.isLoading = false
                 return .none
+            case .user(let action):
+                switch action {
+                case .changeUnAuthenticated:
+                    state.userState.status = .unAuthenticated
+                    state.tabBarState = TabBarStore.State()
+                case .changeAuthenticated:
+                    state.userState.status = .authenticated
+                    state.unAuthenticatedStore = UnAuthenticatedStore.State()
+                default:
+                    break
+                }
             case .unAuthenticated(let action):
                 switch action {
                 case .profileSetting(.tappedCompleteButton):
-                    state.userState.status = .authenticated
-                    return .none
-                case .login(.tappedAppleLoginButtonDone(let result)):
+                    return .init(value: .user(.changeAuthenticated))
+                case .login(.loginResult(let result)):
                     switch result {
                     case .success(let memberToken):
-                        state.userState.token = memberToken
-                        return .none
+                        var effects: [EffectTask<AppStore.Action>] = [
+                            .init(value: .user(.setToken))
+                        ]
+                        if state.unAuthenticatedStore.profileSettingState.userId != "" {
+                            state.userState.token = memberToken
+                            state.unAuthenticatedStore.path.append(.complete)
+                        } else {
+                            state.userState.token = memberToken
+                            state.userState.status = .authenticated
+                            effects.append(.init(value: .user(.changeAuthenticated)))
+                        }
+                        return .merge(effects)
                     case .failure(let error):
                         return .init(value: Action.unAuthenticated(.login(.failureLogin(error))))
                     }
@@ -63,15 +87,28 @@ struct AppStore: ReducerProtocol {
                 ]
                 return .merge(effects)
             case .tabBar(.acceptWithdrawal):
-                #warning("회원탈퇴 네트워크 추가 필요, 네트워크 후 화면전환")
+                let withdrawalResult = loginClient.withdrawal()
+
+                return withdrawalResult.map({
+                    Action.withdrawalDone($0)
+                })
+            case .withdrawalDone(let result):
+                switch result {
+                case .success:
+                    return .init(value: .withdrawal)
+                case .failure:
+                    return .none
+                }
+            case .withdrawal:
                 let effects: [EffectTask<AppStore.Action>] = [
                     .init(value: .user(.expiredToken)),
                     .init(value: .user(.changeUnAuthenticated))
                 ]
                 return .merge(effects)
             default:
-                return .none
+                break
             }
+            return .none
         }
 
         Scope(state: \.appDelegateState, action: /Action.appDelegate) {
