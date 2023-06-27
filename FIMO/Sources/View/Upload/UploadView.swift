@@ -45,11 +45,12 @@ struct UploadView: View {
 
                 if viewStore.isLoading {
                     LoadingView(hasOpacity: true)
+                        .ignoresSafeArea()
                 }
             }
             .modifier(ClosePopupViewModifier(
                 viewStore: viewStore,
-                isShowing: viewStore.binding(\.$isClose)
+                isShowing: viewStore.binding(\.$isIncompleteClose)
             ))
             .toast(
                 isShowing: viewStore.binding(\.$isShowOCRErrorToast),

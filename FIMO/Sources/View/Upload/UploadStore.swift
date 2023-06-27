@@ -13,7 +13,7 @@ import ComposableArchitecture
 
 struct UploadStore: ReducerProtocol {
     struct State: Equatable {
-        @BindingState var isClose = false
+        @BindingState var isIncompleteClose = false
         @BindingState var isShowImagePicker = false
         var uploadedImages = [UploadImage]()
         
@@ -26,6 +26,7 @@ struct UploadStore: ReducerProtocol {
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
         case didTapCloseButton
+        case clearScene
         case didTapCloseButtonWithData
         case didTapUploadButton
         case didTapPublishButton
@@ -47,15 +48,14 @@ struct UploadStore: ReducerProtocol {
         Reduce { state, action in
             switch action {
             case .didTapCloseButton:
-                state.uploadedImages = []
-                state.isClose = false
+                state.isIncompleteClose = false
+                return .init(value: .clearScene)
+            case .clearScene:
                 state.isShowImagePicker = false
                 state.isShowOCRErrorToast = false
-                
-                return .none
+                state.uploadedImages = []
             case .didTapCloseButtonWithData:
-                state.isClose = true
-                
+                state.isIncompleteClose = true
                 return .none
             case .didTapUploadButton:
                 state.isShowImagePicker = true
@@ -135,7 +135,6 @@ struct UploadStore: ReducerProtocol {
                     })
                 )
 
-                let request = FMCreatePostRequest(newPostItems: updatePost)
                 return postClient.uploadPost(updatePost).map {
                     Action.didTapPublishButtonDone($0)
                 }
@@ -144,14 +143,14 @@ struct UploadStore: ReducerProtocol {
                 case .success(let post):
                     Log.warning("피드, 아키이브 View 완성 시 Post 추가 Action 구현 필요")
                     #warning("피드, 아키이브 View 완성 시 Post 추가 Action 구현 필요")
-                    state.isClose = true
-                    return .none
+                    return .init(value: .clearScene)
                 case .failure(let error):
                     return .init(value: .sendToast(ToastModel(title: error.errorDescription ?? "")))
                 }
             default:
                 return .none
             }
+            return .none
         }
     }
     
