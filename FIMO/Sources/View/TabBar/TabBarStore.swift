@@ -214,6 +214,11 @@ struct TabBarStore: ReducerProtocol {
                         Action.archive(.deleteFeed($0))
                     }
                 }
+            case .upload(.didTapPublishButtonDone(let result)):
+                if case .success = result {
+                    state.isSheetPresented = false
+                }
+                return .none
             default:
                 return .none
             }

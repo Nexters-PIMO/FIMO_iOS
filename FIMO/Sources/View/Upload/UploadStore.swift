@@ -20,6 +20,7 @@ struct UploadStore: ReducerProtocol {
         @BindingState var isShowOCRErrorToast = false
         var toastMessage: ToastModel?
         var selectedImage: UploadImage?
+        var isLoading: Bool = false
     }
     
     enum Action: BindableAction, Equatable {
@@ -28,12 +29,18 @@ struct UploadStore: ReducerProtocol {
         case didTapCloseButtonWithData
         case didTapUploadButton
         case didTapPublishButton
+        case didTapPublishButtonDone(Result<FMPostDTO, NetworkError>)
         case didTapUploadedImage(UploadImage)
         case didTapDeleteButton(Int)
         case selectProfileImage(UploadImage)
+        case fetchImageUrl(UploadImage)
+        case fetchImageUrlDone(Result<ImgurImageModel, NetworkError>, UploadImage)
         case sendToast(ToastModel)
         case removeToast
     }
+
+    @Dependency(\.imgurImageClient) var imgurImageClient
+    @Dependency(\.postClient) var postClient
     
     var body: some ReducerProtocol<State, Action> {
         BindingReducer()
@@ -59,26 +66,23 @@ struct UploadStore: ReducerProtocol {
                 
                 return .none
             case .didTapDeleteButton(let index):
-                state.uploadedImages = state.uploadedImages.filter { $0.id != index }
-                var id = 0
-                state.uploadedImages.forEach {
-                    $0.id = id
-                    id += 1
-                }
+                state.uploadedImages = state.uploadedImages
+                    .filter { $0.id != index }
+                    .enumerated()
+                    .map({ (index, image) in
+                        var tempImage = image
+                        tempImage.id = index
+                        return tempImage
+                    })
                 
                 return .none
             case .selectProfileImage(let uploadImage):
+                state.isLoading = true
                 let extractedText = extractText(from: uploadImage, state: &state)
                 let image = UploadImage(id: uploadImage.id, image: uploadImage.image, text: extractedText)
                 
                 if !extractedText.isEmpty {
-                    state.uploadedImages.append(image)
-                    
-                    if state.selectedImage == nil {
-                        state.selectedImage = image
-                    }
-                    
-                    return .none
+                    return .init(value: .fetchImageUrl(image))
                 } else {
                     state.isShowOCRErrorToast = true
                     
@@ -91,6 +95,30 @@ struct UploadStore: ReducerProtocol {
                         return .sendToast(message)
                     }
                 }
+            case .fetchImageUrl(let uploadImage):
+                return imgurImageClient
+                    .uploadImage(uploadImage.image.jpegData(compressionQuality: 0.9) ?? Data())
+                    .map {
+                        Action.fetchImageUrlDone($0, uploadImage)
+                    }
+            case .fetchImageUrlDone(let result, let uploadImage):
+                switch result {
+                case .success(let imageModel):
+                    var tempUploadimage = uploadImage
+                    tempUploadimage.imageUrl = imageModel.link
+
+                    state.uploadedImages.append(tempUploadimage)
+
+                    if state.selectedImage == nil {
+                        state.selectedImage = tempUploadimage
+                    }
+                    state.isLoading = false
+                    return .none
+                case .failure(let error):
+                    state.isLoading = false
+                    return .init(value: .sendToast(ToastModel(title: error.errorDescription ?? "")))
+
+                }
             case .sendToast(let toastModel):
                 state.toastMessage = toastModel
 
@@ -99,12 +127,28 @@ struct UploadStore: ReducerProtocol {
                     .eraseToEffect()
             case .removeToast:
                 state.isShowOCRErrorToast = false
-                
                 return .none
             case .didTapPublishButton:
-                print("업로드")
-                #warning("엔드포인트 (업로드)")
-                return .none
+                let updatePost = FMUpdatedPost(items:
+                    state.uploadedImages.map({
+                        $0.toUpdatedPostItem()
+                    })
+                )
+
+                let request = FMCreatePostRequest(newPostItems: updatePost)
+                return postClient.uploadPost(updatePost).map {
+                    Action.didTapPublishButtonDone($0)
+                }
+            case .didTapPublishButtonDone(let result):
+                switch result {
+                case .success(let post):
+                    Log.warning("피드, 아키이브 View 완성 시 Post 추가 Action 구현 필요")
+                    #warning("피드, 아키이브 View 완성 시 Post 추가 Action 구현 필요")
+                    state.isClose = true
+                    return .none
+                case .failure(let error):
+                    return .init(value: .sendToast(ToastModel(title: error.errorDescription ?? "")))
+                }
             default:
                 return .none
             }

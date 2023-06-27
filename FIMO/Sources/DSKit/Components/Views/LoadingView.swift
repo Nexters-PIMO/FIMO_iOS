@@ -9,10 +9,18 @@
 import SwiftUI
 
 struct LoadingView: View {
+    var hasOpacity: Bool = false
+
     var body: some View {
         ZStack {
-            Rectangle()
-                .foregroundColor(.white)
+            if hasOpacity {
+                Rectangle()
+                    .foregroundColor(.black)
+                    .opacity(0.3)
+            } else {
+                Rectangle()
+                    .foregroundColor(.white)
+            }
             
             VStack {
                 Spacer()
