@@ -127,7 +127,7 @@ struct FriendsListView: View {
                     } label: {
                         Text("친구추가순")
                             .foregroundColor(
-                                store.selectedSort == .newest
+                                store.selectedSort == .created
                                 ? Color(FIMOAsset.Assets.red1.color)
                                 : .black
                             )
@@ -140,7 +140,7 @@ struct FriendsListView: View {
                     } label: {
                         Text("가나다순")
                             .foregroundColor(
-                                store.selectedSort == .characterOrder
+                                store.selectedSort == .alpahabetical
                                 ? Color(FIMOAsset.Assets.red1.color)
                                 : .black
                             )

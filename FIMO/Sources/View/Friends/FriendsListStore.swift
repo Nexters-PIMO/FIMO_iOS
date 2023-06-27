@@ -18,7 +18,7 @@ struct FriendsListStore: ReducerProtocol {
         var id: Int?
         var userName: String?
         var currentTab: FriendType = .mutualFriends
-        var selectedSort: FriendListSortType = .newest
+        var selectedSort: FriendListSortType = .created
         var rowFriendsList: [FMFriend] = [FMFriend]() {
             didSet {
                 let array = Array(repeating: [FMFriend](), count: FriendType.allCases.count)
@@ -40,7 +40,7 @@ struct FriendsListStore: ReducerProtocol {
         case sendToast(ToastModel)
         case sendToastDone
         case tappedTab(String)
-        case fetchFriendsList
+        case fetchFriendsList(FriendListSortType)
         case fetchFriendsListDone(Result<[FMFriendDTO], NetworkError>)
         case tappedNewestButton
         case tappedCharactorOrderButton
@@ -72,14 +72,14 @@ struct FriendsListStore: ReducerProtocol {
             case .onAppear:
                 let effects: [EffectTask<FriendsListStore.Action>] = [
                     .send(.tappedTab(FriendType.mutualFriends.description)),
-                    .send(.fetchFriendsList)
+                    .send(.fetchFriendsList(state.selectedSort))
                 ]
                 return .merge(effects)
             case .tappedTab(let statusName):
                 state.currentTab = FriendType(rawValue: statusName) ?? .mutualFriends
                 return .none
-            case .fetchFriendsList:
-                let fetchResult = friendsClient.fetchFriendsList(.newest)
+            case .fetchFriendsList(let sortType):
+                let fetchResult = friendsClient.fetchFriendsList(sortType)
                 return fetchResult.map {
                     Action.fetchFriendsListDone($0)
                 }
@@ -112,13 +112,19 @@ struct FriendsListStore: ReducerProtocol {
                     return .none
                 }
             case .tappedNewestButton:
-                state.selectedSort = .newest
-                return .none
+                guard state.selectedSort != .created else {
+                    return .none
+                }
+                state.selectedSort = .created
+                return .init(value: .fetchFriendsList(state.selectedSort))
             case .tappedCharactorOrderButton:
-                state.selectedSort = .characterOrder
-                return .none
+                guard state.selectedSort != .alpahabetical else {
+                    return .none
+                }
+                state.selectedSort = .alpahabetical
+                return .init(value: .fetchFriendsList(state.selectedSort))
             case .refreshFriendList:
-                return .send(.fetchFriendsList)
+                return .send(.fetchFriendsList(state.selectedSort))
             default:
                 break
             }
