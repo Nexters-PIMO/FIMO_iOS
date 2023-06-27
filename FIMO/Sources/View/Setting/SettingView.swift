@@ -131,6 +131,9 @@ struct SettingView: View {
                 }
                 .padding(.horizontal, 20)
             }
+            .toast(isShowing: viewStore.binding(\.$isShowToast),
+                   title: viewStore.toastMessage.title,
+                   message: viewStore.toastMessage.message)
             .backPopup(isShowing: viewStore.binding(\.$isShowBackPopup), store: viewStore)
             .fullScreenCover(isPresented: viewStore.binding(\.$isSheetPresented)) {
                 IfLetStore(

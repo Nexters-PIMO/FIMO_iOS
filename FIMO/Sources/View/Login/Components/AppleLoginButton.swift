@@ -82,9 +82,8 @@ extension AppleLoginButton.Coordinator: ASAuthorizationControllerDelegate {
       case let appleIDCredential as ASAuthorizationAppleIDCredential:
           let userID = appleIDCredential.user
           let provider = ASAuthorizationAppleIDProvider()
-          let userName = appleIDCredential.fullName?.formatted() // TODO: 필요없는 경우 제거
           
-          provider.getCredentialState(forUserID: userID) { [weak self] credentialState, _ in
+          provider.getCredentialState(forUserID: userID) { [weak self] credentialState, error in
               guard let self else { return }
               
               switch credentialState {
@@ -100,9 +99,9 @@ extension AppleLoginButton.Coordinator: ASAuthorizationControllerDelegate {
                   print("Apple Login Fail")
                   #endif
                   
-                  self.viewStore.send(.showAlert)
+                  self.viewStore.send(.sendToast(ToastModel(title: error?.localizedDescription ?? "")))
               @unknown default:
-                  self.viewStore.send(.showAlert)
+                  self.viewStore.send(.sendToast(ToastModel(title: error?.localizedDescription ?? "")))
               }
           }
       default:

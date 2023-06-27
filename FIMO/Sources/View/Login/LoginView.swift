@@ -50,11 +50,6 @@ struct LoginView: View {
                             viewStore.send(.tappedKakaoLoginButton(id))
                         }
                     }
-                    .alert("로그인이 실패했습니다", isPresented: viewStore.binding(\.$isAlertShowing)) {
-                        Button("확인", role: .cancel) {
-                            viewStore.send(.tappedAlertOKButton)
-                        }
-                    }
                     .frame(height: 54)
                     .padding(.top, 0)
                     .padding(.bottom, 18)
@@ -69,11 +64,6 @@ struct LoginView: View {
                                 viewStore.send(.tappedAppleLoginButton(token))
                             }
                         })
-                    .alert("로그인이 실패했습니다", isPresented: viewStore.$isAlertShowing) {
-                        Button("확인", role: .cancel) {
-                            viewStore.send(.tappedAlertOKButton)
-                        }
-                    }
                     .cornerRadius(8)
                     .frame(height: 54)
                     .padding(.top, 0)
@@ -81,6 +71,9 @@ struct LoginView: View {
                     .padding([.leading, .trailing], 16)
                 }
             }
+            .toast(isShowing: viewStore.binding(\.$isShowToast),
+                   title: viewStore.toastMessage.title,
+                   message: viewStore.toastMessage.message)
             .toolbar(.hidden, for: .navigationBar)
         }
         .ignoresSafeArea()

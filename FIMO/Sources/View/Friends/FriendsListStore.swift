@@ -12,6 +12,9 @@ import ComposableArchitecture
 
 struct FriendsListStore: ReducerProtocol {
     struct State: Equatable {
+        @BindingState var isShowToast: Bool = false
+        var toastMessage: ToastModel = ToastModel(title: FIMOStrings.textCopyToastTitle,
+                                                  message: FIMOStrings.textCopyToastMessage)
         var id: Int?
         var userName: String?
         var currentTab: FriendType = .mutualFriends
@@ -31,8 +34,11 @@ struct FriendsListStore: ReducerProtocol {
         }
     }
 
-    enum Action: Equatable {
+    enum Action: BindableAction, Equatable {
+        case binding(BindingAction<State>)
         case onAppear
+        case sendToast(ToastModel)
+        case sendToastDone
         case tappedTab(String)
         case fetchFriendsList
         case fetchFriendsListDone(Result<[FMFriendDTO], NetworkError>)
@@ -46,8 +52,23 @@ struct FriendsListStore: ReducerProtocol {
     @Dependency(\.friendsClient) var friendsClient
 
     var body: some ReducerProtocol<State, Action> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
+            case let .sendToast(toastModel):
+                if state.isShowToast {
+                    return EffectTask<Action>(value: .sendToast(toastModel))
+                        .delay(for: .milliseconds(1000), scheduler: DispatchQueue.main)
+                        .eraseToEffect()
+                } else {
+                    state.isShowToast = true
+                    state.toastMessage = toastModel
+                    return EffectTask<Action>(value: .sendToastDone)
+                        .delay(for: .milliseconds(2000), scheduler: DispatchQueue.main)
+                        .eraseToEffect()
+                }
+            case .sendToastDone:
+                state.isShowToast = false
             case .onAppear:
                 let effects: [EffectTask<FriendsListStore.Action>] = [
                     .send(.tappedTab(FriendType.mutualFriends.description)),

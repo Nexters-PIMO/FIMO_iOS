@@ -43,7 +43,7 @@ struct KakaoLoginButton: UIViewRepresentable {
                     }
 
                     if error != nil {
-                        self.kakaoLoginButton.viewStore.send(.showAlert)
+                        self.kakaoLoginButton.viewStore.send(.sendToast(ToastModel(title: error?.localizedDescription ?? "")))
                     } else {
                         self.requestUserInfo()
                     }
@@ -55,7 +55,7 @@ struct KakaoLoginButton: UIViewRepresentable {
                     }
 
                     if error != nil {
-                        self.kakaoLoginButton.viewStore.send(.showAlert)
+                        self.kakaoLoginButton.viewStore.send(.sendToast(ToastModel(title: error?.localizedDescription ?? "")))
                     } else {
                         self.requestUserInfo()
                     }
@@ -70,7 +70,7 @@ struct KakaoLoginButton: UIViewRepresentable {
                 }
 
                 if let error = error {
-                    self.kakaoLoginButton.viewStore.send(.showAlert)
+                    self.kakaoLoginButton.viewStore.send(.sendToast(ToastModel(title: error.localizedDescription)))
                 } else {
                     let id = String(Int(user?.id ?? 0))
                     self.kakaoLoginButton.action(id)

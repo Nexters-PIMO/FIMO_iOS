@@ -31,6 +31,9 @@ struct FriendsListView: View {
                     viewStore.send(.refreshFriendList)
                 }
             }
+            .toast(isShowing: viewStore.binding(\.$isShowToast),
+                   title: viewStore.toastMessage.title,
+                   message: viewStore.toastMessage.message)
             .onAppear {
                 viewStore.send(.onAppear)
             }
