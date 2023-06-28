@@ -36,10 +36,10 @@ class GoogleAnalytics {
         Analytics.setUserID(id)
     }
 
-    func logEvent(_ event: AnalyticsEventType) {
+    func logEvent(_ event: AnalyticsEventType, file: String = #file, function: String = #function) {
         let parameters = [
-          "file": #file,
-          "function": #function
+          "file": file,
+          "function": function
         ]
 
         Analytics.logEvent(event.value, parameters: parameters)

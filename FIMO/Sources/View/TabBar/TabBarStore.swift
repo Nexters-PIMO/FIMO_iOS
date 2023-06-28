@@ -93,6 +93,7 @@ struct TabBarStore: ReducerProtocol {
                     state.isShowToast = true
                 }
             case .setSheetState:
+                GoogleAnalytics.shared.logEvent(.test)
                 state.isSheetPresented = true
             case .upload(.didTapCloseButton):
                 state.isSheetPresented = false
