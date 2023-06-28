@@ -20,12 +20,16 @@ struct OnboardingStore: ReducerProtocol {
         case binding(BindingAction<State>)
         case startButtonTapped
         case skipButtonTapped
+        case changePage(OnboardingPageType)
     }
 
     var body: some ReducerProtocol<State, Action> {
         BindingReducer()
         Reduce { state, action in
             switch action {
+            case .changePage(let pageType):
+                state.pageType = pageType
+                return .none
             default:
                 return .none
             }
