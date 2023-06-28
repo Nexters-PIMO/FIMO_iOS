@@ -14,7 +14,6 @@ struct OnboardingCollectionView: UIViewRepresentable {
     static let cellIdentifier = "OnboardingViewCollectionViewCell"
     var viewStore: ViewStore<OnboardingStore.State, OnboardingStore.Action>
     let onboardingTypes: [OnboardingPageType] = OnboardingPageType.allCases
-    var currentPage = 0
 
     func makeUIView(context: Context) -> UICollectionView {
         let screenSize = UIScreen.main.bounds.size
@@ -56,7 +55,6 @@ struct OnboardingCollectionView: UIViewRepresentable {
 
         func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: OnboardingCollectionView.cellIdentifier, for: indexPath)
-            cell.backgroundColor = .orange
 
             guard let pageType: OnboardingPageType = .init(rawValue: indexPath.row) else {
                 return cell

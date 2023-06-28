@@ -10,6 +10,7 @@ import Foundation
 
 import FirebaseAnalytics
 
+// MARK: 이벤트에 맞춰 추가 예정
 enum AnalyticsEventType: String {
     case analyticsEventSelectItem
     case didTapButton
