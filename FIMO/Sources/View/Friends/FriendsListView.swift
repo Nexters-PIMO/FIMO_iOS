@@ -18,7 +18,7 @@ struct FriendsListView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack(spacing: 0) {
-                CustomNavigationBar(title: viewStore.userName ?? "")
+                CustomNavigationBar(title: viewStore.userName ?? "", isShadowed: true)
 
                 header(viewStore)
 

@@ -17,7 +17,7 @@ struct ModifyProfileView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack(alignment: .leading, spacing: 0) {
-                CustomNavigationBar(title: "프로필 수정") {
+                CustomNavigationBar(title: "프로필 수정", isShadowed: true) {
                     viewStore.send(.tappedBackButton)
                 }
 
