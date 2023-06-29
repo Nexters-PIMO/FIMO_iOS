@@ -14,6 +14,7 @@ extension Project {
             platform: platform,
             product: .app,
             bundleId: "\(Environment.bundleId)",
+            deploymentTarget: Environment.deploymentTarget,
             infoPlist: .extendingDefault(with: Project.infoPlist),
             sources: ["\(name)/Sources/**"],
             resources: ["\(name)/Resources/**", "Tuist/Dependencies/Lockfiles/Package.resolved"],
