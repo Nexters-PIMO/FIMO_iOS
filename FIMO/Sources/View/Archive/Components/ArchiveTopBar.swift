@@ -25,7 +25,7 @@ extension ArchiveView {
     var archiveTopBar: some View {
         WithViewStore(self.store, observe: ArchiveViewState.init) { viewStore in
             HStack {
-                Text(viewStore.archiveProfile.nickname)
+                Text(viewStore.archiveProfile.archiveName)
                     .font(Font(FIMOFontFamily.Pretendard.semiBold.font(size: 24)))
                     .foregroundColor(.black)
                 
