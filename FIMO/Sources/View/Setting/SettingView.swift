@@ -17,7 +17,7 @@ struct SettingView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack(alignment: .leading) {
-                CustomNavigationBar(title: "설정")
+                CustomNavigationBar(title: "설정", isShadowed: true)
 
                 HStack(alignment: .center) {
                     KFImage(URL(string: viewStore.profile.profileImageUrl))
@@ -29,7 +29,7 @@ struct SettingView: View {
                                 .font(.system(size: 40))
                         })
                         .aspectRatio(contentMode: .fill)
-                        .frame(width: 40, height: 40)
+                        .frame(width: 52, height: 52)
                         .mask {
                             Circle()
                         }
@@ -131,6 +131,9 @@ struct SettingView: View {
                 }
                 .padding(.horizontal, 20)
             }
+            .toast(isShowing: viewStore.binding(\.$isShowToast),
+                   title: viewStore.toastMessage.title,
+                   message: viewStore.toastMessage.message)
             .backPopup(isShowing: viewStore.binding(\.$isShowBackPopup), store: viewStore)
             .fullScreenCover(isPresented: viewStore.binding(\.$isSheetPresented)) {
                 IfLetStore(

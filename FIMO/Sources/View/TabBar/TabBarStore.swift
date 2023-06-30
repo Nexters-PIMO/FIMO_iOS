@@ -87,11 +87,13 @@ struct TabBarStore: ReducerProtocol {
                 switch result {
                 case .success(let myProfile):
                     state.myProfile = myProfile.toModel()
+                    GoogleAnalytics.shared.setUserId(myProfile.id)
                 case .failure(let error):
                     state.toastMessage = .init(title: error.errorDescription ?? "")
                     state.isShowToast = true
                 }
             case .setSheetState:
+                GoogleAnalytics.shared.logEvent(.test)
                 state.isSheetPresented = true
             case .upload(.didTapCloseButton):
                 state.isSheetPresented = false
@@ -214,6 +216,11 @@ struct TabBarStore: ReducerProtocol {
                         Action.archive(.deleteFeed($0))
                     }
                 }
+            case .upload(.didTapPublishButtonDone(let result)):
+                if case .success = result {
+                    state.isSheetPresented = false
+                }
+                return .none
             default:
                 return .none
             }

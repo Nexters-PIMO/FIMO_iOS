@@ -11,7 +11,7 @@ import SwiftUI
 struct AcknowView: View {
     var body: some View {
         VStack {
-            CustomNavigationBar(title: "오픈소스 라이선스")
+            CustomNavigationBar(title: "오픈소스 라이선스", isShadowed: true)
 
             AcknowListView()
                 .toolbar(.hidden, for: .navigationBar)

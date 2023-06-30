@@ -18,32 +18,39 @@ struct UploadView: View {
         WithViewStore(store, observe: { $0 }) { viewStore in
             let screenWidth = sceneDelegate.window?.bounds.width ?? 0
             
-            VStack {
-                topBar(viewStore: viewStore, screenWidth: screenWidth)
-                    .shadow(
-                        color: Color(FIMOAsset.Assets.grayShadow.color).opacity(0.1),
-                        radius: 3,
-                        x: 0,
-                        y: 3
-                    )
-                    .padding(.bottom, 20)
-                
-                photoUploader(viewStore: viewStore)
-                    .frame(width: screenWidth - 40, height: 88)
-                    .padding(.bottom, 38)
-                
-                mainImage(viewStore: viewStore)
-                    .frame(width: 353, height: 353)
-                    
-                Spacer()
-                
-                publishButton(viewStore: viewStore)
-                    .padding(.bottom, 60)
-                    .frame(width: 353, height: 56)
+            ZStack {
+                VStack {
+                    topBar(viewStore: viewStore, screenWidth: screenWidth)
+                        .shadow(
+                            color: Color(FIMOAsset.Assets.grayShadow.color).opacity(0.1),
+                            radius: 3,
+                            x: 0,
+                            y: 3
+                        )
+                        .padding(.bottom, 20)
+
+                    photoUploader(viewStore: viewStore)
+                        .frame(width: screenWidth - 40, height: 88)
+                        .padding(.bottom, 38)
+
+                    mainImage(viewStore: viewStore)
+                        .frame(width: 353, height: 353)
+
+                    Spacer()
+
+                    publishButton(viewStore: viewStore)
+                        .padding(.bottom, 60)
+                        .frame(width: 353, height: 56)
+                }
+
+                if viewStore.isLoading {
+                    LoadingView(hasOpacity: true)
+                        .ignoresSafeArea()
+                }
             }
             .modifier(ClosePopupViewModifier(
                 viewStore: viewStore,
-                isShowing: viewStore.binding(\.$isClose)
+                isShowing: viewStore.binding(\.$isIncompleteClose)
             ))
             .toast(
                 isShowing: viewStore.binding(\.$isShowOCRErrorToast),

@@ -8,7 +8,13 @@
 
 import Foundation
 
-enum FriendListSortType {
-    case newest
-    case characterOrder
+enum FriendListSortType: String {
+    case created = "CREATED"
+    case alpahabetical = "ALPAHABETICAL"
+}
+
+extension FriendListSortType: CustomStringConvertible {
+    var description: String {
+        return self.rawValue
+    }
 }
