@@ -33,7 +33,7 @@ extension CheckValidationType: CustomStringConvertible {
         case .blank:
             return ""
         case .beforeDuplicateCheck:
-            return  ""
+            return "중복 확인이 필요해요"
         case .alreadyUsedNickname:
             return "이미 사용 중인 닉네임이에요"
         case .alreadyUsedArchiveName:
