@@ -234,8 +234,11 @@ struct ArchiveStore: ReducerProtocol {
             case .setting(.tappedProfileManagementButton):
                 state.profile = ProfileSettingStore.State(
                     nickname: state.setting?.profile.nickname ?? "",
+                    previousNickname: state.setting?.profile.nickname ?? "",
                     archiveName: state.setting?.profile.archiveName ?? "",
-                    selectedImageURL: state.setting?.profile.profileImageUrl ?? ""
+                    previousArchiveName: state.setting?.profile.archiveName ?? "",
+                    selectedImageURL: state.setting?.profile.profileImageUrl ?? "",
+                    previousSelectedImageURL: state.setting?.profile.profileImageUrl ?? ""
                 )
                 state.path.append(.modifyProfile)
             case let .deleteFeed(result):

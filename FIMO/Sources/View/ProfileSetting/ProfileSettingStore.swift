@@ -29,24 +29,38 @@ struct ProfileSettingStore: ReducerProtocol {
 
         // MARK: 닉네임 설정
         @BindingState var nickname: String = ""
+        var previousNickname: String?
         var nicknameValidationType: CheckValidationType = .blank
-        var isBlackNicknameField: Bool = true
         var isActiveButtonOnNickname: Bool = false
         var isActiveButton: Bool = false
 
         // MARK: 아카이브 설정
         @BindingState var archiveName: String = ""
+        var previousArchiveName: String?
         var archiveValidationType: CheckValidationType = .blank
-        var isBlackArchiveField: Bool = true
         var isActiveButtonOnArchive: Bool = false
 
         // MARK: 프로필 이미지
         @BindingState var isShowImagePicker = false
         var selectedProfileImage: UIImage?
         var selectedImageURL: String?
+        var previousSelectedImageURL: String?
         var isActiveButtonOnImage: Bool = false
 
-        var isChangedInfo: Bool = false
+        // MARK: 프로필 수정 관련 프로퍼티
+        var isModifiedInfo: Bool {
+            return nickname != previousNickname
+            || archiveName != previousArchiveName
+            || selectedImageURL != previousSelectedImageURL
+        }
+
+        var isUnchangedNickname: Bool {
+            return nickname == previousNickname
+        }
+
+        var isUnchangedArchiveName: Bool {
+            return archiveName == previousArchiveName
+        }
     }
 
     enum Action: BindableAction, Equatable, NextButtonActionProtocol {
@@ -54,11 +68,13 @@ struct ProfileSettingStore: ReducerProtocol {
         case onAppear
         case sendToast(ToastModel)
         case sendToastDone
+        case checkNicknameValidationType
         case checkDuplicateOnNickName
         case checkDuplicateOnNickNameDone(Result<Bool, NetworkError>)
         case tappedNextButtonOnNickname
 
         case tappedImagePickerButton
+        case checkArchiveValidationType
         case checkDuplicateOnArchive
         case checkDuplicateOnArchiveNameDone(Result<Bool, NetworkError>)
         case tappedNextButtonOnArchive
@@ -86,9 +102,11 @@ struct ProfileSettingStore: ReducerProtocol {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                state.isBlackNicknameField = state.nickname == ""
-                state.isBlackArchiveField = state.archiveName == ""
-                return .none
+                let effects: [EffectTask<ProfileSettingStore.Action>] = [
+                    .init(value: .checkNicknameValidationType),
+                    .init(value: .checkArchiveValidationType)
+                ]
+                return .merge(effects)
             case let .sendToast(toastModel):
                 if state.isShowToast {
                     return EffectTask<Action>(value: .sendToast(toastModel))
@@ -105,25 +123,26 @@ struct ProfileSettingStore: ReducerProtocol {
                 state.isShowToast = false
                 return .none
             case .binding(\.$nickname):
-                state.isBlackNicknameField = state.nickname == ""
-                state.isActiveButtonOnNickname = false
+                return .init(value: .checkNicknameValidationType)
+            case .checkNicknameValidationType:
+                if state.isUnchangedNickname && state.nicknameValidationType == .availableNickName {
+                    return .none
+                }
 
-                let isKoreanEnglishAndNumber = !state.nickname.match(for: "^[가-힣a-zA-Z0-9]+$")
+                state.isActiveButtonOnNickname = state.nicknameValidationType == .availableNickName
+
+                let isExcludeKoreanEnglishAndNumber = !state.nickname.match(for: "^[가-힣a-zA-Z0-9]+$")
                 let isBlack = state.nickname == ""
                 let nicknameCount = state.nickname.replacingOccurrences(of: "[가-힣]", with: "00", options: .regularExpression)
                     .count
 
-                state.nicknameValidationType = checkValidationOnTyping(isMatchCharactors: isKoreanEnglishAndNumber,
+                state.nicknameValidationType = checkValidationOnTyping(isExcludeCharactors: isExcludeKoreanEnglishAndNumber,
                                                                        isBlack: isBlack,
                                                                        charactorCount: nicknameCount,
-                                                                       type: .nickname)
-
+                                                                       isModifiedInfo: state.isModifiedInfo,
+                                                                       isSameName: state.isUnchangedNickname)
                 return .none
             case .checkDuplicateOnNickName:
-                guard state.nicknameValidationType == .beforeDuplicateCheck else {
-                    return .none
-                }
-
                 return profileClient.isExistsNickname(state.nickname)
                     .map {
                         Action.checkDuplicateOnNickNameDone($0)
@@ -136,25 +155,31 @@ struct ProfileSettingStore: ReducerProtocol {
                     : .alreadyUsedNickname
 
                     state.isActiveButtonOnNickname = state.nicknameValidationType == .availableNickName
-                    state.isChangedInfo = state.nicknameValidationType == .availableNickName
+                    state.previousNickname = state.nickname
                 case .failure(let error):
                     state.toastMessage = .init(title: error.errorDescription ?? "")
                     state.isShowToast = true
                 }
                 return .none
             case .binding(\.$archiveName):
-                state.isBlackArchiveField = state.archiveName == ""
-                state.isActiveButtonOnArchive = false
+                return .init(value: .checkArchiveValidationType)
+            case .checkArchiveValidationType:
+                if state.isUnchangedArchiveName && state.archiveValidationType == .availableArchiveName {
+                    return .none
+                }
 
-                let isKoreanEnglishAndNumber = !state.archiveName.match(for: "^[가-힣a-zA-Z0-9\\s]+$")
+                state.isActiveButtonOnArchive = state.archiveValidationType == .availableArchiveName
+
+                let isExcludeKoreanAndEnglish = !state.archiveName.match(for: "^[가-힣a-zA-Z0-9\\s]+$")
                 let isBlack = state.archiveName == ""
                 let archiveCharactorCount = state.archiveName.replacingOccurrences(of: "[가-힣]", with: "00", options: .regularExpression)
                     .count
 
-                state.archiveValidationType = checkValidationOnTyping(isMatchCharactors: isKoreanEnglishAndNumber,
+                state.archiveValidationType = checkValidationOnTyping(isExcludeCharactors: isExcludeKoreanAndEnglish,
                                                                       isBlack: isBlack,
                                                                       charactorCount: archiveCharactorCount,
-                                                                      type: .archiveName)
+                                                                      isModifiedInfo: state.isModifiedInfo,
+                                                                      isSameName: state.isUnchangedArchiveName)
 
                 return .none
             case .checkDuplicateOnArchive:
@@ -174,7 +199,7 @@ struct ProfileSettingStore: ReducerProtocol {
                     : .alreadyUsedArchiveName
 
                     state.isActiveButtonOnArchive = state.archiveValidationType == .availableArchiveName
-                    state.isChangedInfo = state.archiveValidationType == .availableArchiveName
+                    state.previousArchiveName = state.archiveName
                 case .failure(let error):
                     state.toastMessage = .init(title: error.errorDescription ?? "")
                     state.isShowToast = true
@@ -198,7 +223,6 @@ struct ProfileSettingStore: ReducerProtocol {
                 case .success(let imageModel):
                     state.selectedImageURL = imageModel.link
                     state.isActiveButtonOnImage = true
-                    state.isChangedInfo = true
                     
                     return .none
                 case .failure(let error):
@@ -240,18 +264,23 @@ struct ProfileSettingStore: ReducerProtocol {
         }
     }
 
-    private func checkValidationOnTyping(isMatchCharactors: Bool,
+    private func checkValidationOnTyping(isExcludeCharactors: Bool,
                                          isBlack: Bool,
                                          charactorCount: Int,
-                                         type: ProfileSettingFieldType) -> CheckValidationType {
+                                         isModifiedInfo: Bool,
+                                         isSameName: Bool) -> CheckValidationType {
         if isBlack {
             return .blank
-        } else if isMatchCharactors {
+        } else if isExcludeCharactors {
             return .onlyKoreanEnglishAndNumber
         } else if charactorCount > 16 {
             return .exceededCharacters
-        } else {
+        } else if isSameName {
+            return .sameName
+        } else if isModifiedInfo {
             return .beforeDuplicateCheck
+        } else {
+            return .availableNickName
         }
     }
 }

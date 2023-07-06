@@ -40,7 +40,7 @@ struct ArchiveSettingView: View {
                     Text(viewStore.archiveValidationType.description)
                         .padding(.top, 10)
                         .font(.system(size: 12))
-                        .foregroundColor(viewStore.archiveValidationType.color)
+                        .foregroundColor(viewStore.archiveValidationType.descriptionColor)
 
                     nextButton(viewStore)
                 }
@@ -61,13 +61,13 @@ struct ArchiveSettingView: View {
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity, minHeight: 56)
                 .background(
-                    viewStore.isActiveButtonOnArchive
+                    viewStore.archiveValidationType.isOKButtonClickable
                     ? Color(FIMOAsset.Assets.red2.color)
                     : Color(FIMOAsset.Assets.gray1.color)
                     )
                 .cornerRadius(2)
         }
-        .disabled(!viewStore.isActiveButtonOnArchive)
+        .disabled(!viewStore.archiveValidationType.isOKButtonClickable)
         .padding(.top, 34)
     }
 
@@ -76,7 +76,7 @@ struct ArchiveSettingView: View {
             TextField("텍스트를 입력해주세요.", text: viewStore.binding(\.$archiveName))
                 .padding()
                 .foregroundColor(
-                    fieldColor(isBlackArchiveField: viewStore.isBlackArchiveField)
+                    viewStore.archiveValidationType.fieldColor
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 2)
@@ -95,25 +95,21 @@ struct ArchiveSettingView: View {
                         Text("중복확인")
                             .font(.system(size: 16))
                             .foregroundColor(
-                                fieldColor(isBlackArchiveField: viewStore.isBlackArchiveField)
+                                viewStore.archiveValidationType.duplicatedButtonColor
                             )
 
                         Divider()
                             .frame(width: 60)
                             .background(
-                                fieldColor(isBlackArchiveField: viewStore.isBlackArchiveField)
+                                viewStore.archiveValidationType.duplicatedButtonColor
                             )
                     }
 
                 }
-                .disabled(viewStore.isBlackArchiveField)
+                .disabled(!viewStore.archiveValidationType.isDuplicateButtonEnabled)
                 .padding(.trailing, 21)
             }
         }
-    }
-
-    func fieldColor(isBlackArchiveField: Bool) -> Color {
-        return isBlackArchiveField ? Color(FIMOAsset.Assets.gray1.color) : Color.black
     }
 }
 
