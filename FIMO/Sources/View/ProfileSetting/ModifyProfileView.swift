@@ -17,7 +17,7 @@ struct ModifyProfileView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack(alignment: .leading, spacing: 0) {
-                CustomNavigationBar(title: "프로필 수정") {
+                CustomNavigationBar(title: "프로필 수정", isShadowed: true) {
                     viewStore.send(.tappedBackButton)
                 }
 
@@ -53,6 +53,9 @@ struct ModifyProfileView: View {
                 }
                 .padding(.horizontal, 20)
             }
+            .toast(isShowing: viewStore.binding(\.$isShowToast),
+                   title: viewStore.toastMessage.title,
+                   message: viewStore.toastMessage.message)
             .sheet(isPresented: viewStore.binding(\.$isShowImagePicker)) {
                 ImagePicker { uiImage in
                     viewStore.send(.selectProfileImage(uiImage))

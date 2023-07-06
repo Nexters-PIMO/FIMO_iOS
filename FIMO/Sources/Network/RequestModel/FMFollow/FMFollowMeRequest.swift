@@ -12,6 +12,7 @@ import Alamofire
 
 struct FMFollowMeRequest: Requestable {
     typealias Response = [FMFriendDTO]
+    let sortType: FriendListSortType
 
     var path: String {
         return "/follow/me"
@@ -21,7 +22,12 @@ struct FMFollowMeRequest: Requestable {
         return .get
     }
 
-    var parameters: Parameters = [:]
+    var parameters: Parameters {
+        return [
+            "sortType": sortType.description
+        ]
+    }
+
 
     var header: [HTTPFields: String] = [
         HTTPFields.authorization: HTTPHeaderType.authorization.header

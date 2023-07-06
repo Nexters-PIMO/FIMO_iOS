@@ -18,7 +18,7 @@ struct FriendsListView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack(spacing: 0) {
-                CustomNavigationBar(title: viewStore.userName ?? "")
+                CustomNavigationBar(title: viewStore.userName ?? "", isShadowed: true)
 
                 header(viewStore)
 
@@ -31,6 +31,9 @@ struct FriendsListView: View {
                     viewStore.send(.refreshFriendList)
                 }
             }
+            .toast(isShowing: viewStore.binding(\.$isShowToast),
+                   title: viewStore.toastMessage.title,
+                   message: viewStore.toastMessage.message)
             .onAppear {
                 viewStore.send(.onAppear)
             }
@@ -124,7 +127,7 @@ struct FriendsListView: View {
                     } label: {
                         Text("친구추가순")
                             .foregroundColor(
-                                store.selectedSort == .newest
+                                store.selectedSort == .created
                                 ? Color(FIMOAsset.Assets.red1.color)
                                 : .black
                             )
@@ -137,7 +140,7 @@ struct FriendsListView: View {
                     } label: {
                         Text("가나다순")
                             .foregroundColor(
-                                store.selectedSort == .characterOrder
+                                store.selectedSort == .alpahabetical
                                 ? Color(FIMOAsset.Assets.red1.color)
                                 : .black
                             )

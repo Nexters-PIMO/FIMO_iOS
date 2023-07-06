@@ -8,11 +8,11 @@
 
 import SwiftUI
 
-enum OnboardingPageType: String {
-    case one
-    case two
-    case three
-    case four
+enum OnboardingPageType: Int {
+    case one = 0
+    case two = 1
+    case three = 2
+    case four = 3
 
     var title: String {
         switch self {
@@ -65,10 +65,14 @@ enum OnboardingPageType: String {
             return Image(uiImage: FIMOAsset.Assets.onboardingBackgroundFour.image)
         }
     }
+
+    var index: Int {
+        return self.rawValue
+    }
 }
 
 extension OnboardingPageType: Identifiable, CaseIterable {
     var id: String {
-        self.rawValue
+        return "\(self.rawValue)"
     }
 }

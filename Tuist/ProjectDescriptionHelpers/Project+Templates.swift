@@ -14,12 +14,14 @@ extension Project {
             platform: platform,
             product: .app,
             bundleId: "\(Environment.bundleId)",
+            deploymentTarget: Environment.deploymentTarget,
             infoPlist: .extendingDefault(with: Project.infoPlist),
             sources: ["\(name)/Sources/**"],
             resources: ["\(name)/Resources/**", "Tuist/Dependencies/Lockfiles/Package.resolved"],
             entitlements: "\(name)/\(name).entitlements",
             scripts: [.SwiftLintShell],
-            dependencies: dependencies
+            dependencies: dependencies,
+            launchArguments: [LaunchArgument(name: "-FIRDebugEnabled", isEnabled: true)]
         )
         
         let testTarget = Target(
@@ -44,6 +46,9 @@ extension Project {
         return Project(
             name: name,
             organizationName: Environment.organizationName,
+            packages: [
+                .remote(url: "https://github.com/firebase/firebase-ios-sdk", requirement: .upToNextMajor(from:"10.7.0"))
+            ],
             settings: .settings(base: baseSettings, configurations: configSettings),
             targets: targets
         )

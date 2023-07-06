@@ -26,7 +26,7 @@ extension DependencyValues {
 
 extension FriendsClient: DependencyKey {
     static let liveValue = Self.init { (sortType) in
-        let request = FMFollowMeRequest()
+        let request = FMFollowMeRequest(sortType: sortType)
 
         return BaseNetwork.shared.request(api: request, isInterceptive: true)
             .catchToEffect()

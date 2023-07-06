@@ -14,6 +14,9 @@ struct SettingStore: ReducerProtocol {
     struct State: Equatable {
         @BindingState var isShowBackPopup: Bool = false
         @BindingState var isSheetPresented: Bool = false
+        @BindingState var isShowToast: Bool = false
+        var toastMessage: ToastModel = ToastModel(title: FIMOStrings.textCopyToastTitle,
+                                                  message: FIMOStrings.textCopyToastMessage)
         var onboarding: OnboardingStore.State?
         var profile: FMProfile = .EMPTY
         var termsOfUseURL: URL? = URL(string: FIMOStrings.termsOfUseURL)
@@ -30,6 +33,8 @@ struct SettingStore: ReducerProtocol {
 
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
+        case sendToast(ToastModel)
+        case sendToastDone
         case onboarding(OnboardingStore.Action)
         case tappedProfileManagementButton
         case tappedGuideAgainButton
@@ -44,6 +49,20 @@ struct SettingStore: ReducerProtocol {
         BindingReducer()
         Reduce { state, action in
             switch action {
+            case let .sendToast(toastModel):
+                if state.isShowToast {
+                    return EffectTask<Action>(value: .sendToast(toastModel))
+                        .delay(for: .milliseconds(1000), scheduler: DispatchQueue.main)
+                        .eraseToEffect()
+                } else {
+                    state.isShowToast = true
+                    state.toastMessage = toastModel
+                    return EffectTask<Action>(value: .sendToastDone)
+                        .delay(for: .milliseconds(2000), scheduler: DispatchQueue.main)
+                        .eraseToEffect()
+                }
+            case .sendToastDone:
+                state.isShowToast = false
             case .tappedTermsOfUseButton:
                 return .none
             case .tappedGuideAgainButton:
@@ -56,6 +75,7 @@ struct SettingStore: ReducerProtocol {
             default:
                 return .none
             }
+            return .none
         }
         .ifLet(\.onboarding, action: /Action.onboarding) {
             OnboardingStore()
