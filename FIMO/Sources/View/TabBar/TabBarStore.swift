@@ -224,6 +224,13 @@ struct TabBarStore: ReducerProtocol {
             case .upload(.didTapPublishButtonDone(let result)):
                 if case .success = result {
                     state.isSheetPresented = false
+
+                    let effects: [EffectTask<TabBarStore.Action>] = [
+                        .init(value: .home(.onAppear)),
+                        .init(value: .archive(.onAppear))
+                    ]
+
+                    return .merge(effects)
                 }
                 return .none
             default:

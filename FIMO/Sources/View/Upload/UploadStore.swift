@@ -131,9 +131,7 @@ struct UploadStore: ReducerProtocol {
                 }
             case .didTapPublishButtonDone(let result):
                 switch result {
-                case .success(let post):
-                    Log.warning("피드, 아키이브 View 완성 시 Post 추가 Action 구현 필요")
-                    #warning("피드, 아키이브 View 완성 시 Post 추가 Action 구현 필요")
+                case .success:
                     return .init(value: .clearScene)
                 case .failure(let error):
                     return .init(value: .sendToast(ToastModel(title: error.errorDescription ?? "")))
