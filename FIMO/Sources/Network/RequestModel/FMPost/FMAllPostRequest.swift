@@ -22,7 +22,7 @@ struct FMAllPostRequest: Requestable {
     var path: String {
         switch target {
         case .me:
-            return "/post/"
+            return "/post"
         case .another(let userId):
             return "/post/user/\(userId)"
         }
