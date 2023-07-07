@@ -22,7 +22,7 @@ struct HomeView: View {
                     
                     if viewStore.isLoading {
                         LoadingView()
-                    } else if viewStore.feeds.isEmpty {
+                    } else if viewStore.posts.isEmpty {
                         homeWelcome
                             .refreshable {
                                 viewStore.send(.refresh)
@@ -79,8 +79,8 @@ struct HomeView: View {
                 LazyVStack {
                     ForEachStore(
                         self.store.scope(
-                            state: \.feeds,
-                            action: HomeStore.Action.feed(id:action:)
+                            state: \.posts,
+                            action: HomeStore.Action.post(id:action:)
                         )
                     ) {
                         FeedView(store: $0)

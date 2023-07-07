@@ -14,8 +14,13 @@ import ComposableArchitecture
 struct FeedClient {
     let play: (String) -> EffectPublisher<Void, Never>
     let stop: () -> EffectPublisher<Void, Never>
+
+    #warning("새로운 API로 제거 예정")
     let postClap: (Int) -> EffectPublisher<Result<Bool, NetworkError>, Never>
     let deleteFeed: (Int) -> EffectPublisher<Result<Bool, NetworkError>, Never>
+
+    let clap: (String) -> EffectPublisher<Result<Int, NetworkError>, Never>
+    let deletePost: (String) -> EffectPublisher<Result<FMServerDescriptionDTO, NetworkError>, Never>
 }
 
 extension DependencyValues {
@@ -40,6 +45,16 @@ extension FeedClient: DependencyKey {
                 let request = FeedActionRequest(target: .deleteFeed(feedId))
                 
                 return BaseNetwork.shared.requestWithNoResponse(api: request, isInterceptive: false)
+                    .catchToEffect()
+            }, clap: { id in
+                let request = FMPostFavoriteRequest(postId: id)
+
+                return BaseNetwork.shared.request(api: request, isInterceptive: false)
+                    .catchToEffect()
+            }, deletePost: { id in
+                let request = FMDeletePostRequest(postId: id)
+
+                return BaseNetwork.shared.request(api: request, isInterceptive: false)
                     .catchToEffect()
             }
         )

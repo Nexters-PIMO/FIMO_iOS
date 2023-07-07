@@ -15,7 +15,7 @@ extension HomeView {
         let postCount: Int
         
         init(_ state: HomeStore.State) {
-            self.postCount = state.feeds.count
+            self.postCount = state.posts.count
         }
     }
     

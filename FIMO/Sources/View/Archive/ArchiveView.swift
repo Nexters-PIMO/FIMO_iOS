@@ -90,9 +90,9 @@ struct ArchiveView: View {
             }
             
             IfLetStore(
-                self.store.scope(state: \.feed, action: { .feedDetail($0) })
+                self.store.scope(state: \.post, action: { .postDetail($0) })
             ) {
-                feedDetail(viewStore, feedStore: $0)
+                postDetail(viewStore, postStore: $0)
             } else: {
                 if viewStore.feedsType == .basic {
                     basicFeedView(viewStore)
@@ -109,15 +109,15 @@ struct ArchiveView: View {
     // 피드 기본 모드로 보기
     func basicFeedView(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>) -> some View {
         LazyVStack(alignment: .center, pinnedViews: [.sectionHeaders]) {
-            Section(header: feedsHeader(viewStore)) {
-                if viewStore.feeds.isEmpty {
+            Section(header: postsHeader(viewStore)) {
+                if viewStore.posts.isEmpty {
                     ArchiveEmptyView(archiveType: viewStore.archiveType)
                         .frame(height: UIScreen.screenHeight - 350)
                 } else {
                     ForEachStore(
                         self.store.scope(
-                            state: \.feeds,
-                            action: ArchiveStore.Action.feed(id:action:)
+                            state: \.posts,
+                            action: ArchiveStore.Action.post(id:action:)
                         )
                     ) {
                         FeedView(store: $0)
@@ -137,19 +137,19 @@ struct ArchiveView: View {
     // 피드 그리드 모드로 보기
     func gridFeedView(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>) -> some View {
         LazyVGrid(
-            columns: viewStore.feeds.isEmpty
+            columns: viewStore.posts.isEmpty
             ? [GridItem(.flexible())] : columns,
             alignment: .center,
             spacing: 5,
             pinnedViews: [.sectionHeaders]
         ) {
-            Section(header: feedsHeader(viewStore)) {
-                if viewStore.feeds.isEmpty {
+            Section(header: postsHeader(viewStore)) {
+                if viewStore.posts.isEmpty {
                     ArchiveEmptyView(archiveType: viewStore.archiveType)
                         .frame(height: UIScreen.screenHeight - 344)
                 } else {
-                    ForEach(viewStore.state.gridFeeds, id: \.self) { feed in
-                        KFImage(URL(string: feed.textImages[0].imageURL))
+                    ForEach(viewStore.state.gridPosts, id: \.self) { post in
+                        KFImage(URL(string: post.items[0].imageUrl))
                             .placeholder {
                                 Rectangle()
                                     .foregroundColor(.gray)
@@ -157,7 +157,7 @@ struct ArchiveView: View {
                             .resizable()
                             .frame(height: width/2)
                             .onTapGesture {
-                                viewStore.send(.feedDidTap(feed.id))
+                                viewStore.send(.postDidTap(post.id))
                             }
                     }
                 }
@@ -166,7 +166,7 @@ struct ArchiveView: View {
     }
     
     // 글사진 상세
-    func feedDetail(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>, feedStore: Store<FeedStore.State, FeedStore.Action>) -> some View {
+    func postDetail(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>, postStore: Store<PostStore.State, PostStore.Action>) -> some View {
         VStack {
             Rectangle()
                 .fill(Color.white)
@@ -201,7 +201,7 @@ struct ArchiveView: View {
                 .background(Color(FIMOAsset.Assets.grayDivider.color))
                 .padding([.leading, .trailing], 20)
             
-            FeedView(store: feedStore)
+            FeedView(store: postStore)
             
             Spacer()
                 .frame(height: 16)
@@ -230,7 +230,7 @@ struct ArchiveView: View {
                 Text(viewStore.archiveProfile.nickname)
                     .font(Font(FIMOFontFamily.Pretendard.medium.font(size: 16)))
                 
-                Text(FIMOStrings.archivingTextImage(viewStore.feeds.count))
+                Text(FIMOStrings.archivingTextImage(viewStore.posts.count))
                     .font(Font(FIMOFontFamily.Pretendard.regular.font(size: 14)))
                     .foregroundColor(Color(FIMOAsset.Assets.grayText.color))
             }
@@ -253,11 +253,11 @@ struct ArchiveView: View {
     }
     
     // 아카이브 상단 글 사진 뷰
-    func feedsHeader(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>) -> some View {
+    func postsHeader(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>) -> some View {
         HStack {
             Image(uiImage: FIMOAsset.Assets.archiveLogo.image)
             
-            Text(FIMOStrings.textImageTitle(viewStore.feeds.count))
+            Text(FIMOStrings.textImageTitle(viewStore.posts.count))
                 .font(Font(FIMOFontFamily.Pretendard.medium.font(size: 16)))
                 .foregroundColor(.black)
             

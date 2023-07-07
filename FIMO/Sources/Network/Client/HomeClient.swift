@@ -12,7 +12,10 @@ import Foundation
 import ComposableArchitecture
 
 struct HomeClient {
+    #warning("새로운 API로 삭제 예정")
     let fetchFeeds: () -> EffectPublisher<Result<[FeedDTO], NetworkError>, Never>
+
+    let posts: () -> EffectPublisher<Result<[FMPostDTO], NetworkError>, Never>
 }
 
 extension DependencyValues {
@@ -27,6 +30,11 @@ extension HomeClient: DependencyKey {
         fetchFeeds: {
             let request = FeedsRequest(target: .fetchHomeFeeds)
             
+            return BaseNetwork.shared.request(api: request, isInterceptive: false)
+                .catchToEffect()
+        }, posts: {
+            let request = FMAllFeedRequest()
+
             return BaseNetwork.shared.request(api: request, isInterceptive: false)
                 .catchToEffect()
         })

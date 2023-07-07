@@ -25,11 +25,11 @@ struct HomeStore: ReducerProtocol {
         var isLoading: Bool = false
         var toastMessage: ToastModel = ToastModel(title: FIMOStrings.textCopyToastTitle,
                                                   message: FIMOStrings.textCopyToastMessage)
-        var feeds: IdentifiedArrayOf<FeedStore.State> = []
+        var posts: IdentifiedArrayOf<PostStore.State> = []
         var setting: SettingStore.State?
         var bottomSheet: BottomSheetStore.State?
         var profile: ProfileSettingStore.State?
-        var audioPlayingFeedId: Int?
+        var audioPlayingPostId: String?
     }
     
     enum Action: BindableAction, Equatable {
@@ -38,17 +38,17 @@ struct HomeStore: ReducerProtocol {
         case refresh
         case sendToast(ToastModel)
         case sendToastDone
-        case fetchFeeds(Result<[FeedDTO], NetworkError>)
-        case fetchFeedProfile(Result<Profile, NetworkError>)
-        case feed(id: FeedStore.State.ID, action: FeedStore.Action)
+        case fetchPosts(Result<[FMPostDTO], NetworkError>)
+        case fetchPostProfile(Result<Profile, NetworkError>)
+        case post(id: PostStore.State.ID, action: PostStore.Action)
         case settingButtonDidTap
         case receiveProfileInfo(FMProfile)
         case setting(SettingStore.Action)
         case onboarding(OnboardingStore.Action)
         case bottomSheet(BottomSheetStore.Action)
         case profile(ProfileSettingStore.Action)
-        case dismissBottomSheet(Feed)
-        case deleteFeed(Result<Bool, NetworkError>)
+        case dismissBottomSheet(FMPost)
+        case deletePost(Result<FMServerDescriptionDTO, NetworkError>)
     }
     
     @Dependency(\.homeClient) var homeClient
@@ -75,27 +75,27 @@ struct HomeStore: ReducerProtocol {
                 state.isShowToast = false
             case .onAppear:
                 state.isLoading = true
-                return homeClient.fetchFeeds().map {
-                    Action.fetchFeeds($0)
+                return homeClient.posts().map {
+                    Action.fetchPosts($0)
                 }
             case .refresh:
-                return homeClient.fetchFeeds().map {
-                    Action.fetchFeeds($0)
+                return homeClient.posts().map {
+                    Action.fetchPosts($0)
                 }
-            case let .fetchFeeds(result):
+            case let .fetchPosts(result):
                 switch result {
-                case let .success(feeds):
-                    var firstFeed = 0
-                    if !feeds.isEmpty { firstFeed = feeds[0].id }
-                    state.feeds = IdentifiedArrayOf(
-                        uniqueElements: feeds.map { $0.toModel() }.map { feed in
-                            FeedStore.State(
-                                textImage: feed.textImages[0],
-                                id: feed.id,
-                                feed: feed,
-                                isFirstFeed: (feed.id == firstFeed) ? true : false,
-                                clapCount: feed.clapCount,
-                                isClapped: feed.isClapped
+                case let .success(posts):
+                    var firstPost = ""
+                    if !posts.isEmpty { firstPost = posts[0].id }
+                    state.posts = IdentifiedArrayOf(
+                        uniqueElements: posts.map { $0.toModel() }.map { post in
+                            PostStore.State(
+                                textImage: post.items[0],
+                                id: post.id,
+                                post: post,
+                                isFirstPost: (post.id == firstPost) ? true : false,
+                                clapCount: post.favorite,
+                                isClapped: post.isClicked
                             )
                         }
                     )
@@ -103,33 +103,33 @@ struct HomeStore: ReducerProtocol {
                     break
                 }
                 state.isLoading = false
-            case let .feed(id: id, action: action):
+            case let .post(id: id, action: action):
                 switch action {
                 case let .copyButtonDidTap(text):
                     pasteboard.string = text
                     state.isShowToast = true
                 case let .moreButtonDidTap(id):
                     state.isBottomSheetPresented = true
-                    state.bottomSheet = BottomSheetStore.State(feedId: id,
-                                                               feed: state.feeds[id: id]?.feed ?? Feed.EMPTY,
+                    state.bottomSheet = BottomSheetStore.State(postId: id,
+                                                               post: state.posts[id: id]?.post ?? FMPost.EMPTY,
                                                                bottomSheetType: .me)
                 case .audioButtonDidTap:
-                    guard let feedId = state.audioPlayingFeedId else {
-                        state.audioPlayingFeedId = id
+                    guard let postId = state.audioPlayingPostId else {
+                        state.audioPlayingPostId = id
                         break
                     }
-                    if state.feeds[id: feedId]?.audioButtonDidTap ?? false && feedId != id {
-                        state.feeds[id: feedId]?.audioButtonDidTap.toggle()
+                    if state.posts[id: postId]?.audioButtonDidTap ?? false && postId != id {
+                        state.posts[id: postId]?.audioButtonDidTap.toggle()
                     }
-                    state.audioPlayingFeedId = id
+                    state.audioPlayingPostId = id
                 default:
                     break
                 }
             case let .bottomSheet(action):
                 switch action {
-                case let  .editButtonDidTap(feed):
+                case let .editButtonDidTap(post):
                     state.isBottomSheetPresented = false
-                    return EffectTask<Action>(value: .dismissBottomSheet(feed))
+                    return EffectTask<Action>(value: .dismissBottomSheet(post))
                         .delay(for: .seconds(0.3), scheduler: DispatchQueue.main)
                         .eraseToEffect()
                 case .deleteButtonDidTap:
@@ -137,7 +137,7 @@ struct HomeStore: ReducerProtocol {
                 case .declationButtonDidTap:
                     state.isBottomSheetPresented = false
                 }
-            case let .deleteFeed(result):
+            case let .deletePost(result):
                 switch result {
                 case .success:
                     return .send(.onAppear)
@@ -170,8 +170,8 @@ struct HomeStore: ReducerProtocol {
         .ifLet(\.bottomSheet, action: /Action.bottomSheet) {
             BottomSheetStore()
         }
-        .forEach(\.feeds, action: /Action.feed(id:action:)) {
-            FeedStore()
+        .forEach(\.posts, action: /Action.post(id:action:)) {
+            PostStore()
         }
         .ifLet(\.profile, action: /Action.profile) {
             ProfileSettingStore()

@@ -12,9 +12,13 @@ import Foundation
 import ComposableArchitecture
 
 struct ArchiveClient {
+    #warning("새로운 API로 삭제 예정")
     let fetchProfile: () -> EffectPublisher<Result<Profile, NetworkError>, Never>
     let fetchArchiveFeeds: () -> EffectPublisher<Result<[FeedDTO], NetworkError>, Never>
     let fetchFeed: (Int) -> EffectPublisher<Result<FeedDTO, NetworkError>, Never>
+
+    let archivePosts: () -> EffectPublisher<Result<[FMPostDTO], NetworkError>, Never>
+    let post: (String) -> EffectPublisher<Result<FMPostDTO, NetworkError>, Never>
 }
 
 extension DependencyValues {
@@ -40,6 +44,16 @@ extension ArchiveClient: DependencyKey {
             let request = FeedRequest(feedId: feedId)
             
             return BaseNetwork.shared.request(api: request, isInterceptive: false)
+                .catchToEffect()
+        }, archivePosts: {
+            let request = FMAllPostRequest(target: .me)
+
+            return BaseNetwork.shared.request(api: request, isInterceptive: true)
+                .catchToEffect()
+        }, post: { id in
+            let request = FMPostDetailRequest(postId: id)
+
+            return BaseNetwork.shared.request(api: request, isInterceptive: true)
                 .catchToEffect()
         }
     )

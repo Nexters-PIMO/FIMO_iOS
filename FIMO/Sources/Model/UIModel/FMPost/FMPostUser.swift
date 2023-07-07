@@ -8,8 +8,10 @@
 
 import Foundation
 
-struct FMPostUser: Equatable {
+struct FMPostUser {
     let id: String
     let nickname: String
     let archiveName: String
 }
+
+extension FMPostUser: Equatable, Hashable { }

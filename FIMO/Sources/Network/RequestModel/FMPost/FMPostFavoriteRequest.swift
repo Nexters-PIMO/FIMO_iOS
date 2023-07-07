@@ -12,7 +12,7 @@ import Alamofire
 
 struct FMPostFavoriteRequest: Requestable {
     typealias Response = Int
-    let postId: Int
+    let postId: String
 
     var path: String {
         return "/post/favorite/\(postId)"

@@ -11,14 +11,14 @@ import SwiftUI
 import Kingfisher
 
 struct FeedTextImageView: View {
-    private let textImage: TextImage
+    private let postItem: FMPostItem
     
-    init(textImage: TextImage) {
-        self.textImage = textImage
+    init(postItem: FMPostItem) {
+        self.postItem = postItem
     }
     
     var body: some View {
-        KFImage(URL(string: textImage.imageURL))
+        KFImage(URL(string: postItem.imageUrl))
             .placeholder { Image(systemName: "person.fill") }
             .resizable()
             .aspectRatio(contentMode: .fill)
@@ -27,9 +27,11 @@ struct FeedTextImageView: View {
 
 struct FeedTextImageView_Previews: PreviewProvider {
     static var previews: some View {
-        FeedTextImageView(textImage: TextImage(
-            id: 1,
-            imageURL: FIMOStrings.textImage,
-            text: "안녕"))
+        FeedTextImageView(
+            postItem: FMPostItem(
+                imageUrl: FIMOStrings.textImage,
+                content: "안녕"
+            )
+        )
     }
 }

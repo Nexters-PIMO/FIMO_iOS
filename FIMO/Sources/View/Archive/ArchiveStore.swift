@@ -45,18 +45,18 @@ struct ArchiveStore: ReducerProtocol {
                                                   message: FIMOStrings.textCopyToastMessage)
         var archiveType: ArchiveType = .myArchive
         var archiveProfile: FMProfile = .EMPTY
-        var gridFeeds: [Feed] = []
-        var feeds: IdentifiedArrayOf<FeedStore.State> = []
+        var gridPosts: [FMPost] = []
+        var posts: IdentifiedArrayOf<PostStore.State> = []
         var pushToSettingView: Bool = false
         var pushToFriendView: Bool = false
         var feedsType: FeedsType = .basic
-        var feed: FeedStore.State?
-        var feedId: Int?
+        var post: PostStore.State?
+        var postId: String?
         var friends: FriendsListStore.State?
         var setting: SettingStore.State?
         var bottomSheet: BottomSheetStore.State?
         var profile: ProfileSettingStore.State?
-        var audioPlayingFeedId: Int?
+        var audioPlayingPostId: String?
     }
     
     enum Action: BindableAction, Equatable {
@@ -66,22 +66,22 @@ struct ArchiveStore: ReducerProtocol {
         case onAppear
         case refresh
         case fetchArchiveProfile(Result<FMProfileDTO, NetworkError>)
-        case fetchArchiveFeeds(Result<[FeedDTO], NetworkError>)
-        case fetchFeed(Result<FeedDTO, NetworkError>)
-        case feed(id: FeedStore.State.ID, action: FeedStore.Action)
+        case fetchArchivePosts(Result<[FMPostDTO], NetworkError>)
+        case fetchPost(Result<FMPostDTO, NetworkError>)
+        case post(id: PostStore.State.ID, action: PostStore.Action)
         case topBarButtonDidTap
         case settingButtonDidTap
         case friendListButtonDidTap
         case feedsTypeButtonDidTap(FeedsType)
-        case feedDidTap(Int)
+        case postDidTap(String)
         case receiveProfileInfo(FMProfile)
-        case feedDetail(FeedStore.Action)
+        case postDetail(PostStore.Action)
         case friends(FriendsListStore.Action)
         case setting(SettingStore.Action)
         case bottomSheet(BottomSheetStore.Action)
         case profile(ProfileSettingStore.Action)
-        case dismissBottomSheet(Feed)
-        case deleteFeed(Result<Bool, NetworkError>)
+        case dismissBottomSheet(FMPost)
+        case deletePost(Result<FMServerDescriptionDTO, NetworkError>)
     }
     
     @Dependency(\.archiveClient) var archiveClient
@@ -113,18 +113,18 @@ struct ArchiveStore: ReducerProtocol {
                     profileClient.myProfile().map {
                         Action.fetchArchiveProfile($0)
                     },
-                    archiveClient.fetchArchiveFeeds().map {
-                        Action.fetchArchiveFeeds($0)
+                    archiveClient.archivePosts().map {
+                        Action.fetchArchivePosts($0)
                     }
                 )
             case .refresh:
-                guard let feedId = state.feedId else {
-                    return archiveClient.fetchArchiveFeeds().map {
-                        Action.fetchArchiveFeeds($0)
+                guard let postId = state.postId else {
+                    return archiveClient.archivePosts().map {
+                        Action.fetchArchivePosts($0)
                     }
                 }
-                return archiveClient.fetchFeed(feedId).map {
-                    Action.fetchFeed($0)
+                return archiveClient.post(postId).map {
+                    Action.fetchPost($0)
                 }
             case let .fetchArchiveProfile(result):
                 switch result {
@@ -134,22 +134,22 @@ struct ArchiveStore: ReducerProtocol {
                     print("error")
                 }
                 state.isLoading = false
-            case let .fetchArchiveFeeds(result):
+            case let .fetchArchivePosts(result):
                 switch result {
-                case let .success(feeds):
-                    let feeds = feeds.map { $0.toModel() }
-                    var firstFeed = 0
-                    if !feeds.isEmpty { firstFeed = feeds[0].id }
-                    state.gridFeeds = feeds
-                    state.feeds = IdentifiedArrayOf(
-                        uniqueElements: feeds.map { feed in
-                            FeedStore.State(
-                                textImage: feed.textImages[0],
-                                id: feed.id,
-                                feed: feed,
-                                isFirstFeed: (firstFeed == feed.id) ? true : false,
-                                clapCount: feed.clapCount,
-                                isClapped: feed.isClapped
+                case let .success(posts):
+                    let posts = posts.map { $0.toModel() }
+                    var firstPost = ""
+                    if !posts.isEmpty { firstPost = posts[0].id }
+                    state.gridPosts = posts
+                    state.posts = IdentifiedArrayOf(
+                        uniqueElements: posts.map { post in
+                            PostStore.State(
+                                textImage: post.items[0],
+                                id: post.id,
+                                post: post,
+                                isFirstPost: (firstPost == post.id) ? true : false,
+                                clapCount: post.favorite,
+                                isClapped: post.isClicked
                             )
                         }
                     )
@@ -157,37 +157,37 @@ struct ArchiveStore: ReducerProtocol {
                     print("error")
                 }
                 state.isLoading = false
-            case let .feed(id: id, action: action):
+            case let .post(id: id, action: action):
                 switch action {
                 case let .copyButtonDidTap(text):
                     pasteboard.string = text
                     state.isShowToast = true
                 case let .moreButtonDidTap(id):
                     state.isBottomSheetPresented = true
-                    state.bottomSheet = BottomSheetStore.State(feedId: id,
-                                                               feed: state.feeds[id: id]?.feed ?? Feed.EMPTY,
+                    state.bottomSheet = BottomSheetStore.State(postId: id,
+                                                               post: state.posts[id: id]?.post ?? FMPost.EMPTY,
                                                                bottomSheetType: .me)
                 case .audioButtonDidTap:
-                    guard let feedId = state.audioPlayingFeedId else {
-                        state.audioPlayingFeedId = id
+                    guard let postId = state.audioPlayingPostId else {
+                        state.audioPlayingPostId = id
                         break
                     }
-                    if state.feeds[id: feedId]?.audioButtonDidTap ?? false && feedId != id {
-                        state.feeds[id: feedId]?.audioButtonDidTap.toggle()
+                    if state.posts[id: postId]?.audioButtonDidTap ?? false && postId != id {
+                        state.posts[id: postId]?.audioButtonDidTap.toggle()
                     }
-                    state.audioPlayingFeedId = id
+                    state.audioPlayingPostId = id
                 default:
                     break
                 }
-            case let .feedDetail(action):
+            case let .postDetail(action):
                 switch action {
                 case let .copyButtonDidTap(text):
                     pasteboard.string = text
                     state.isShowToast = true
                 case let .moreButtonDidTap(id):
                     state.isBottomSheetPresented = true
-                    state.bottomSheet = BottomSheetStore.State(feedId: id,
-                                                               feed: state.feeds[id: id]?.feed ?? Feed.EMPTY,
+                    state.bottomSheet = BottomSheetStore.State(postId: id,
+                                                               post: state.posts[id: id]?.post ?? FMPost.EMPTY,
                                                                bottomSheetType: .me)
                 default:
                     break
@@ -211,19 +211,19 @@ struct ArchiveStore: ReducerProtocol {
                 state.path.append(.friends)
             case let .feedsTypeButtonDidTap(type):
                 state.feedsType = type
-                state.feed = nil
-                state.feedId = nil
+                state.post = nil
+                state.postId = nil
                 TTSManager.shared.stopPlaying()
                 if type == .basic {
-                    return archiveClient.fetchArchiveFeeds().map {
-                        Action.fetchArchiveFeeds($0)
+                    return archiveClient.archivePosts().map {
+                        Action.fetchArchivePosts($0)
                     }
                 }
             case let .bottomSheet(action):
                 switch action {
-                case let .editButtonDidTap(feed):
+                case let .editButtonDidTap(post):
                     state.isBottomSheetPresented = false
-                    return EffectTask<Action>(value: .dismissBottomSheet(feed))
+                    return EffectTask<Action>(value: .dismissBottomSheet(post))
                         .delay(for: .seconds(0.3), scheduler: DispatchQueue.main)
                         .eraseToEffect()
                 case .deleteButtonDidTap:
@@ -241,30 +241,30 @@ struct ArchiveStore: ReducerProtocol {
                     previousSelectedImageURL: state.setting?.profile.profileImageUrl ?? ""
                 )
                 state.path.append(.modifyProfile)
-            case let .deleteFeed(result):
+            case let .deletePost(result):
                 switch result {
                 case .success:
                     return .send(.onAppear)
                 default:
                     print("error")
                 }
-            case let .feedDidTap(feedId):
+            case let .postDidTap(postId):
                 state.isLoading = true
-                state.feedId = feedId
-                return archiveClient.fetchFeed(feedId).map {
-                    Action.fetchFeed($0)
+                state.postId = postId
+                return archiveClient.post(postId).map {
+                    Action.fetchPost($0)
                 }
-            case let .fetchFeed(result):
+            case let .fetchPost(result):
                 switch result {
-                case let .success(feed):
-                    let feed = feed.toModel()
-                    state.feed = FeedStore.State(
-                        textImage: feed.textImages[0],
-                        id: feed.id,
-                        feed: feed,
-                        isFirstFeed: true,
-                        clapCount: feed.clapCount,
-                        isClapped: feed.isClapped
+                case let .success(post):
+                    let post = post.toModel()
+                    state.post = PostStore.State(
+                        textImage: post.items[0],
+                        id: post.id,
+                        post: post,
+                        isFirstPost: true,
+                        clapCount: post.favorite,
+                        isClapped: post.isClicked
                     )
                 default:
                     print("error")
@@ -278,8 +278,8 @@ struct ArchiveStore: ReducerProtocol {
         .ifLet(\.setting, action: /Action.setting) {
             SettingStore()
         }
-        .ifLet(\.feed, action: /Action.feedDetail) {
-            FeedStore()
+        .ifLet(\.post, action: /Action.postDetail) {
+            PostStore()
         }
         .ifLet(\.friends, action: /Action.friends) {
             FriendsListStore()
@@ -290,8 +290,8 @@ struct ArchiveStore: ReducerProtocol {
         .ifLet(\.profile, action: /Action.profile) {
             ProfileSettingStore()
         }
-        .forEach(\.feeds, action: /Action.feed(id:action:)) {
-            FeedStore()
+        .forEach(\.posts, action: /Action.post(id:action:)) {
+            PostStore()
         }
     }
 }

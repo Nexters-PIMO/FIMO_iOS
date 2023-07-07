@@ -55,7 +55,7 @@ struct RemovePopupViewModifier: ViewModifier {
                     }, type: .cancel),
                     PopupButton(buttonText: "삭제하기", buttonCompletionHandler: {
                         isShowing = false
-                        store.send(.deleteFeed)
+                        store.send(.deletePost)
                     }, type: .destructive)
                 ])
         }

@@ -10,12 +10,12 @@ import Foundation
 
 import ComposableArchitecture
 
-struct FeedStore: ReducerProtocol {
+struct PostStore: ReducerProtocol {
     struct State: Equatable, Identifiable {
-        @BindingState var textImage: TextImage = TextImage.EMPTY
-        var id: Int = 0
-        var feed: Feed = Feed.EMPTY
-        var isFirstFeed: Bool = false
+        @BindingState var textImage: FMPostItem = FMPostItem.EMPTY
+        var id: String = ""
+        var post: FMPost = FMPost.EMPTY
+        var isFirstPost: Bool = false
         var clapCount: Int = 0
         var plusClapCount: Int = 0
         var isClapped: Bool = false
@@ -28,11 +28,11 @@ struct FeedStore: ReducerProtocol {
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
         case checkTextGuideClosed
-        case moreButtonDidTap(Int)
+        case moreButtonDidTap(String)
         case copyButtonDidTap(String)
         case closeButtonDidTap
         case clapButtonDidTap
-        case postClap(Result<Bool, NetworkError>)
+        case postClap(Result<Int, NetworkError>)
         case clapButtonIsDone
         case shareButtonDidTap
         case audioButtonDidTap(String)
@@ -59,7 +59,7 @@ struct FeedStore: ReducerProtocol {
                 state.clapCount += 1
                 state.clapButtonDidTap = true
                 state.isClapPlusViewShowing = true
-                return feedClient.postClap(state.id).map {
+                return feedClient.clap(state.id).map {
                     Action.postClap($0)
                 }
             case let .postClap(result):
