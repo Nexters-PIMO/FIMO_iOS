@@ -120,7 +120,7 @@ struct ArchiveView: View {
                             action: ArchiveStore.Action.post(id:action:)
                         )
                     ) {
-                        FeedView(store: $0)
+                        PostView(store: $0)
                         
                         Spacer()
                             .frame(height: 12)
@@ -201,7 +201,7 @@ struct ArchiveView: View {
                 .background(Color(FIMOAsset.Assets.grayDivider.color))
                 .padding([.leading, .trailing], 20)
             
-            FeedView(store: postStore)
+            PostView(store: postStore)
             
             Spacer()
                 .frame(height: 16)

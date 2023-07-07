@@ -28,7 +28,7 @@ struct HomeView: View {
                                 viewStore.send(.refresh)
                             }
                     } else {
-                        homeFeedView(viewStore: viewStore)
+                        homePostView(viewStore: viewStore)
                             .refreshable {
                                 viewStore.send(.refresh)
                             }
@@ -73,7 +73,7 @@ struct HomeView: View {
         }
     }
     
-    func homeFeedView(viewStore: ViewStore<HomeStore.State, HomeStore.Action>) -> some View {
+    func homePostView(viewStore: ViewStore<HomeStore.State, HomeStore.Action>) -> some View {
         ScrollView {
             LazyVStack(alignment: .center) {
                 LazyVStack {
@@ -83,7 +83,7 @@ struct HomeView: View {
                             action: HomeStore.Action.post(id:action:)
                         )
                     ) {
-                        FeedView(store: $0)
+                        PostView(store: $0)
                         
                         Spacer()
                             .frame(height: 12)

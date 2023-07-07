@@ -1,5 +1,5 @@
 //
-//  FeedStore.swift
+//  PostStore.swift
 //  PIMO
 //
 //  Created by 김영인 on 2023/02/24.

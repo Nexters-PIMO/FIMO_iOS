@@ -1,5 +1,5 @@
 //
-//  FeedView.swift
+//  PostView.swift
 //  PIMO
 //
 //  Created by 김영인 on 2023/02/18.
@@ -11,7 +11,7 @@ import SwiftUI
 import ComposableArchitecture
 import Kingfisher
 
-struct FeedView: View {
+struct PostView: View {
     let store: StoreOf<PostStore>
     
     let width = UIScreen.screenWidth - 40
@@ -63,7 +63,7 @@ struct FeedView: View {
                     ZStack {
                         TabView(selection: viewStore.binding(\.$textImage)) {
                             ForEach(viewStore.post.items, id: \.self) {
-                                FeedTextImageView(postItem: $0)
+                                PostTextImageView(postItem: $0)
                                     .tag($0)
                             }
                         }

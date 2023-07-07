@@ -1,5 +1,5 @@
 //
-//  FeedTextImageView.swift
+//  PostTextImageView.swift
 //  PIMO
 //
 //  Created by 김영인 on 2023/02/21.
@@ -10,7 +10,7 @@ import SwiftUI
 
 import Kingfisher
 
-struct FeedTextImageView: View {
+struct PostTextImageView: View {
     private let postItem: FMPostItem
     
     init(postItem: FMPostItem) {
@@ -25,9 +25,9 @@ struct FeedTextImageView: View {
     }
 }
 
-struct FeedTextImageView_Previews: PreviewProvider {
+struct PostTextImageView_Previews: PreviewProvider {
     static var previews: some View {
-        FeedTextImageView(
+        PostTextImageView(
             postItem: FMPostItem(
                 imageUrl: FIMOStrings.textImage,
                 content: "안녕"
