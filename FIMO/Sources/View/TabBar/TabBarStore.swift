@@ -137,6 +137,8 @@ struct TabBarStore: ReducerProtocol {
                 case let .dismissBottomSheet(post):
                     print(post)
                     state.isSheetPresented = true
+                    state.uploadState.uploadedPostItems = post.items
+                    state.uploadState.selectedPostItem = post.items.first
                 case .setting(.tappedLogoutButton):
                     state.isShowLogoutPopup = true
                 case .setting(.tappedWithdrawalButton):
@@ -167,9 +169,10 @@ struct TabBarStore: ReducerProtocol {
                     state.isShowRemovePopup = true
                     state.postId = postId
                     state.deleteAt = .archive
-                case let .dismissBottomSheet(feed):
-                    print(feed)
+                case let .dismissBottomSheet(post):
                     state.isSheetPresented = true
+                    state.uploadState.uploadedPostItems = post.items
+                    state.uploadState.selectedPostItem = post.items.first
                 case .setting(.tappedLogoutButton):
                     state.isShowLogoutPopup = true
                 case .setting(.tappedWithdrawalButton):

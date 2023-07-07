@@ -9,6 +9,7 @@
 import Foundation
 
 struct FMPostItem {
+    let id: UUID = UUID()
     let imageUrl: String
     let content: String
 }
