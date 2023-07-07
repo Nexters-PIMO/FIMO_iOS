@@ -101,12 +101,14 @@ struct TabBarStore: ReducerProtocol {
                 return .send(.home(.receiveProfileInfo(state.myProfile ?? FMProfile.EMPTY)))
             case .home(.bottomSheet(.deleteButtonDidTap(let postId))):
                 state.isShowRemovePopup = true
-                let _ = print(postId)
+                state.postId = postId
+                state.deleteAt = .home
             case .archive(.settingButtonDidTap):
                 return .send(.archive(.receiveProfileInfo(state.myProfile ?? FMProfile.EMPTY)))
             case .archive(.bottomSheet(.deleteButtonDidTap(let postId))):
                 state.isShowRemovePopup = true
-                let _ = print(postId)
+                state.postId = postId
+                state.deleteAt = .archive
             case .acceptBackOnProfileSetting:
                 if state.tabBarItem == .home,
                    state.homeState.path.last == .modifyProfile {
