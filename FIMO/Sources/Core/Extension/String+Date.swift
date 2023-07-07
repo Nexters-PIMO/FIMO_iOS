@@ -17,7 +17,7 @@ extension String {
     
     func toUploadTime() -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyyMMddHHmmss"
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
         
         guard let date = dateFormatter.date(from: self) else {
             return "-"

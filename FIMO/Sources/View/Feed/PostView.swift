@@ -42,7 +42,7 @@ struct PostView: View {
                         
                         Spacer()
                         
-                        Text(viewStore.post.createdAt)
+                        Text(viewStore.post.createdAt.toUploadTime())
                             .foregroundColor(Color(FIMOAsset.Assets.grayText.color))
                             .font(.system(size: 14))
                         
