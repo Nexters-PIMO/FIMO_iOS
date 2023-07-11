@@ -15,11 +15,11 @@ struct UploadStore: ReducerProtocol {
     struct State: Equatable {
         @BindingState var isIncompleteClose = false
         @BindingState var isShowImagePicker = false
-        var uploadedImages = [UploadImage]()
+        var uploadedPostItems = [FMPostItem]()
         
         @BindingState var isShowOCRErrorToast = false
         var toastMessage: ToastModel?
-        var selectedImage: UploadImage?
+        var selectedPostItem: FMPostItem?
         var isLoading: Bool = false
     }
     
@@ -31,11 +31,11 @@ struct UploadStore: ReducerProtocol {
         case didTapUploadButton
         case didTapPublishButton
         case didTapPublishButtonDone(Result<FMPostDTO, NetworkError>)
-        case didTapUploadedImage(UploadImage)
-        case didTapDeleteButton(Int)
-        case selectProfileImage(UploadImage)
-        case fetchImageUrl(UploadImage)
-        case fetchImageUrlDone(Result<ImgurImageModel, NetworkError>, UploadImage)
+        case didTapUploadedImage(FMPostItem)
+        case didTapDeleteButton(FMPostItem)
+        case selectProfileImage(UIImage)
+        case fetchImageUrl(UIImage, String)
+        case fetchImageUrlDone(Result<ImgurImageModel, NetworkError>, UIImage, String)
         case sendToast(ToastModel)
         case removeToast
     }
@@ -53,7 +53,7 @@ struct UploadStore: ReducerProtocol {
             case .clearScene:
                 state.isShowImagePicker = false
                 state.isShowOCRErrorToast = false
-                state.uploadedImages = []
+                state.uploadedPostItems = []
             case .didTapCloseButtonWithData:
                 state.isIncompleteClose = true
                 return .none
@@ -61,28 +61,20 @@ struct UploadStore: ReducerProtocol {
                 state.isShowImagePicker = true
                 
                 return .none
-            case .didTapUploadedImage(let uploadedImage):
-                state.selectedImage = uploadedImage
+            case .didTapUploadedImage(let postItem):
+                state.selectedPostItem = postItem
                 
                 return .none
-            case .didTapDeleteButton(let index):
-                state.uploadedImages = state.uploadedImages
-                    .filter { $0.id != index }
-                    .enumerated()
-                    .map({ (index, image) in
-                        var tempImage = image
-                        tempImage.id = index
-                        return tempImage
-                    })
+            case .didTapDeleteButton(let postItem):
+                state.uploadedPostItems.removeAll(where: { $0.id == postItem.id })
                 
                 return .none
             case .selectProfileImage(let uploadImage):
                 state.isLoading = true
                 let extractedText = extractText(from: uploadImage, state: &state)
-                let image = UploadImage(id: uploadImage.id, image: uploadImage.image, text: extractedText)
                 
                 if !extractedText.isEmpty {
-                    return .init(value: .fetchImageUrl(image))
+                    return .init(value: .fetchImageUrl(uploadImage, extractedText))
                 } else {
                     state.isShowOCRErrorToast = true
                     
@@ -95,22 +87,21 @@ struct UploadStore: ReducerProtocol {
                         return .sendToast(message)
                     }
                 }
-            case .fetchImageUrl(let uploadImage):
+            case .fetchImageUrl(let uploadImage, let extractedText):
                 return imgurImageClient
-                    .uploadImage(uploadImage.image.jpegData(compressionQuality: 0.9) ?? Data())
+                    .uploadImage(uploadImage.jpegData(compressionQuality: 0.9) ?? Data())
                     .map {
-                        Action.fetchImageUrlDone($0, uploadImage)
+                        Action.fetchImageUrlDone($0, uploadImage, extractedText)
                     }
-            case .fetchImageUrlDone(let result, let uploadImage):
+            case .fetchImageUrlDone(let result, let uploadImage, let extractedText):
                 switch result {
                 case .success(let imageModel):
-                    var tempUploadimage = uploadImage
-                    tempUploadimage.imageUrl = imageModel.link
+                    var postItem = FMPostItem(imageUrl: imageModel.link, content: extractedText)
 
-                    state.uploadedImages.append(tempUploadimage)
+                    state.uploadedPostItems.append(postItem)
 
-                    if state.selectedImage == nil {
-                        state.selectedImage = tempUploadimage
+                    if state.selectedPostItem == nil {
+                        state.selectedPostItem = postItem
                     }
                     state.isLoading = false
                     return .none
@@ -129,10 +120,10 @@ struct UploadStore: ReducerProtocol {
                 state.isShowOCRErrorToast = false
                 return .none
             case .didTapPublishButton:
-                let updatePost = FMUpdatedPost(items:
-                    state.uploadedImages.map({
-                        $0.toUpdatedPostItem()
-                    })
+                let updatePost = FMUpdatedPost(
+                    items: state.uploadedPostItems.map {
+                        FMUpdatedPostItem(imageUrl: $0.imageUrl, content: $0.content)
+                    }
                 )
 
                 return postClient.uploadPost(updatePost).map {
@@ -140,9 +131,7 @@ struct UploadStore: ReducerProtocol {
                 }
             case .didTapPublishButtonDone(let result):
                 switch result {
-                case .success(let post):
-                    Log.warning("피드, 아키이브 View 완성 시 Post 추가 Action 구현 필요")
-                    #warning("피드, 아키이브 View 완성 시 Post 추가 Action 구현 필요")
+                case .success:
                     return .init(value: .clearScene)
                 case .failure(let error):
                     return .init(value: .sendToast(ToastModel(title: error.errorDescription ?? "")))
@@ -154,8 +143,8 @@ struct UploadStore: ReducerProtocol {
         }
     }
     
-    private func extractText(from image: UploadImage, state: inout State) -> String {
-        guard let convertedImage = image.image.cgImage else {
+    private func extractText(from image: UIImage, state: inout State) -> String {
+        guard let convertedImage = image.cgImage else {
             return ""
         }
         

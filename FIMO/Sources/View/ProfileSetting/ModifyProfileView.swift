@@ -34,7 +34,7 @@ struct ModifyProfileView: View {
                     Text(viewStore.nicknameValidationType.description)
                         .padding(.top, 10)
                         .font(.system(size: 12))
-                        .foregroundColor(viewStore.nicknameValidationType.color)
+                        .foregroundColor(viewStore.nicknameValidationType.descriptionColor)
 
                     Text("아카이브 이름")
                         .font(.system(size: 16))
@@ -45,7 +45,7 @@ struct ModifyProfileView: View {
                     Text(viewStore.archiveValidationType.description)
                         .padding(.top, 10)
                         .font(.system(size: 12))
-                        .foregroundColor(viewStore.archiveValidationType.color)
+                        .foregroundColor(viewStore.archiveValidationType.descriptionColor)
 
                     Spacer()
 
@@ -121,13 +121,25 @@ struct ModifyProfileView: View {
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity, minHeight: 56)
                 .background(
-                    viewStore.isChangedInfo
+                    viewStore.nicknameValidationType.isOKButtonClickable ||
+                    viewStore.archiveValidationType.isOKButtonClickable && (
+                        viewStore.nicknameValidationType == .sameName ||
+                        viewStore.archiveValidationType == .sameName
+                    )
                     ? Color(FIMOAsset.Assets.red2.color)
                     : Color(FIMOAsset.Assets.gray1.color)
-                    )
+                )
                 .cornerRadius(2)
         }
-        .disabled(!viewStore.isChangedInfo)
+        .disabled(
+            !(
+                viewStore.nicknameValidationType.isOKButtonClickable ||
+                viewStore.archiveValidationType.isOKButtonClickable && (
+                    viewStore.nicknameValidationType == .sameName ||
+                    viewStore.archiveValidationType == .sameName
+                )
+            )
+        )
         .padding(.top, 34)
         .padding(.bottom, 60)
     }
@@ -137,7 +149,7 @@ struct ModifyProfileView: View {
             TextField("텍스트를 입력해주세요.", text: viewStore.binding(\.$nickname))
                 .padding()
                 .foregroundColor(
-                    fieldColor(isBlack: viewStore.isBlackNicknameField)
+                    viewStore.nicknameValidationType.fieldColor
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 2)
@@ -156,18 +168,18 @@ struct ModifyProfileView: View {
                         Text("중복확인")
                             .font(.system(size: 16))
                             .foregroundColor(
-                                fieldColor(isBlack: viewStore.isBlackNicknameField)
+                                viewStore.nicknameValidationType.duplicatedButtonColor
                             )
 
                         Divider()
                             .frame(width: 60)
                             .background(
-                                fieldColor(isBlack: viewStore.isBlackNicknameField)
+                                viewStore.nicknameValidationType.duplicatedButtonColor
                             )
                     }
 
                 }
-                .disabled(viewStore.isBlackNicknameField)
+                .disabled(!viewStore.nicknameValidationType.isDuplicateButtonEnabled)
                 .padding(.trailing, 21)
                 .padding(.top, 13)
             }
@@ -179,7 +191,7 @@ struct ModifyProfileView: View {
             TextField("텍스트를 입력해주세요.", text: viewStore.binding(\.$archiveName))
                 .padding()
                 .foregroundColor(
-                    fieldColor(isBlack: viewStore.isBlackArchiveField)
+                    viewStore.archiveValidationType.fieldColor
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 2)
@@ -198,26 +210,22 @@ struct ModifyProfileView: View {
                         Text("중복확인")
                             .font(.system(size: 16))
                             .foregroundColor(
-                                fieldColor(isBlack: viewStore.isBlackArchiveField)
+                                viewStore.archiveValidationType.duplicatedButtonColor
                             )
 
                         Divider()
                             .frame(width: 60)
                             .background(
-                                fieldColor(isBlack: viewStore.isBlackArchiveField)
+                                viewStore.archiveValidationType.duplicatedButtonColor
                             )
                     }
 
                 }
-                .disabled(viewStore.isBlackArchiveField)
+                .disabled(!viewStore.archiveValidationType.isDuplicateButtonEnabled)
                 .padding(.trailing, 21)
                 .padding(.top, 13)
             }
         }
-    }
-
-    func fieldColor(isBlack: Bool) -> Color {
-        return isBlack ? Color(FIMOAsset.Assets.gray1.color) : Color.black
     }
 }
 

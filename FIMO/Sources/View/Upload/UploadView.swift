@@ -9,6 +9,7 @@
 import SwiftUI
 
 import ComposableArchitecture
+import Kingfisher
 
 struct UploadView: View {
     @EnvironmentObject var sceneDelegate: SceneDelegate
@@ -70,7 +71,7 @@ struct UploadView: View {
                 .foregroundColor(.white)
             HStack {
                 Button {
-                    if viewStore.state.uploadedImages.isEmpty {
+                    if viewStore.state.uploadedPostItems.isEmpty {
                         viewStore.send(.didTapCloseButton)
                     } else {
                         viewStore.send(.didTapCloseButtonWithData)
@@ -96,7 +97,7 @@ struct UploadView: View {
         HStack(spacing: 8) {
             uploadButton(viewStore: viewStore)
                 .onTapGesture {
-                    if viewStore.state.uploadedImages.count < 5 {
+                    if viewStore.state.uploadedPostItems.count < 5 {
                         viewStore.send(.didTapUploadButton)
                     }
                 }
@@ -113,12 +114,7 @@ struct UploadView: View {
         }
         .sheet(isPresented: viewStore.binding(\.$isShowImagePicker)) {
             ImagePicker { uiImage in
-                let uploadImage = UploadImage(
-                    id: viewStore.uploadedImages.count,
-                    image: uiImage
-                )
-                
-                viewStore.send(.selectProfileImage(uploadImage))
+                viewStore.send(.selectProfileImage(uiImage))
             }
         }
     }
@@ -151,7 +147,7 @@ struct UploadView: View {
                     .padding(.bottom, 8)
                 
                 HStack(spacing: 0) {
-                    Text("\(viewStore.uploadedImages.count)")
+                    Text("\(viewStore.uploadedPostItems.count)")
                     Text("/5")
                         .foregroundColor(Color(FIMOAsset.Assets.gray3.color))
                 }
@@ -162,35 +158,34 @@ struct UploadView: View {
     }
     
     private func uploadedImage(viewStore: ViewStore<UploadStore.State, UploadStore.Action>) -> some View {
-            ForEach(viewStore.uploadedImages) { uploadedImage in
+        ForEach(viewStore.uploadedPostItems, id: \.id) { postItem in
                 ZStack {
                     VStack {
                         Spacer(minLength: 14)
-                        
-                        Image(uiImage: uploadedImage.image)
+
+                        KFImage(URL(string: postItem.imageUrl))
                             .resizable()
                             .renderingMode(.original)
                             .scaledToFit()
-                            .cornerRadius(2)
                             .frame(width: 72, height: 72)
-                            .overlay {
-                                if uploadedImage.id == .zero {
+                            .if(postItem.id == viewStore.selectedPostItem?.id, transform: {
+                                $0.overlay {
                                     RoundedRectangle(cornerRadius: 2)
                                         .stroke(Color(FIMOAsset.Assets.red3.color), lineWidth: 2)
                                 }
-                            }
+                            })
                     }
                     
                     VStack {
                         Image(uiImage: FIMOAsset.Assets.deleteButton.image)
                             .onTapGesture {
-                                viewStore.send(.didTapDeleteButton(uploadedImage.id))
+                                viewStore.send(.didTapDeleteButton(postItem))
                             }
                             .frame(width: 20, height: 20)
                             .padding(.bottom, 58)
                     }
                     
-                    if uploadedImage.id == .zero {
+                    if postItem.id == viewStore.selectedPostItem?.id {
                         VStack {
                             Spacer(minLength: 63.5)
                             
@@ -205,14 +200,14 @@ struct UploadView: View {
                     }
                 }
                 .onTapGesture {
-                    viewStore.send(.didTapUploadedImage(uploadedImage))
+                    viewStore.send(.didTapUploadedImage(postItem))
                 }
             }
     }
     
     private func mainImage(viewStore: ViewStore<UploadStore.State, UploadStore.Action>) -> some View {
         ZStack {
-            if viewStore.state.uploadedImages.isEmpty {
+            if viewStore.state.uploadedPostItems.isEmpty {
                 RoundedRectangle(cornerRadius: 2)
                     .foregroundColor(Color(FIMOAsset.Assets.gray0.color))
                     .frame(width: 353, height: 353)
@@ -233,7 +228,7 @@ struct UploadView: View {
                         .foregroundColor(Color(FIMOAsset.Assets.gray3.color))
                 }
             } else {
-                Image(uiImage: viewStore.selectedImage?.image ?? UIImage())
+                KFImage(URL(string: viewStore.selectedPostItem?.imageUrl ?? ""))
                     .resizable()
                     .renderingMode(.original)
                     .scaledToFit()
@@ -245,7 +240,7 @@ struct UploadView: View {
     
     private func publishButton(viewStore: ViewStore<UploadStore.State, UploadStore.Action>) -> some View {
         Button {
-            if !viewStore.state.uploadedImages.isEmpty {
+            if !viewStore.state.uploadedPostItems.isEmpty {
                 viewStore.send(.didTapPublishButton)
             }
         } label: {
@@ -254,7 +249,7 @@ struct UploadView: View {
                 let orange = Color(uiColor: FIMOAsset.Assets.red3.color)
 
                 RoundedRectangle(cornerRadius: 2)
-                    .fill(viewStore.state.uploadedImages.isEmpty ? gray : orange)
+                    .fill(viewStore.state.uploadedPostItems.isEmpty ? gray : orange)
                     .frame(width: 353, height: 56)
                 
                 Text("게시하기")

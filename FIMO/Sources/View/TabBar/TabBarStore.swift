@@ -31,7 +31,7 @@ struct TabBarStore: ReducerProtocol {
         var homeState = HomeStore.State()
         var uploadState = UploadStore.State()
         var archiveState = ArchiveStore.State()
-        var feedId: Int?
+        var postId: String?
         var deleteAt: DeleteAt?
         var selectedFriend: FMFriend?
     }
@@ -46,7 +46,7 @@ struct TabBarStore: ReducerProtocol {
         case home(HomeStore.Action)
         case upload(UploadStore.Action)
         case archive(ArchiveStore.Action)
-        case deleteFeed
+        case deletePost
         case acceptBackOnProfileSetting
         case acceptLogout
         case acceptWithdrawal
@@ -99,14 +99,16 @@ struct TabBarStore: ReducerProtocol {
                 state.isSheetPresented = false
             case .home(.settingButtonDidTap):
                 return .send(.home(.receiveProfileInfo(state.myProfile ?? FMProfile.EMPTY)))
-            case .home(.bottomSheet(.deleteButtonDidTap(let feedId))):
+            case .home(.bottomSheet(.deleteButtonDidTap(let postId))):
                 state.isShowRemovePopup = true
-                let _ = print(feedId)
+                state.postId = postId
+                state.deleteAt = .home
             case .archive(.settingButtonDidTap):
                 return .send(.archive(.receiveProfileInfo(state.myProfile ?? FMProfile.EMPTY)))
-            case .archive(.bottomSheet(.deleteButtonDidTap(let feedId))):
+            case .archive(.bottomSheet(.deleteButtonDidTap(let postId))):
                 state.isShowRemovePopup = true
-                let _ = print(feedId)
+                state.postId = postId
+                state.deleteAt = .archive
             case .acceptBackOnProfileSetting:
                 if state.tabBarItem == .home,
                    state.homeState.path.last == .modifyProfile {
@@ -128,13 +130,15 @@ struct TabBarStore: ReducerProtocol {
                 switch action {
                 case .settingButtonDidTap:
                     return .send(.home(.receiveProfileInfo(state.myProfile ?? FMProfile.EMPTY)))
-                case let .bottomSheet(.deleteButtonDidTap(feedId)):
+                case let .bottomSheet(.deleteButtonDidTap(postId)):
                     state.isShowRemovePopup = true
-                    state.feedId = feedId
+                    state.postId = postId
                     state.deleteAt = .home
-                case let .dismissBottomSheet(feed):
-                    print(feed)
+                case let .dismissBottomSheet(post):
+                    print(post)
                     state.isSheetPresented = true
+                    state.uploadState.uploadedPostItems = post.items
+                    state.uploadState.selectedPostItem = post.items.first
                 case .setting(.tappedLogoutButton):
                     state.isShowLogoutPopup = true
                 case .setting(.tappedWithdrawalButton):
@@ -161,13 +165,14 @@ struct TabBarStore: ReducerProtocol {
                 switch action {
                 case .settingButtonDidTap:
                     return .send(.archive(.receiveProfileInfo(state.myProfile ?? FMProfile.EMPTY)))
-                case let .bottomSheet(.deleteButtonDidTap(feedId)):
+                case let .bottomSheet(.deleteButtonDidTap(postId)):
                     state.isShowRemovePopup = true
-                    state.feedId = feedId
+                    state.postId = postId
                     state.deleteAt = .archive
-                case let .dismissBottomSheet(feed):
-                    print(feed)
+                case let .dismissBottomSheet(post):
                     state.isSheetPresented = true
+                    state.uploadState.uploadedPostItems = post.items
+                    state.uploadState.selectedPostItem = post.items.first
                 case .setting(.tappedLogoutButton):
                     state.isShowLogoutPopup = true
                 case .setting(.tappedWithdrawalButton):
@@ -194,31 +199,38 @@ struct TabBarStore: ReducerProtocol {
             case .acceptFriendship(let friend):
                 switch friend.friendType.friendshipInteraction {
                 case .follow:
-                    return friendsClient.followFriend(friend.id).map{
+                    return friendsClient.followFriend(friend.id).map {
                         Action.archive(.friends(.tappedRequestFriendDone(friend, $0)))
                     }
                 case .unfollow:
-                    return friendsClient.unfollowFriend(friend.id).map{
+                    return friendsClient.unfollowFriend(friend.id).map {
                         Action.archive(.friends(.tappedRequestFriendDone(friend, $0)))
                     }
                 }
-            case .deleteFeed:
-                guard let feedId = state.feedId else {
+            case .deletePost:
+                guard let postId = state.postId else {
                     return .none
                 }
                 
                 if state.deleteAt == .home {
-                    return feedClient.deleteFeed(feedId).map {
-                        Action.home(.deleteFeed($0))
+                    return feedClient.deletePost(postId).map {
+                        Action.home(.deletePost($0))
                     }
                 } else {
-                    return feedClient.deleteFeed(feedId).map {
-                        Action.archive(.deleteFeed($0))
+                    return feedClient.deletePost(postId).map {
+                        Action.archive(.deletePost($0))
                     }
                 }
             case .upload(.didTapPublishButtonDone(let result)):
                 if case .success = result {
                     state.isSheetPresented = false
+
+                    let effects: [EffectTask<TabBarStore.Action>] = [
+                        .init(value: .home(.onAppear)),
+                        .init(value: .archive(.onAppear))
+                    ]
+
+                    return .merge(effects)
                 }
                 return .none
             default:

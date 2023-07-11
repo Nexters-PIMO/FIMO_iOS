@@ -11,8 +11,8 @@ import Foundation
 import Alamofire
 
 struct FMDeletePostRequest: Requestable {
-    typealias Response = Empty
-    let postId: Int
+    typealias Response = FMServerDescriptionDTO
+    let postId: String
 
     var path: String {
         return "/post/delete/\(postId)"

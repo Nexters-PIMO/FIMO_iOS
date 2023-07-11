@@ -22,13 +22,13 @@ struct HomeView: View {
                     
                     if viewStore.isLoading {
                         LoadingView()
-                    } else if viewStore.feeds.isEmpty {
+                    } else if viewStore.posts.isEmpty {
                         homeWelcome
                             .refreshable {
                                 viewStore.send(.refresh)
                             }
                     } else {
-                        homeFeedView(viewStore: viewStore)
+                        homePostView(viewStore: viewStore)
                             .refreshable {
                                 viewStore.send(.refresh)
                             }
@@ -73,17 +73,17 @@ struct HomeView: View {
         }
     }
     
-    func homeFeedView(viewStore: ViewStore<HomeStore.State, HomeStore.Action>) -> some View {
+    func homePostView(viewStore: ViewStore<HomeStore.State, HomeStore.Action>) -> some View {
         ScrollView {
             LazyVStack(alignment: .center) {
                 LazyVStack {
                     ForEachStore(
                         self.store.scope(
-                            state: \.feeds,
-                            action: HomeStore.Action.feed(id:action:)
+                            state: \.posts,
+                            action: HomeStore.Action.post(id:action:)
                         )
                     ) {
-                        FeedView(store: $0)
+                        PostView(store: $0)
                         
                         Spacer()
                             .frame(height: 12)
