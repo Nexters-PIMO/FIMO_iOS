@@ -20,7 +20,6 @@ struct FeedActionRequest: Requestable {
     typealias Response = Bool
     let target: FeedTarget
     
-#warning("로그인 후 수정")
     var path: String {
         switch target {
         case let .postClap(feedId):
