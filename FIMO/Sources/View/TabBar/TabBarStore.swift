@@ -52,7 +52,7 @@ struct TabBarStore: ReducerProtocol {
         case acceptWithdrawal
         case acceptFriendship(FMFriend)
     }
-
+    
     struct CancelID: Hashable {
         let id = String(describing: TabBarStore.self)
     }
@@ -87,6 +87,7 @@ struct TabBarStore: ReducerProtocol {
                 switch result {
                 case .success(let myProfile):
                     state.myProfile = myProfile.toModel()
+                    state.archiveState.userId = myProfile.id
                     GoogleAnalytics.shared.setUserId(myProfile.id)
                 case .failure(let error):
                     state.toastMessage = .init(title: error.errorDescription ?? "")
@@ -121,9 +122,9 @@ struct TabBarStore: ReducerProtocol {
             case .archive(.profile(.tappedBackButton)):
                 state.isShowAcceptBackPopup = true
                 return .none
-
-                // MARK: Home
-
+                
+            // MARK: Home
+                
             case let .home(action):
                 switch action {
                 case .settingButtonDidTap:
@@ -154,9 +155,9 @@ struct TabBarStore: ReducerProtocol {
                 default:
                     break
                 }
-
-                // MARK: Archive
-
+                
+            // MARK: Archive
+                
             case let .archive(action):
                 switch action {
                 case .settingButtonDidTap:
@@ -224,7 +225,7 @@ struct TabBarStore: ReducerProtocol {
             default:
                 return .none
             }
-
+            
             return .none
         }
         
