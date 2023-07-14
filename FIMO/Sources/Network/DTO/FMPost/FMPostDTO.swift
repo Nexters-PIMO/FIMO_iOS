@@ -22,7 +22,7 @@ struct FMPostDTO: Decodable, Equatable {
             user: user.toModel(),
             clapCount: favorite,
             isClapped: isClicked,
-            uploadTime: createdAt,
+            uploadTime: createdAt.toUploadTime(),
             textImages: items.map { $0.toModel() }
         )
     }
