@@ -13,6 +13,10 @@ struct FMPostItemDTO: Decodable, Equatable {
     let content: String
 
     func toModel() -> FMPostItem {
-        return .init(imageUrl: imageUrl, content: content)
+        return .init(
+            id: "",
+            imageURL: "",
+            text: ""
+        )
     }
 }

@@ -17,7 +17,8 @@ struct FMPostUserDTO: Decodable, Equatable {
         return .init(
             id: id,
             nickname: nickname,
-            archiveName: archiveName
+            archiveName: archiveName,
+            profileImage: ""
         )
     }
 }

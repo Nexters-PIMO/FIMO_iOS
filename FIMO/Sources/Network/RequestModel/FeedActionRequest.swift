@@ -11,9 +11,9 @@ import Foundation
 import Alamofire
 
 enum FeedTarget {
-    case postClap(Int)
-    case deleteFeed(Int)
-    case postDeclaration(Int)
+    case postClap(String)
+    case deleteFeed(String)
+    case postDeclaration(String)
 }
 
 struct FeedActionRequest: Requestable {

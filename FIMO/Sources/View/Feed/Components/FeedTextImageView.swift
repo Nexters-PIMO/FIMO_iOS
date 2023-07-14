@@ -11,9 +11,9 @@ import SwiftUI
 import Kingfisher
 
 struct FeedTextImageView: View {
-    private let textImage: TextImage
+    private let textImage: FMPostItem
     
-    init(textImage: TextImage) {
+    init(textImage: FMPostItem) {
         self.textImage = textImage
     }
     
@@ -27,8 +27,8 @@ struct FeedTextImageView: View {
 
 struct FeedTextImageView_Previews: PreviewProvider {
     static var previews: some View {
-        FeedTextImageView(textImage: TextImage(
-            id: 1,
+        FeedTextImageView(textImage: FMPostItem(
+            id: "",
             imageURL: FIMOStrings.textImage,
             text: "안녕"))
     }

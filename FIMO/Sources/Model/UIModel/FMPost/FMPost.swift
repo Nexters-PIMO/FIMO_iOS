@@ -8,11 +8,20 @@
 
 import Foundation
 
-struct FMPost: Equatable {
+struct FMPost: Equatable, Hashable {
     let id: String
     let user: FMPostUser
-    let favorite: Int
-    let isClicked: Bool
-    let createdAt: String
-    let items: [FMPostItem]
+    let clapCount: Int
+    let isClapped: Bool
+    let uploadTime: String
+    let textImages: [FMPostItem]
+    
+    static var EMPTY: FMPost = .init(
+        id: "",
+        user: FMPostUser.EMPTY,
+        clapCount: 0,
+        isClapped: false,
+        uploadTime: "",
+        textImages: []
+    )
 }

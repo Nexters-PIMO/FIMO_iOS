@@ -8,8 +8,16 @@
 
 import Foundation
 
-struct FMPostUser: Equatable {
+struct FMPostUser: Equatable, Hashable {
     let id: String
     let nickname: String
     let archiveName: String
+    let profileImage: String
+    
+    static var EMPTY: FMPostUser = .init(
+        id: "",
+        nickname: "",
+        archiveName: "",
+        profileImage: ""
+    )
 }

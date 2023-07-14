@@ -13,8 +13,8 @@ import ComposableArchitecture
 
 struct ArchiveClient {
     let fetchProfile: () -> EffectPublisher<Result<Profile, NetworkError>, Never>
-    let fetchArchiveFeeds: () -> EffectPublisher<Result<[FeedDTO], NetworkError>, Never>
-    let fetchFeed: (Int) -> EffectPublisher<Result<FeedDTO, NetworkError>, Never>
+    let fetchArchiveFeeds: (String) -> EffectPublisher<Result<[FMPostDTO], NetworkError>, Never>
+    let fetchFeed: (String) -> EffectPublisher<Result<FMPostDTO, NetworkError>, Never>
 }
 
 extension DependencyValues {
@@ -31,13 +31,13 @@ extension ArchiveClient: DependencyKey {
             
             return BaseNetwork.shared.request(api: request, isInterceptive: false)
                 .catchToEffect()
-        }, fetchArchiveFeeds: {
-            let request = FeedsRequest(target: .fetchArchiveFeeds)
+        }, fetchArchiveFeeds: { userId in
+            let request = FMAllPostRequest(target: .archive(userId))
             
             return BaseNetwork.shared.request(api: request, isInterceptive: false)
                 .catchToEffect()
         }, fetchFeed: { feedId in
-            let request = FeedRequest(feedId: feedId)
+            let request = FMPostDetailRequest(postId: feedId)
             
             return BaseNetwork.shared.request(api: request, isInterceptive: false)
                 .catchToEffect()

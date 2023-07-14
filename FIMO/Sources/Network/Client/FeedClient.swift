@@ -14,8 +14,8 @@ import ComposableArchitecture
 struct FeedClient {
     let play: (String) -> EffectPublisher<Void, Never>
     let stop: () -> EffectPublisher<Void, Never>
-    let postClap: (Int) -> EffectPublisher<Result<Bool, NetworkError>, Never>
-    let deleteFeed: (Int) -> EffectPublisher<Result<Bool, NetworkError>, Never>
+    let postClap: (String) -> EffectPublisher<Result<Bool, NetworkError>, Never>
+    let deleteFeed: (String) -> EffectPublisher<Result<Bool, NetworkError>, Never>
 }
 
 extension DependencyValues {

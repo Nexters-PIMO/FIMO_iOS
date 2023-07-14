@@ -20,10 +20,10 @@ struct FMPostDTO: Decodable, Equatable {
         return .init(
             id: id,
             user: user.toModel(),
-            favorite: favorite,
-            isClicked: isClicked,
-            createdAt: createdAt,
-            items: items.map({ $0.toModel() })
+            clapCount: favorite,
+            isClapped: isClicked,
+            uploadTime: createdAt,
+            textImages: items.map { $0.toModel() }
         )
     }
 }

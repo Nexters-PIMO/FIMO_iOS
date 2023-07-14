@@ -12,9 +12,9 @@ import ComposableArchitecture
 
 struct FeedStore: ReducerProtocol {
     struct State: Equatable, Identifiable {
-        @BindingState var textImage: TextImage = TextImage.EMPTY
-        var id: Int = 0
-        var feed: Feed = Feed.EMPTY
+        @BindingState var textImage: FMPostItem = FMPostItem.EMPTY
+        var id: String = ""
+        var feed: FMPost = FMPost.EMPTY
         var isFirstFeed: Bool = false
         var clapCount: Int = 0
         var plusClapCount: Int = 0
@@ -28,7 +28,7 @@ struct FeedStore: ReducerProtocol {
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
         case checkTextGuideClosed
-        case moreButtonDidTap(Int)
+        case moreButtonDidTap(String)
         case copyButtonDidTap(String)
         case closeButtonDidTap
         case clapButtonDidTap

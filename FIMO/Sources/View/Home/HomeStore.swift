@@ -29,7 +29,7 @@ struct HomeStore: ReducerProtocol {
         var setting: SettingStore.State?
         var bottomSheet: BottomSheetStore.State?
         var profile: ProfileSettingStore.State?
-        var audioPlayingFeedId: Int?
+        var audioPlayingFeedId: String?
     }
     
     enum Action: BindableAction, Equatable {
@@ -38,7 +38,7 @@ struct HomeStore: ReducerProtocol {
         case refresh
         case sendToast(ToastModel)
         case sendToastDone
-        case fetchFeeds(Result<[FeedDTO], NetworkError>)
+        case fetchFeeds(Result<[FMPostDTO], NetworkError>)
         case fetchFeedProfile(Result<Profile, NetworkError>)
         case feed(id: FeedStore.State.ID, action: FeedStore.Action)
         case settingButtonDidTap
@@ -47,7 +47,7 @@ struct HomeStore: ReducerProtocol {
         case onboarding(OnboardingStore.Action)
         case bottomSheet(BottomSheetStore.Action)
         case profile(ProfileSettingStore.Action)
-        case dismissBottomSheet(Feed)
+        case dismissBottomSheet(FMPost)
         case deleteFeed(Result<Bool, NetworkError>)
     }
     
@@ -85,7 +85,7 @@ struct HomeStore: ReducerProtocol {
             case let .fetchFeeds(result):
                 switch result {
                 case let .success(feeds):
-                    var firstFeed = 0
+                    var firstFeed = ""
                     if !feeds.isEmpty { firstFeed = feeds[0].id }
                     state.feeds = IdentifiedArrayOf(
                         uniqueElements: feeds.map { $0.toModel() }.map { feed in
@@ -111,7 +111,7 @@ struct HomeStore: ReducerProtocol {
                 case let .moreButtonDidTap(id):
                     state.isBottomSheetPresented = true
                     state.bottomSheet = BottomSheetStore.State(feedId: id,
-                                                               feed: state.feeds[id: id]?.feed ?? Feed.EMPTY,
+                                                               feed: state.feeds[id: id]?.feed ?? FMPost.EMPTY,
                                                                bottomSheetType: .me)
                 case .audioButtonDidTap:
                     guard let feedId = state.audioPlayingFeedId else {

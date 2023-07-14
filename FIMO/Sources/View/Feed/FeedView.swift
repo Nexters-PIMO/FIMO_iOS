@@ -36,7 +36,7 @@ struct FeedView: View {
                         Spacer()
                             .frame(width: 12)
                         
-                        Text(viewStore.feed.user.nickName)
+                        Text(viewStore.feed.user.nickname)
                             .font(.system(size: 14, weight: .medium))
                         
                         Spacer()

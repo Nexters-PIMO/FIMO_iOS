@@ -31,7 +31,7 @@ struct TabBarStore: ReducerProtocol {
         var homeState = HomeStore.State()
         var uploadState = UploadStore.State()
         var archiveState = ArchiveStore.State()
-        var feedId: Int?
+        var feedId: String?
         var deleteAt: DeleteAt?
         var selectedFriend: FMFriend?
     }

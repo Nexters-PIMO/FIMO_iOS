@@ -11,8 +11,8 @@ import Foundation
 import Alamofire
 
 enum FMAllPostTarget {
-    case me
-    case another(String)
+    case all
+    case archive(String)
 }
 
 struct FMAllPostRequest: Requestable {
@@ -21,9 +21,9 @@ struct FMAllPostRequest: Requestable {
 
     var path: String {
         switch target {
-        case .me:
+        case .all:
             return "/post/"
-        case .another(let userId):
+        case .archive(let userId):
             return "/post/user/\(userId)"
         }
     }

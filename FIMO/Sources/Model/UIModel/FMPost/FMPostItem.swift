@@ -8,7 +8,14 @@
 
 import Foundation
 
-struct FMPostItem: Equatable {
-    let imageUrl: String
-    let content: String
+struct FMPostItem: Equatable, Hashable {
+    let id: String
+    let imageURL: String
+    let text: String
+    
+    static var EMPTY: FMPostItem = .init(
+        id: "",
+        imageURL: "",
+        text: ""
+    )
 }

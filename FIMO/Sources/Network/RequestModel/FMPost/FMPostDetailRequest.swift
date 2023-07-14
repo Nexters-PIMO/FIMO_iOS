@@ -12,7 +12,7 @@ import Alamofire
 
 struct FMPostDetailRequest: Requestable {
     typealias Response = FMPostDTO
-    let postId: Int
+    let postId: String
 
     var path: String {
         return "/post/detail/\(postId)"
