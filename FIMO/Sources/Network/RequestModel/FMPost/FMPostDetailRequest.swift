@@ -15,7 +15,7 @@ struct FMPostDetailRequest: Requestable {
     let postId: String
 
     var path: String {
-        return "/post/detail/\(postId)"
+        return "/post/details/\(postId)"
     }
 
     var method: HTTPMethod {
