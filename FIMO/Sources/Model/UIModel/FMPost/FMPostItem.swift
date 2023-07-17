@@ -9,12 +9,10 @@
 import Foundation
 
 struct FMPostItem: Equatable, Hashable {
-    let id: String
     let imageURL: String
     let text: String
     
     static var EMPTY: FMPostItem = .init(
-        id: "",
         imageURL: "",
         text: ""
     )

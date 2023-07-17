@@ -19,7 +19,7 @@ struct FeedTextImageView: View {
     
     var body: some View {
         KFImage(URL(string: textImage.imageURL))
-            .placeholder { Image(systemName: "person.fill") }
+            .placeholder { FIMOAsset.Assets.emptyView.swiftUIImage }
             .resizable()
             .aspectRatio(contentMode: .fill)
     }
@@ -28,7 +28,6 @@ struct FeedTextImageView: View {
 struct FeedTextImageView_Previews: PreviewProvider {
     static var previews: some View {
         FeedTextImageView(textImage: FMPostItem(
-            id: "",
             imageURL: FIMOStrings.textImage,
             text: "안녕"))
     }

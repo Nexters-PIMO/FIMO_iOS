@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct FMPost: Equatable, Hashable {
+struct FMPost: Equatable, Hashable, Identifiable {
     let id: String
     let user: FMPostUser
     let clapCount: Int

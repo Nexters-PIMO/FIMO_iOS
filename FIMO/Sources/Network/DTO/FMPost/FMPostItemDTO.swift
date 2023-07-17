@@ -14,9 +14,8 @@ struct FMPostItemDTO: Decodable, Equatable {
 
     func toModel() -> FMPostItem {
         return .init(
-            id: "",
-            imageURL: "",
-            text: ""
+            imageURL: imageUrl,
+            text: content
         )
     }
 }
