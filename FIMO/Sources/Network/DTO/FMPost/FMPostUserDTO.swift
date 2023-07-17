@@ -12,13 +12,14 @@ struct FMPostUserDTO: Decodable, Equatable {
     let id: String
     let nickname: String
     let archiveName: String
+    let profileImageUrl: String
 
     func toModel() -> FMPostUser {
         return .init(
             id: id,
             nickname: nickname,
             archiveName: archiveName,
-            profileImage: ""
+            profileImage: profileImageUrl
         )
     }
 }
