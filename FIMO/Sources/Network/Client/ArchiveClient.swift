@@ -17,7 +17,7 @@ struct ArchiveClient {
     let fetchArchiveFeeds: () -> EffectPublisher<Result<[FeedDTO], NetworkError>, Never>
     let fetchFeed: (Int) -> EffectPublisher<Result<FeedDTO, NetworkError>, Never>
 
-    let archivePosts: () -> EffectPublisher<Result<[FMPostDTO], NetworkError>, Never>
+    let archivePosts: (String) -> EffectPublisher<Result<[FMPostDTO], NetworkError>, Never>
     let post: (String) -> EffectPublisher<Result<FMPostDTO, NetworkError>, Never>
 }
 
@@ -45,8 +45,8 @@ extension ArchiveClient: DependencyKey {
             
             return BaseNetwork.shared.request(api: request, isInterceptive: false)
                 .catchToEffect()
-        }, archivePosts: {
-            let request = FMAllPostRequest(target: .me)
+        }, archivePosts: { userId in
+            let request = FMAllPostRequest(target: .another(userId))
 
             return BaseNetwork.shared.request(api: request, isInterceptive: true)
                 .catchToEffect()

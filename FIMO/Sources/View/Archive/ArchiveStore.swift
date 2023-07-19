@@ -57,6 +57,7 @@ struct ArchiveStore: ReducerProtocol {
         var bottomSheet: BottomSheetStore.State?
         var profile: ProfileSettingStore.State?
         var audioPlayingPostId: String?
+        var userId: String = ""
     }
     
     enum Action: BindableAction, Equatable {
@@ -113,13 +114,13 @@ struct ArchiveStore: ReducerProtocol {
                     profileClient.myProfile().map {
                         Action.fetchArchiveProfile($0)
                     },
-                    archiveClient.archivePosts().map {
+                    archiveClient.archivePosts(state.userId).map {
                         Action.fetchArchivePosts($0)
                     }
                 )
             case .refresh:
                 guard let postId = state.postId else {
-                    return archiveClient.archivePosts().map {
+                    return archiveClient.archivePosts(state.userId).map {
                         Action.fetchArchivePosts($0)
                     }
                 }
@@ -215,7 +216,7 @@ struct ArchiveStore: ReducerProtocol {
                 state.postId = nil
                 TTSManager.shared.stopPlaying()
                 if type == .basic {
-                    return archiveClient.archivePosts().map {
+                    return archiveClient.archivePosts(state.userId).map {
                         Action.fetchArchivePosts($0)
                     }
                 }
