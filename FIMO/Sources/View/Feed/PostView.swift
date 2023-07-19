@@ -24,8 +24,7 @@ struct PostView: View {
                 VStack {
                     // 피드 상단
                     HStack {
-                        #warning("프로필 이미지 추가 필요")
-                        KFImage(URL(string: viewStore.post.user.archiveName))
+                        KFImage(URL(string: viewStore.post.user.profileImage))
                             .placeholder { Image(systemName: "person") }
                             .resizable()
                             .aspectRatio(contentMode: .fill)
