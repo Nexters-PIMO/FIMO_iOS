@@ -87,6 +87,7 @@ struct TabBarStore: ReducerProtocol {
                 switch result {
                 case .success(let myProfile):
                     state.myProfile = myProfile.toModel()
+                    state.archiveState.userId = myProfile.id
                     GoogleAnalytics.shared.setUserId(myProfile.id)
                 case .failure(let error):
                     state.toastMessage = .init(title: error.errorDescription ?? "")

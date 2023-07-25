@@ -12,6 +12,7 @@ struct FMPostUser {
     let id: String
     let nickname: String
     let archiveName: String
+    let profileImage: String
 }
 
 extension FMPostUser: Equatable, Hashable { }
