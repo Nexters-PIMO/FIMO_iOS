@@ -9,6 +9,7 @@
 import SwiftUI
 
 import ComposableArchitecture
+import FirebaseDynamicLinks
 
 enum ArchiveType {
     case myArchive
@@ -40,6 +41,7 @@ struct ArchiveStore: ReducerProtocol {
         @BindingState var path: [ArchiveScene] = []
         @BindingState var isShowToast: Bool = false
         @BindingState var isBottomSheetPresented = false
+        @BindingState var isShareSheetPresented = false
         var isLoading: Bool = false
         var toastMessage: ToastModel = ToastModel(title: FIMOStrings.textCopyToastTitle,
                                                   message: FIMOStrings.textCopyToastMessage)
@@ -57,6 +59,7 @@ struct ArchiveStore: ReducerProtocol {
         var bottomSheet: BottomSheetStore.State?
         var profile: ProfileSettingStore.State?
         var audioPlayingPostId: String?
+        var link: String = ""
     }
     
     enum Action: BindableAction, Equatable {
@@ -153,6 +156,14 @@ struct ArchiveStore: ReducerProtocol {
                             )
                         }
                     )
+                    if let content = posts.first?.items.first?.content {
+                        state.link = """
+                                [fimo]
+                                \(content)
+                                \n\(state.archiveProfile.nickname)님의 [\(state.archiveProfile.archiveName)] 아카이브를 구경해보세요.
+                                https://fimo.page.link/fimo
+                                """
+                    }
                 default:
                     print("error")
                 }
@@ -194,7 +205,7 @@ struct ArchiveStore: ReducerProtocol {
                 }
             case .topBarButtonDidTap:
                 if state.archiveType == .myArchive {
-                    #warning("내 피드 공유 (딥링크)")
+                    state.isShareSheetPresented = true
                 } else {
                     #warning("친구 서버 (POST)")
                 }
