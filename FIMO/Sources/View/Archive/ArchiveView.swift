@@ -82,7 +82,6 @@ struct ArchiveView: View {
                 }
                 .sheet(
                     isPresented: viewStore.binding(\.$isShareSheetPresented),
-                    onDismiss: { print("Dismiss") },
                     content: { ActivityView(activityItems: [viewStore.link]) }
                 )
             }
