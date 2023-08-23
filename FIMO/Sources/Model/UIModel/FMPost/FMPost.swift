@@ -24,7 +24,8 @@ extension FMPost: Hashable, Equatable {
             user: .init(
                 id: "",
                 nickname: "",
-                archiveName: ""
+                archiveName: "",
+                profileImage: ""
             ),
             favorite: 0,
             isClicked: false,

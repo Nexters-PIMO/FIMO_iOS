@@ -19,7 +19,7 @@ struct PostTextImageView: View {
     
     var body: some View {
         KFImage(URL(string: postItem.imageUrl))
-            .placeholder { Image(systemName: "person.fill") }
+            .placeholder { FIMOAsset.Assets.emptyView.swiftUIImage }
             .resizable()
             .aspectRatio(contentMode: .fill)
     }

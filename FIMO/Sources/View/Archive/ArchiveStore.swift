@@ -59,6 +59,7 @@ struct ArchiveStore: ReducerProtocol {
         var bottomSheet: BottomSheetStore.State?
         var profile: ProfileSettingStore.State?
         var audioPlayingPostId: String?
+        var userId: String = ""
         var link: String = ""
     }
     
@@ -116,13 +117,13 @@ struct ArchiveStore: ReducerProtocol {
                     profileClient.myProfile().map {
                         Action.fetchArchiveProfile($0)
                     },
-                    archiveClient.archivePosts().map {
+                    archiveClient.archivePosts(state.userId).map {
                         Action.fetchArchivePosts($0)
                     }
                 )
             case .refresh:
                 guard let postId = state.postId else {
-                    return archiveClient.archivePosts().map {
+                    return archiveClient.archivePosts(state.userId).map {
                         Action.fetchArchivePosts($0)
                     }
                 }
@@ -158,7 +159,6 @@ struct ArchiveStore: ReducerProtocol {
                     )
                     if let content = posts.first?.items.first?.content {
                         state.link = """
-                                [fimo]
                                 \(content)
                                 \n\(state.archiveProfile.nickname)님의 [\(state.archiveProfile.archiveName)] 아카이브를 구경해보세요.
                                 https://fimo.page.link/fimo
@@ -226,7 +226,7 @@ struct ArchiveStore: ReducerProtocol {
                 state.postId = nil
                 TTSManager.shared.stopPlaying()
                 if type == .basic {
-                    return archiveClient.archivePosts().map {
+                    return archiveClient.archivePosts(state.userId).map {
                         Action.fetchArchivePosts($0)
                     }
                 }
