@@ -47,7 +47,7 @@ extension Project {
             name: name,
             organizationName: Environment.organizationName,
             packages: [
-                .remote(url: "https://github.com/firebase/firebase-ios-sdk", requirement: .upToNextMajor(from:"10.7.0"))
+                .remote(url: "https://github.com/firebase/firebase-ios-sdk", requirement: .upToNextMajor(from:"10.14.0"))
             ],
             settings: .settings(base: baseSettings, configurations: configSettings),
             targets: targets
