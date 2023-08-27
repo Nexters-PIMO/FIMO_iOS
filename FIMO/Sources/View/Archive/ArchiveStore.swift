@@ -60,7 +60,7 @@ struct ArchiveStore: ReducerProtocol {
         var profile: ProfileSettingStore.State?
         var audioPlayingPostId: String?
         var userId: String = ""
-        var link: String = ""
+        var link: String?
     }
     
     enum Action: BindableAction, Equatable {

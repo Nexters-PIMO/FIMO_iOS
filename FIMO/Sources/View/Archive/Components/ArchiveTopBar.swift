@@ -24,28 +24,30 @@ extension ArchiveView {
     @ViewBuilder
     var archiveTopBar: some View {
         WithViewStore(self.store, observe: ArchiveViewState.init) { viewStore in
-            HStack {
-                Text(viewStore.archiveProfile.nickname)
-                    .font(Font(FIMOFontFamily.Pretendard.semiBold.font(size: 24)))
-                    .foregroundColor(.black)
-                
-                Spacer()
-                    .frame(width: 12)
-                
-                archiveTopBarButton(viewStore)
-                    .onTapGesture {
-                        viewStore.send(.topBarButtonDidTap)
-                    }
-                
-                Spacer()
-                
-                Image(uiImage: FIMOAsset.Assets.setting.image)
-                    .onTapGesture {
-                        viewStore.send(.settingButtonDidTap)
-                    }
+            if viewStore.archiveProfile != .EMPTY {
+                HStack {
+                    Text(viewStore.archiveProfile.nickname)
+                        .font(Font(FIMOFontFamily.Pretendard.semiBold.font(size: 24)))
+                        .foregroundColor(.black)
+                    
+                    Spacer()
+                        .frame(width: 12)
+                    
+                    archiveTopBarButton(viewStore)
+                        .onTapGesture {
+                            viewStore.send(.topBarButtonDidTap)
+                        }
+                    
+                    Spacer()
+                    
+                    Image(uiImage: FIMOAsset.Assets.setting.image)
+                        .onTapGesture {
+                            viewStore.send(.settingButtonDidTap)
+                        }
+                }
+                .frame(maxHeight: .infinity, alignment: .top)
+                .padding([.top, .leading, .trailing], 20)
             }
-            .frame(maxHeight: .infinity, alignment: .top)
-            .padding([.top, .leading, .trailing], 20)
         }
     }
 }
