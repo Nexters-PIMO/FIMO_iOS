@@ -16,7 +16,7 @@ enum DynamicLinkUtil {
         userId: String="",
         postId: String=""
     ) async throws -> String {
-        guard let link = URL(string: "https://www.fimo.com/?userId=\(userId))&postId=\(postId))") else { return "" }
+        guard let link = DynamicLink.archive(userId).url else { return "" }
         
         let linkBuilder = DynamicLinkComponents(
             link: link,
