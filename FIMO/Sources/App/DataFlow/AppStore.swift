@@ -37,13 +37,16 @@ struct AppStore: ReducerProtocol {
             switch action {
             case .appDelegate(.onLaunchFinish):
                 return .init(value: .user(.checkAccessToken))
+                
             case .onAppear:
                 return .init(value: .hiddenLaunchScreen)
                     .delay(for: .milliseconds(2000), scheduler: DispatchQueue.main)
                     .eraseToEffect()
+                
             case .hiddenLaunchScreen:
                 state.isLoading = false
                 return .none
+                
             case .user(let action):
                 switch action {
                 case .changeUnAuthenticated:
@@ -55,6 +58,7 @@ struct AppStore: ReducerProtocol {
                 default:
                     break
                 }
+                
             case .unAuthenticated(let action):
                 switch action {
                 case .profileSetting(.tappedCompleteButton):
@@ -80,18 +84,21 @@ struct AppStore: ReducerProtocol {
                 default:
                     return .none
                 }
+                
             case .tabBar(.acceptLogout):
                 let effects: [EffectTask<AppStore.Action>] = [
                     .init(value: .user(.expiredToken)),
                     .init(value: .user(.changeUnAuthenticated))
                 ]
                 return .merge(effects)
+                
             case .tabBar(.acceptWithdrawal):
                 let withdrawalResult = loginClient.withdrawal()
 
                 return withdrawalResult.map({
                     Action.withdrawalDone($0)
                 })
+                
             case .withdrawalDone(let result):
                 switch result {
                 case .success:
@@ -99,12 +106,14 @@ struct AppStore: ReducerProtocol {
                 case .failure:
                     return .none
                 }
+                
             case .withdrawal:
                 let effects: [EffectTask<AppStore.Action>] = [
                     .init(value: .user(.expiredToken)),
                     .init(value: .user(.changeUnAuthenticated))
                 ]
                 return .merge(effects)
+                
             default:
                 break
             }

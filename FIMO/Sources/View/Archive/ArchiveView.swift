@@ -9,6 +9,7 @@
 import SwiftUI
 
 import ComposableArchitecture
+import FirebaseDynamicLinks
 import Kingfisher
 
 struct ArchiveView: View {
@@ -79,10 +80,15 @@ struct ArchiveView: View {
                             .presentationDetents([.height((viewStore.bottomSheet?.bottomSheetType == .me) ? 110 : 60)])
                     }
                 }
+                .sheet(
+                    isPresented: viewStore.binding(\.$isShareSheetPresented),
+                    content: { ActivityView(activityItems: [viewStore.link]) }
+                )
             }
         }
     }
     
+    // 아카이브 전체 피드 뷰
     func archiveFeedView(_ viewStore: ViewStore<ArchiveStore.State, ArchiveStore.Action>) -> some View {
         ScrollView {
             ZStack {

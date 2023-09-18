@@ -7,7 +7,7 @@ import KakaoSDKCommon
 @main
 struct PIMOApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-
+    
     var body: some Scene {
         WindowGroup {
             WithViewStore(
@@ -35,17 +35,20 @@ struct PIMOApp: App {
                             )
                         )
                     }
-
+                    
                     if viewStore.isLoading {
                         LaunchScreen()
                     }
+                }
+                .onOpenURL { url in
+                    handleDynamicLink(url)
                 }
                 .onAppear {
                     viewStore.send(.onAppear)
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: .tokenExpired)) { _ in
-                #warning("TCA 맞춰 재로그인 구현 필요")
+#warning("TCA 맞춰 재로그인 구현 필요")
             }
         }
     }
@@ -54,5 +57,20 @@ struct PIMOApp: App {
         let kakaoAppKey = Bundle.main.infoDictionary?["KAKAO_NATIVE_APP_KEY"] as? String
         
         KakaoSDK.initSDK(appKey: kakaoAppKey ?? "")
+    }
+    
+    private func handleDynamicLink(_ url: URL) -> (String?, String?) {
+        guard let link = url.params()?["link"],
+              let dynamicLink = URL(string: link as! String),
+              let params = dynamicLink.params() else {
+            return (nil, nil)
+        }
+        
+        let userId = params["userId"] as? String
+        let postId = params["postId"] as? String
+        
+        print("🙂 userId: \(userId)")
+        
+        return (userId, postId)
     }
 }

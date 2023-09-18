@@ -9,6 +9,7 @@
 import SwiftUI
 
 import ComposableArchitecture
+import FirebaseDynamicLinks
 
 enum ArchiveType {
     case myArchive
@@ -40,6 +41,7 @@ struct ArchiveStore: ReducerProtocol {
         @BindingState var path: [ArchiveScene] = []
         @BindingState var isShowToast: Bool = false
         @BindingState var isBottomSheetPresented = false
+        @BindingState var isShareSheetPresented = false
         var isLoading: Bool = false
         var toastMessage: ToastModel = ToastModel(title: FIMOStrings.textCopyToastTitle,
                                                   message: FIMOStrings.textCopyToastMessage)
@@ -58,6 +60,7 @@ struct ArchiveStore: ReducerProtocol {
         var profile: ProfileSettingStore.State?
         var audioPlayingPostId: String?
         var userId: String = ""
+        var link: String?
     }
     
     enum Action: BindableAction, Equatable {
@@ -83,6 +86,8 @@ struct ArchiveStore: ReducerProtocol {
         case profile(ProfileSettingStore.Action)
         case dismissBottomSheet(FMPost)
         case deletePost(Result<FMServerDescriptionDTO, NetworkError>)
+        case createLink
+        case fetchLink(TaskResult<String>)
     }
     
     @Dependency(\.archiveClient) var archiveClient
@@ -92,6 +97,7 @@ struct ArchiveStore: ReducerProtocol {
     
     var body: some ReducerProtocol<State, Action> {
         BindingReducer()
+        
         Reduce { state, action in
             switch action {
             case let .sendToast(toastModel):
@@ -106,8 +112,10 @@ struct ArchiveStore: ReducerProtocol {
                         .delay(for: .milliseconds(2000), scheduler: DispatchQueue.main)
                         .eraseToEffect()
                 }
+                
             case .sendToastDone:
                 state.isShowToast = false
+                
             case .onAppear:
                 state.isLoading = true
                 return .merge(
@@ -118,6 +126,7 @@ struct ArchiveStore: ReducerProtocol {
                         Action.fetchArchivePosts($0)
                     }
                 )
+                
             case .refresh:
                 guard let postId = state.postId else {
                     return archiveClient.archivePosts(state.userId).map {
@@ -127,6 +136,7 @@ struct ArchiveStore: ReducerProtocol {
                 return archiveClient.post(postId).map {
                     Action.fetchPost($0)
                 }
+                
             case let .fetchArchiveProfile(result):
                 switch result {
                 case let .success(profile):
@@ -135,6 +145,7 @@ struct ArchiveStore: ReducerProtocol {
                     print("error")
                 }
                 state.isLoading = false
+                
             case let .fetchArchivePosts(result):
                 switch result {
                 case let .success(posts):
@@ -154,10 +165,13 @@ struct ArchiveStore: ReducerProtocol {
                             )
                         }
                     )
+                    return .send(.createLink)
+                    
                 default:
                     print("error")
                 }
                 state.isLoading = false
+                
             case let .post(id: id, action: action):
                 switch action {
                 case let .copyButtonDidTap(text):
@@ -180,6 +194,7 @@ struct ArchiveStore: ReducerProtocol {
                 default:
                     break
                 }
+                
             case let .postDetail(action):
                 switch action {
                 case let .copyButtonDidTap(text):
@@ -195,9 +210,9 @@ struct ArchiveStore: ReducerProtocol {
                 }
             case .topBarButtonDidTap:
                 if state.archiveType == .myArchive {
-                    #warning("내 피드 공유 (딥링크)")
+                    state.isShareSheetPresented = true
                 } else {
-                    #warning("친구 서버 (POST)")
+#warning("친구 서버 (POST)")
                 }
                 break
             case .receiveProfileInfo(let profile):
@@ -207,7 +222,7 @@ struct ArchiveStore: ReducerProtocol {
                 state.path.append(.openSourceLicence)
             case .friendListButtonDidTap:
                 state.pushToFriendView = true
-                #warning("Friend List 받아오는 매개변수 주입 필요")
+#warning("Friend List 받아오는 매개변수 주입 필요")
                 state.friends = FriendsListStore.State(id: 0, userName: state.archiveProfile.nickname)
                 state.path.append(.friends)
             case let .feedsTypeButtonDidTap(type):
@@ -220,6 +235,7 @@ struct ArchiveStore: ReducerProtocol {
                         Action.fetchArchivePosts($0)
                     }
                 }
+                
             case let .bottomSheet(action):
                 switch action {
                 case let .editButtonDidTap(post):
@@ -232,6 +248,7 @@ struct ArchiveStore: ReducerProtocol {
                 case .declationButtonDidTap:
                     state.isBottomSheetPresented = false
                 }
+                
             case .setting(.tappedProfileManagementButton):
                 state.profile = ProfileSettingStore.State(
                     nickname: state.setting?.profile.nickname ?? "",
@@ -242,6 +259,7 @@ struct ArchiveStore: ReducerProtocol {
                     previousSelectedImageURL: state.setting?.profile.profileImageUrl ?? ""
                 )
                 state.path.append(.modifyProfile)
+                
             case let .deletePost(result):
                 switch result {
                 case .success:
@@ -249,12 +267,14 @@ struct ArchiveStore: ReducerProtocol {
                 default:
                     print("error")
                 }
+                
             case let .postDidTap(postId):
                 state.isLoading = true
                 state.postId = postId
                 return archiveClient.post(postId).map {
                     Action.fetchPost($0)
                 }
+                
             case let .fetchPost(result):
                 switch result {
                 case let .success(post):
@@ -271,6 +291,24 @@ struct ArchiveStore: ReducerProtocol {
                     print("error")
                 }
                 state.isLoading = false
+                
+            case .createLink:
+                return .run { [userId = state.userId] send in
+                    await send(.fetchLink(
+                        TaskResult { try await DynamicLinkUtil.createDynamicLink(userId: userId) }
+                        )
+                    )
+                }
+                
+            case let .fetchLink(.success(linkURL)):
+                let content = state.posts.first?.textImage.content ?? ""
+                let link = """
+                              \(content)
+                              \n\(state.archiveProfile.nickname)님의 [\(state.archiveProfile.archiveName)] 아카이브를 구경해보세요.
+                              \(linkURL)
+                              """
+                state.link = link
+                
             default:
                 break
             }
